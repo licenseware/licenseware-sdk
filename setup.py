@@ -23,5 +23,5 @@ setup (
 	packages=find_packages(exclude=("tests",)),
 	long_description=long_description,
     long_description_content_type="text/markdown",
-	package_dir={"":"src"}
+	package_dir={"":"src.lware"}
 )
