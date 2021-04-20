@@ -34,8 +34,8 @@ def validate_text_contains_any(text, text_contains_any):
     for txt_to_find in text_contains_any:
         match = re.search(re.escape(txt_to_find), text, re.IGNORECASE)
         if match:
-            if match[0] not in matches:
-                matches.append(match[0])
+            if match.group(0) not in matches:
+                matches.append(match.group(0))
 
     if not matches:
         raise Exception(f'File must contain at least one of the following keywords: {", ".join(text_contains_any)}')
@@ -178,38 +178,33 @@ class GeneralValidator:
             Raise error if file/obj type is not as expected (excel/txt file, or string/stream) 
         """
 
-        altered_csv = False
-        if (
-                self.required_columns == []
-                and
-                self.text_contains_any or self.text_contains_all
-        ):
-            self.required_input_type = 'txt'
-            altered_csv = True
-
         if "stream" in str(dir(self.input_object)):
-
             if self.required_input_type == 'excel':
                 self.required_input_type = 'excel-stream'
             else:
                 self.required_input_type = 'stream'
 
-        elif os.path.exists(self.input_object):
+        if (
+            self.required_columns == []
+            and
+            self.text_contains_any or self.text_contains_all
+        ):
+            self.required_input_type = 'txt'
+            return 
+            
+        if os.path.exists(self.input_object):
 
             if self.input_object.endswith('.xlsx') or self.input_object.endswith('.xls'):
                 self.required_input_type = "excel"
 
-            if self.input_object.endswith('.csv') and altered_csv == False:
+            if self.input_object.endswith('.csv'):
                 self.required_input_type = "csv"
-
+            
             if self.input_object.endswith('.txt'):
                 self.required_input_type = "txt"
-
-        elif isinstance(self.input_object, str):
+        else:
             self.required_input_type = "string"
 
-        else:
-            raise Exception("File extension doesn't match it's contents!")
 
     def check_required_input_type(self):
         allowed_input_types = ['excel', 'csv', 'txt', 'string', 'stream', 'excel-stream']
@@ -218,59 +213,64 @@ class GeneralValidator:
             raise Exception('Only ".xlsx", ".xls", ".csv", ".txt" files types are accepted!')
 
 
-    def parse_data(self):
 
-        if self.required_input_type == "excel-stream":
+    def parse_excel_stream(self):
 
-            xlobj = pd.ExcelFile(BytesIO(self.input_object.stream.read()))
-            sheets = xlobj.sheet_names
+        xlobj = pd.ExcelFile(BytesIO(self.input_object.stream.read()))
+        sheets = xlobj.sheet_names
 
-            if len(sheets) == 1:
-                return pd.read_excel(
-                            xlobj, 
-                            nrows=self.min_rows_number, 
-                            skiprows=self.header_starts_at
-                        )
-            else:
-                dfs = {}
-                for sheet in sheets:
-                    if sheet not in self.required_sheets: continue
-                    dfs[sheet] = pd.read_excel(
-                                        xlobj, 
-                                        sheet_name=sheet, 
-                                        nrows=self.min_rows_number,
-                                        skiprows=self.header_starts_at
-                                    )
-                return dfs
-
-        if self.required_input_type == "excel":
-
-            sheets = pd.ExcelFile(self.input_object).sheet_names
-
-            if len(sheets) == 1:
-                return pd.read_excel(
-                            self.input_object, 
-                            nrows=self.min_rows_number, 
-                            skiprows=self.header_starts_at
-                        )
-            else:
-                dfs = {}
-                for sheet in sheets:
-                    if sheet not in self.required_sheets: continue
-                    dfs[sheet] = pd.read_excel(
-                                    self.input_object, 
-                                    sheet_name=sheet, 
-                                    nrows=self.min_rows_number,
-                                    skiprows=self.header_starts_at
-                                )
-                return dfs
-
-        elif self.required_input_type == "csv":
-            return pd.read_csv(
-                        self.input_object, 
+        if len(sheets) == 1:
+            return pd.read_excel(
+                        xlobj, 
                         nrows=self.min_rows_number, 
                         skiprows=self.header_starts_at
                     )
+
+        dfs = {}
+        for sheet in sheets:
+            if sheet not in self.required_sheets: continue
+            dfs[sheet] = pd.read_excel(
+                                xlobj, 
+                                sheet_name=sheet, 
+                                nrows=self.min_rows_number,
+                                skiprows=self.header_starts_at
+                            )
+        return dfs
+
+
+    def parse_excel(self):
+
+        sheets = pd.ExcelFile(self.input_object).sheet_names
+
+        if len(sheets) == 1:
+            return pd.read_excel(
+                self.input_object, nrows=self.min_rows_number, skiprows=self.header_starts_at
+            )
+
+
+        dfs = {}
+        for sheet in sheets:
+            if sheet not in self.required_sheets: continue
+            dfs[sheet] = pd.read_excel(
+                self.input_object, sheet_name=sheet, nrows=self.min_rows_number, skiprows=self.header_starts_at
+            )
+
+        return dfs
+
+
+    def parse_data(self):
+
+        if self.required_input_type == "excel-stream":
+            return self.parse_excel_stream()
+
+        if self.required_input_type == "excel":
+            return self.parse_excel()
+
+            
+        elif self.required_input_type == "csv":
+            return pd.read_csv(
+                self.input_object, nrows=self.min_rows_number, skiprows=self.header_starts_at
+            )
 
         elif self.required_input_type == "txt":
             with open(self.input_object, 'r') as f:

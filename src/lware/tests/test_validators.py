@@ -1,6 +1,6 @@
 import pytest
 from assertpy import assert_that
-from src.lware.file_validators import GeneralValidator, validate_filename
+from lware.file_validators import GeneralValidator, validate_filename
 
 
 
@@ -13,7 +13,7 @@ def test_validate_filename():
 def test_validate_cpuq_file_ok():
 
     v = GeneralValidator(
-        input_object = "../files_test/cpuq_original.txt", 
+        input_object = "../files_test/cpuq.txt", 
         required_input_type = "txt",
         text_contains_all   = ["[BEGIN SCRIPT INFO]", "Virtual CPUs"]
     )
@@ -37,7 +37,7 @@ def test_validate_cpuq_file_nok():
 def test_validate_lms_detail_file_ok():
 
     v = GeneralValidator(
-        input_object = "../files_test/lms_detail_original.csv", 
+        input_object = "../files_test/lms_detail.csv", 
         required_input_type = "csv",
         min_rows_number = 1,
         required_columns = [
@@ -102,7 +102,7 @@ def test_validate_lms_detail_file_nok():
 def test_validate_rvtools_file_ok():
 
     v = GeneralValidator(
-        input_object = "../files_test/RVTools_original.xlsx", 
+        input_object = "../files_test/RVTools.xlsx", 
         required_input_type = "excel",
         min_rows_number = 1,
         required_sheets = ['tabvInfo', 'tabvCPU', 'tabvHost', 'tabvCluster'],
@@ -204,7 +204,7 @@ def test_validate_review_lite_dba_feature_file_ok():
     # server-name_database-name_filename.csv
 
     v = GeneralValidator(
-        input_object = "../files_test/review_lite_original/anjin_SD2213_dba_feature.csv", 
+        input_object = "../files_test/anjin_SD2213_dba_feature.csv", 
         required_input_type = "csv",
         text_contains_any   = [
             'DBA_FEATURE_USAGE_STATISTICS',
@@ -221,7 +221,7 @@ def test_validate_review_lite_options_file_ok():
     # server-name_database-name_filename.csv
 
     v = GeneralValidator(
-        input_object = "../files_test/review_lite_original/anjin_SD2213_options.csv", 
+        input_object = "../files_test/anjin_SD2213_options.csv", 
         required_input_type = "csv",
         text_contains_any   = [
             'DBA_FEATURE_USAGE_STATISTICS',
@@ -238,7 +238,7 @@ def test_validate_review_lite_version_file_ok():
     # server-name_database-name_filename.csv
 
     v = GeneralValidator(
-        input_object = "../files_test/review_lite_original/anjin_SD2213_version.csv", 
+        input_object = "../files_test/anjin_SD2213_version.csv", 
         required_input_type = "csv",
         text_contains_any   = [
             'DBA_FEATURE_USAGE_STATISTICS',
