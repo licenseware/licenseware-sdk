@@ -4,8 +4,7 @@ import os
 import sys
 import uuid
 import dateutil.parser as parser
-from marshmallow import Schema, fields
-from mongodata import MongoData as m
+from .mongodata import MongoData as m
 
 
 QUOTA = {
@@ -26,16 +25,6 @@ if os.getenv('DEBUG') == 'true':
     )
 
     
-
-class AppUtilizationSchema(Schema):
-    _id = fields.Str(required=True)
-    tenant_id = fields.Str(required=True)
-    unit_type = fields.Str(required=True)
-    monthly_quota = fields.Int(required=True) 
-    monthly_quota_consumed = fields.Int(required=True) 
-    quota_reset_date = fields.Str(required=True)
-
-
 # Utils
 
 def get_quota_reset_date():
