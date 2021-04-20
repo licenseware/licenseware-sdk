@@ -3,6 +3,7 @@ from assertpy import assert_that
 from src.lware.file_validators import GeneralValidator, validate_filename
 
 
+
 def test_validate_filename():
     valid_fname = validate_filename("cpuq_original.txt", ["cpuq"], [".txt"])
     assert_that(valid_fname).is_true()

@@ -20,12 +20,26 @@ from pymongo.collection import Collection
 from bson.json_util import dumps, loads
 from bson.objectid import ObjectId
 import json
-from .utils import failsafe
+from .utils.decorators import failsafe
 
 
 #Vars
 
-default_db = os.getenv("MONGO_DB_NAME") or os.getenv("MONGO_DATABASE_NAME")
+debug = True
+
+if debug:
+    MONGO_ROOT_USERNAME = 'licensewaredev'
+    MONGO_ROOT_PASSWORD ='license123ware'
+    MONGO_DATABASE_NAME='db'
+    MONGO_HOSTNAME= 'localhost' #for a docker environment use 'mongodb' (service name)
+    MONGO_PORT=27017
+
+    os.environ['MONGO_DATABASE_NAME'] = MONGO_DATABASE_NAME
+    os.environ['MONGO_CONNECTION_STRING'] = f"mongodb://{MONGO_ROOT_USERNAME}:{MONGO_ROOT_PASSWORD}@{MONGO_HOSTNAME}:{MONGO_PORT}"
+
+
+
+default_db = os.getenv("MONGO_DB_NAME") or os.getenv("MONGO_DATABASE_NAME") or "db"
 default_collection = os.getenv("MONGO_COLLECTION_NAME") or "data"
 mongo_connection = MongoClient(os.getenv("MONGO_CONNECTION_STRING"))
 
@@ -98,12 +112,10 @@ def get_collection(collection, db_name):
     collection = collection or default_collection
     db_name = db_name or default_db
 
-    # print(db_name, collection)
+    # print(db_name, collection, os.getenv("MONGO_CONNECTION_STRING"), mongo_connection)
 
     if not db_name and collection:
-        raise Exception(
-            "Didn't found: MONGO_COLLECTION_NAME, MONGO_DATABASE_NAME, MONGO_CONNECTION_STRING"
-        )
+        raise Exception("Can't create connection to mongo.")
 
     collection = mongo_connection[db_name][collection]
     
@@ -223,19 +235,22 @@ def delete(match, collection=None, db_name=None):
         Delete documents based on match query.
 
         :collection  - collection name
-        :match       - id as string or dict filter query
+        :match       - id as string or dict filter query, if match == collection: will delete collection
         :db_name     - specify other db if needed by default is MONGO_DATABASE_NAME from .env
         
         returns number of deleted documents
 
     """
+    _, _, key, match = _parse_match(match)
 
-    _, _, _, match = _parse_match(match)
+    col = get_collection(collection, db_name)
+    if not isinstance(col, Collection): return col 
 
-    collection = get_collection(collection, db_name)
-    if not isinstance(collection, Collection): return collection 
+    if match == collection and key == match: 
+        res = col.drop()
+        return 1 if res is None else 0
 
-    deleted_docs_nbr = collection.delete_many(
+    deleted_docs_nbr = col.delete_many(
         filter=match,
     ).deleted_count
     

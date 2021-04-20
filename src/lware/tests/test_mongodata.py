@@ -1,7 +1,7 @@
 import pytest
 from assertpy import assert_that
 import os
-from src.mongodata import MongoData
+import lware.mongodata as m
 from marshmallow import Schema, fields
 import uuid
 import datetime as dt
@@ -56,7 +56,7 @@ dummy_data = \
 
 def test_md_insert_one():
     
-    id_list = MongoData.insert(
+    id_list = m.insert(
         schema=DummySchema, 
         collection="testcollection", 
         data={
@@ -73,7 +73,7 @@ def test_md_insert_one():
 
 def test_md_fetch_one_with_id():
 
-    data_dict = MongoData.fetch(
+    data_dict = m.fetch(
         match = id1,
         collection="testcollection"
     )
@@ -88,7 +88,7 @@ def test_md_fetch_one_with_id():
 
 def test_md_insert_many():
     
-    id_list = MongoData.insert(
+    id_list = m.insert(
         schema=DummySchema, 
         collection="testcollection", 
         data=[
@@ -107,7 +107,7 @@ def test_md_insert_many():
 
 def test_md_fetch_all_with_match():
 
-    datagen = MongoData.fetch(
+    datagen = m.fetch(
         match = {'name': 'John Show'},
         collection="testcollection",
         
@@ -121,7 +121,7 @@ def test_md_fetch_all_with_match():
 
 def test_md_update_one_with_id():
 
-    response = MongoData.update(
+    response = m.update(
         schema= AnotherDummySchema,
         collection = "testcollection",
         match      = id1,
@@ -139,7 +139,7 @@ def test_md_update_all_with_match():
     import re
     regx = re.compile("^New John", re.IGNORECASE)
 
-    response = MongoData.update(
+    response = m.update(
         schema= AnotherDummySchema,
         collection = "testcollection",
         match      = {'name': regx},
@@ -154,7 +154,7 @@ def test_md_update_all_with_match():
 
 def test_md_fetch_with_agreggate():
 
-    doc_list = MongoData.aggregate(
+    doc_list = m.aggregate(
         collection = "testcollection",
         pipeline   = [{ "$match": {'name': 'John'} }],
         as_list = True        
@@ -167,7 +167,7 @@ def test_md_fetch_with_agreggate():
 
 def test_md_fetch_distinct():
 
-    doc_list = MongoData.fetch(
+    doc_list = m.fetch(
         match = 'name',
         collection = "testcollection",
         as_list = True        
@@ -182,7 +182,7 @@ def test_md_fetch_distinct():
 
 def test_md_delete_by_id():
 
-    deleted_docs_nbr = MongoData.delete(
+    deleted_docs_nbr = m.delete(
         collection = "testcollection",
         match      = id1,
     )
@@ -195,7 +195,7 @@ def test_md_delete_by_id():
 
 def test_md_delete_with_query():
 
-    deleted_docs_nbr = MongoData.delete(
+    deleted_docs_nbr = m.delete(
         collection = "testcollection",
         match      = {'name': 'John'},
     )
@@ -204,6 +204,18 @@ def test_md_delete_with_query():
 
     assert_that(deleted_docs_nbr).is_greater_than_or_equal_to(1)
 
+
+
+def test_md_delete_collection():
+
+    deleted_col_nbr = m.delete(
+        collection = "testcollection",
+        match      = "testcollection",
+    )
+
+    # print(deleted_col_nbr)
+
+    assert_that(deleted_col_nbr).is_equal_to(1)
 
 
 

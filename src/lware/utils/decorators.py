@@ -1,34 +1,20 @@
 import os
 import logging
 import requests
-import logging, traceback
-from pymongo.errors import ConnectionFailure
-from marshmallow import ValidationError
 from functools import wraps
 from flask import request
+from loguru import logger
 
-
+logger.add("failsafe.log", format="{time:YYYY-MM-DD at HH:mm:ss} [{level}] - {message}", backtrace=False, diagnose=False)
 
 def failsafe(func):
     def func_wrapper(*args, **kwargs):
         try:
-        
            return func(*args, **kwargs)
-           
-        except ConnectionFailure as err:
-            logging.error(traceback.format_exc())
-            return "errors with mongo connection"
-
-        except ValidationError as err:
-            logging.error(traceback.format_exc())
-            return "errors on validation"
-
         except Exception as err:
-            logging.error(traceback.format_exc())
+            logger.exception("Failsafe traceback:")
             return str(err)
-
     return func_wrapper
-
 
 
 # Auth decorators

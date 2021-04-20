@@ -120,7 +120,7 @@ class GeneralValidator:
     
         Usage
 
-        from file_handler.validators import GeneralValidator
+        from file_validators import GeneralValidator, validate_filename
 
         v = GeneralValidator(
             input_object,           - required: file path, string or stream
@@ -147,17 +147,18 @@ class GeneralValidator:
 
     """
 
-    def __init__(self,
-                 input_object,
-                 required_input_type=None,
-                 required_sheets=[],
-                 required_columns=[],
-                 text_contains_all=[],
-                 text_contains_any=[],
-                 min_rows_number=0,
-                 header_starts_at=0,
-                 buffer=9000,
-                 ):
+    def __init__(
+        self,
+        input_object,
+        required_input_type=None,
+        required_sheets=[],
+        required_columns=[],
+        text_contains_all=[],
+        text_contains_any=[],
+        min_rows_number=0,
+        header_starts_at=0,
+        buffer=9000,
+    ):
 
         self.input_object = input_object
         self.required_input_type = required_input_type
