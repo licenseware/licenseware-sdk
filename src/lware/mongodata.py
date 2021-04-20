@@ -217,13 +217,12 @@ def update(schema, match, new_data, collection=None, db_name=None):
     new_data = validate_data(schema, new_data)
     if isinstance(new_data, str): return new_data
 
-
     updated_docs_nbr = collection.update_many(
-        filter=match,
+        filter={"_id": match["_id"]} if "_id" in match else match,
         update={"$set": new_data},
         upsert=True
     ).modified_count
-    
+
     return updated_docs_nbr
 
 

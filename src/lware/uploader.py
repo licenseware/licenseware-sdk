@@ -12,7 +12,7 @@ class Uploader:
         Use case:
         ```py
 
-        from uploader import Uploader
+        from lware.uploader import Uploader
 
         UniqueName = Uploader(
             app_id="name-service",

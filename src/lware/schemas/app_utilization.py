@@ -1,7 +1,6 @@
 from marshmallow import Schema, fields
 
 
-
 class AppUtilizationSchema(Schema):
     _id = fields.Str(required=True)
     tenant_id = fields.Str(required=True)
