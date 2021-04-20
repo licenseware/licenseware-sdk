@@ -1,23 +1,28 @@
-import logging
-import os
+import os, logging
 import traceback
-
 import requests
-
-from ..util.data_utils import (
-    get_activated_tenants,
-    get_tenants_with_data
-)
 
 
 class AppDefinition:
 
-    def __init__(self, id, name, description, icon, app_activation_url):
+    def __init__(
+        self, 
+        id, 
+        name, 
+        description, 
+        activated_tenants_func,
+        tenants_with_data_func,
+        icon="default.png", 
+        app_activation_url='/app/init'
+    ):
+
         self.id = id
         self.name = name
         self.description = description
-        self.icon = icon
+        self.icon = icon 
         self.app_activation_url = app_activation_url
+        self.activated_tenants_func = activated_tenants_func
+        self.tenants_with_data_func = tenants_with_data_func
         self.refresh_registration_url = os.getenv("APP_BASE_PATH") + os.getenv("APP_URL_PREFIX") + '/register_all'
 
 
@@ -35,8 +40,8 @@ class AppDefinition:
             'data': [{
                 "app_id": self.id,
                 "name": self.name,
-                "tenants_with_app_activated": get_activated_tenants(),
-                "tenants_with_data_available": get_tenants_with_data(),
+                "tenants_with_app_activated": self.activated_tenants_func(),
+                "tenants_with_data_available": self.tenants_with_data_func(),
                 "description": self.description,
                 "icon": self.icon,
                 "refresh_registration_url": self.refresh_registration_url,

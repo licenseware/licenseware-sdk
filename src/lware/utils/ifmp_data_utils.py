@@ -1,32 +1,24 @@
-from ..service.data_management_service import DataManagement as dm
-from .logging import app_log
+import logging
+from lware.service.data_management_service import DataManagement as dm
 
 
 def get_enabled_tenants():
-    _filter = {
-        'doc_type': 'database',
-    } 
-    tenants, status = dm(collection="data").return_distinct_values(key="tenant_id", _filter=_filter)
+    tenants, status = dm(collection="Device").return_distinct_values(key="tenant_id")
     if tenants: return tenants
-    app_log.warning("No tenants with data")
+    logging.warning("No tenants with data")
     return []
-    
+
 
 def get_activated_tenants():
-    tenants, status = dm(collection="ODBUtilization").return_distinct_values(key="tenant_id")
+    tenants, status = dm(collection="IFMPUtilization").return_distinct_values(key="tenant_id")
     if tenants: return tenants
-    app_log.warning("No tenants activated")
+    logging.warning("No tenants activated")
     return []
-
 
     
 def get_last_update_dates():
     pipeline = [
         {
-            '$match': {
-                'doc_type': 'database'
-            }
-        }, {
             '$group': {
                 '_id': {
                     'tenant_id': '$tenant_id'
@@ -43,10 +35,10 @@ def get_last_update_dates():
             }
         }
     ]
-    last_update_dates = dm(collection="data").get_with_aggregation(pipeline)
+    last_update_dates = dm(collection="Device").get_with_aggregation(pipeline)
     if last_update_dates[1] == 200:
-        return last_update_dates[0]
-    app_log.warning("Could not get last update dates")
+        return last_update_dates[0] 
+    logging.warning("Could not get last update dates")
     return []
 
 
