@@ -9,6 +9,18 @@ from setuptools import setup, find_packages
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+DEPENDENCIES = [
+	"pandas", 
+	"openpyxl",
+	"flask", 
+	"redis",
+	"loguru",
+	"requests",
+	"pymongo",
+	"marshmallow"
+]
+
+
 
 setup (
 	name="lware",
@@ -19,8 +31,8 @@ setup (
 	author_email="contact@licenseware.io",
 	license='',
 	py_modules=["lware"],
-	install_requires=[],
-	packages=find_packages(exclude=("tests",)),
+	install_requires=DEPENDENCIES,
+	packages=find_packages(exclude=("lware/tests",)),
 	long_description=long_description,
     long_description_content_type="text/markdown",
 	package_dir={"":"./src/lware"}
