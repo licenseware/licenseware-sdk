@@ -11,9 +11,7 @@ q.init_quota(tenant_id, unit_type)
 """
 
 import datetime
-import logging
 import os
-from re import match
 import sys
 import uuid
 import dateutil.parser as dateparser

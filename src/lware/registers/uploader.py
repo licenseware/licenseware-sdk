@@ -8,6 +8,10 @@ from lware.redis_service import RedisService
 # Utils 
 
 def save_file(file, tenant_id):
+    """
+        Save to disk flask file stream
+    """
+    
     filename = secure_filename(file.filename)
 
     save_path = os.path.join(os.getenv("UPLOAD_PATH"), tenant_id)

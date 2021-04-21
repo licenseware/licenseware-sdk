@@ -20,7 +20,7 @@ from pymongo.collection import Collection
 from bson.json_util import dumps, loads
 from bson.objectid import ObjectId
 import json
-from .utils.decorators import failsafe
+from lware.decorators import failsafe
 
 
 #Vars
