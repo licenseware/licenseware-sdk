@@ -2,7 +2,7 @@ import os
 import logging
 import requests
 from werkzeug.utils import secure_filename
-from lware.utils.redis_service import RedisService
+from lware.redis_service import RedisService
 
 
 # Utils 
