@@ -2,7 +2,9 @@ import os, re
 import traceback, itertools
 import pandas as pd
 from io import BytesIO
-import logging
+from loguru import logger
+
+logger.add("file_validators.log", format="{time:YYYY-MM-DD at HH:mm:ss} [{level}] - {message}", backtrace=False, diagnose=False)
 
 
 def validate_text_contains_all(text, text_contains_all):
@@ -309,9 +311,7 @@ class GeneralValidator:
             return res if show_reason else True
            
         except Exception as e:
-            error_msg = f'\n\n{str(e).upper()}\n\n{traceback.format_exc()}\n\n'
-            logging.warning(error_msg)
-
+            logger.exception("\n\n\n\n-------------Failsafe traceback:\n\n")
             res = {"status": "fail", "message": str(e)}
             return res if show_reason else False
            

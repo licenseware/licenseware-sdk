@@ -1,6 +1,6 @@
-# lware
+# Licenseware SDK
 
-Common utilities for licenseware.
+Common utilities for Licenseware.
 
 
 ## Quickstart
@@ -8,7 +8,7 @@ Common utilities for licenseware.
 Install this package using the following pip command:
 ```bash
 
-pip3 install git+https://git@github.com/licenseware/lware-components.git
+pip3 install git+https://git@github.com/licenseware/licenseware-sdk.git
 
 ```
 
@@ -21,4 +21,4 @@ python3 -m pydoc -p 0 -b
 
 ```
 
-It will start a localhost server with the documentation taken from docstrings found. 
+It will start a localhost server with the documentation.

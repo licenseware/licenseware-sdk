@@ -1,3 +1,8 @@
+"""
+Depreciated
+"""
+
+
 from marshmallow import ValidationError
 from pymongo import errors
 

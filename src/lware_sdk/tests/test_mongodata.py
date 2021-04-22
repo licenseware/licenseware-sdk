@@ -253,7 +253,6 @@ def test_existing_id():
     test_update_new_doc_existing_id()
 
 
-
 def test_update_id_field_match():
 
     new_data = {
@@ -273,11 +272,9 @@ def test_update_id_field_match():
         collection="AnotherDummySchema",
     )
 
-    print(data)
+    # print(data)
 
     assert_that(data['_id']).is_equal_to(new_data["_id"])
-
-
 
 
 
@@ -367,16 +364,16 @@ def test_delete_with_query():
 
 
 
-# def test_delete_collection():
+def test_delete_collection():
 
-#     deleted_col_nbr = m.delete(
-#         collection = "testcollection",
-#         match      = "testcollection",
-#     )
+    deleted_col_nbr = m.delete(
+        collection = "testcollection",
+        match      = "testcollection",
+    )
 
-#     # print(deleted_col_nbr)
+    # print(deleted_col_nbr)
 
-#     assert_that(deleted_col_nbr).is_equal_to(1)
+    assert_that(deleted_col_nbr).is_equal_to(1)
 
 
 
