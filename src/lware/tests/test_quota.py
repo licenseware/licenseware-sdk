@@ -1,6 +1,6 @@
 import pytest
 from assertpy import assert_that
-from ..quota import Quota
+from lware.quota import Quota
 import lware.mongodata as m
 
 q = Quota("TestUtilization")

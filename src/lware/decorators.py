@@ -1,3 +1,15 @@
+"""
+Usage:
+
+from lware.decorators import (
+    failsafe,
+    authorization_check,
+    machine_check,
+    header_doc_decorator
+)
+"""
+
+
 import os
 import logging
 import requests
@@ -12,15 +24,15 @@ def failsafe(func):
         try:
            return func(*args, **kwargs)
         except Exception as err:
-            logger.exception("Failsafe traceback:")
+            logger.exception("\n\nFailsafe traceback:")
             return str(err)
     return func_wrapper
 
 
 # Auth decorators
 
-url_auth_check = f"{os.getenv('AUTH_SERVICE_URL')}/verify"
-url_machine_check =  f"{os.getenv('AUTH_SERVICE_URL')}/machine_authorization"  
+url_auth_check = os.getenv('AUTH_SERVICE_URL') + "/verify"
+url_machine_check =  os.getenv('AUTH_SERVICE_URL') + "/machine_authorization"  
 
 env = os.getenv("ENVIRONMENT")
 

@@ -5,16 +5,17 @@ Usage:
 import mongodata as m
 
 m.insert(schema, data, collection="myCollection")
+* if collection not specified will take schema name
 
 Needs the following environment variables:
 - MONGO_DATABASE_NAME
 - MONGO_CONNECTION_STRING
+- MONGO_COLLECTION_NAME (optional)
 
 """
 
 import os
 from uuid import UUID
-import logging, traceback
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from bson.json_util import dumps, loads
@@ -25,23 +26,18 @@ from lware.decorators import failsafe
 
 #Vars
 
-debug = True
+# debug = True
 
-if debug:
-    MONGO_ROOT_USERNAME = 'licensewaredev'
-    MONGO_ROOT_PASSWORD ='license123ware'
-    MONGO_DATABASE_NAME='db'
-    MONGO_HOSTNAME= 'localhost' #for a docker environment use 'mongodb' (service name)
-    MONGO_PORT=27017
+# if debug:
+#     MONGO_ROOT_USERNAME = 'licensewaredev'
+#     MONGO_ROOT_PASSWORD ='license123ware'
+#     MONGO_DATABASE_NAME='db'
+#     MONGO_HOSTNAME= 'localhost' #for a docker environment use 'mongodb' (service name)
+#     MONGO_PORT=27017
 
-    os.environ['MONGO_DATABASE_NAME'] = MONGO_DATABASE_NAME
-    os.environ['MONGO_CONNECTION_STRING'] = f"mongodb://{MONGO_ROOT_USERNAME}:{MONGO_ROOT_PASSWORD}@{MONGO_HOSTNAME}:{MONGO_PORT}"
+#     os.environ['MONGO_DATABASE_NAME'] = MONGO_DATABASE_NAME
+#     os.environ['MONGO_CONNECTION_STRING'] = f"mongodb://{MONGO_ROOT_USERNAME}:{MONGO_ROOT_PASSWORD}@{MONGO_HOSTNAME}:{MONGO_PORT}"
 
-
-
-default_db = os.getenv("MONGO_DB_NAME") or os.getenv("MONGO_DATABASE_NAME") or "db"
-default_collection = os.getenv("MONGO_COLLECTION_NAME") or "data"
-mongo_connection = MongoClient(os.getenv("MONGO_CONNECTION_STRING"))
 
 
 #Utils
@@ -61,9 +57,9 @@ def validate_data(schema, data):
     return data
 
 
-def valid_uuid4(uuid_string):
+def valid_uuid(uuid_string):
     try:
-        UUID(uuid_string, version=4)
+        UUID(uuid_string)
         return True
     except ValueError:
         return False
@@ -90,7 +86,7 @@ def _parse_doc(doc):
 def _parse_match(match):
     oid, uid, key = None, None, None
     if isinstance(match, str): 
-        if valid_uuid4(match): 
+        if valid_uuid(match): 
             match = {"_id": match}
             oid, uid = False, True
         elif valid_object_id(match):
@@ -103,8 +99,14 @@ def _parse_match(match):
 
 #Mongo
 
+
+default_db = os.getenv("MONGO_DB_NAME") or os.getenv("MONGO_DATABASE_NAME") or "db"
+default_collection = os.getenv("MONGO_COLLECTION_NAME") or "data"
+mongo_connection = MongoClient(os.getenv("MONGO_CONNECTION_STRING"))
+
+
 @failsafe
-def get_collection(collection, db_name):
+def get_collection(collection, db_name=None):
     """
         Gets the collection on which mongo CRUD operations can be performed
     """
@@ -114,7 +116,7 @@ def get_collection(collection, db_name):
 
     # print(db_name, collection, os.getenv("MONGO_CONNECTION_STRING"), mongo_connection)
 
-    if not db_name and collection:
+    if all([db_name, collection]) :
         raise Exception("Can't create connection to mongo.")
 
     collection = mongo_connection[db_name][collection]
@@ -136,7 +138,7 @@ def insert(schema, data, collection=None, db_name=None):
         returns a list of ids inserted in the database in the order they were added
     """
 
-    collection = get_collection(collection, db_name)
+    collection = get_collection(collection or schema.__name__, db_name)
     if not isinstance(collection, Collection): 
         return collection 
 
@@ -157,7 +159,7 @@ def insert(schema, data, collection=None, db_name=None):
 
 
 @failsafe
-def fetch(match, collection=None, as_list=True, db_name=None):
+def fetch(match, collection, as_list=True, db_name=None):
     """
         Get data from mongo, based on match dict or string id.
         
@@ -211,7 +213,7 @@ def update(schema, match, new_data, collection=None, db_name=None):
 
     _, _, _, match = _parse_match(match)
     
-    collection = get_collection(collection, db_name)
+    collection = get_collection(collection or schema.__name__, db_name)
     if not isinstance(collection, Collection): return collection 
 
     new_data = validate_data(schema, new_data)
@@ -228,7 +230,7 @@ def update(schema, match, new_data, collection=None, db_name=None):
 
 
 @failsafe
-def delete(match, collection=None, db_name=None):
+def delete(match, collection, db_name=None):
     """
 
         Delete documents based on match query.
@@ -258,7 +260,7 @@ def delete(match, collection=None, db_name=None):
 
 
 @failsafe
-def aggregate(pipeline, collection=None, as_list=True, db_name=None):
+def aggregate(pipeline, collection, as_list=True, db_name=None):
     """
         Fetch documents based on pipeline queries.
         https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/

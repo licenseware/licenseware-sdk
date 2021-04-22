@@ -1,26 +1,7 @@
 import os
 import logging
 import requests
-from werkzeug.utils import secure_filename
-from lware.redis_service import RedisService
-
-
-# Utils 
-
-def save_file(file, tenant_id):
-    """
-        Save to disk flask file stream
-    """
-    
-    filename = secure_filename(file.filename)
-
-    save_path = os.path.join(os.getenv("UPLOAD_PATH"), tenant_id)
-    if not os.path.exists(save_path): os.mkdir(save_path)
-
-    file.seek(0)  # move cursor to 0 (stream left it on last read)
-    file.save(os.path.join(save_path, filename))
-
-    return filename
+from lware.utils import RedisService, save_file
 
 
 def reason_response(reason, valid_fname, valid_contents, filename_nok_msg='Filename is not valid.'):

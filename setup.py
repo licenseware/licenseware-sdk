@@ -9,6 +9,8 @@ from setuptools import setup, find_packages
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+
+
 DEPENDENCIES = [
 	"pandas", 
 	"openpyxl",
@@ -21,7 +23,6 @@ DEPENDENCIES = [
 ]
 
 
-
 setup (
 	name="lware",
 	version="0.0.1",
@@ -30,10 +31,9 @@ setup (
 	author="licenseware",
 	author_email="contact@licenseware.io",
 	license='',
-	py_modules=["lware"],
 	install_requires=DEPENDENCIES,
-	packages=find_packages(exclude=("lware/tests",)),
+	packages=find_packages(where="src", exclude=("tests",)),
 	long_description=long_description,
     long_description_content_type="text/markdown",
-	package_dir={"":"./src/lware"}
+	package_dir={"":"src"},
 )
