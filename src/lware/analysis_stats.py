@@ -2,7 +2,7 @@ import datetime
 import uuid
 import logging
 
-from .data_management_service import DataManagement as dm
+from .data_management import DataManagement as dm
 from ..serializer.analysis_stats_schema import AnalysisStatsSchema
 from mongodata import MongoData as m
 

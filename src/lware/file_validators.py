@@ -172,7 +172,7 @@ class GeneralValidator:
         self.buffer = buffer
 
 
-    def validate_type(self):
+    def _validate_type(self):
         """
             Determine which handler to use based on input type provided 
             Raise error if file/obj type is not as expected (excel/txt file, or string/stream) 
@@ -206,7 +206,7 @@ class GeneralValidator:
             self.required_input_type = "string"
 
 
-    def check_required_input_type(self):
+    def _check_required_input_type(self):
         allowed_input_types = ['excel', 'csv', 'txt', 'string', 'stream', 'excel-stream']
         if not self.required_input_type: return
         if self.required_input_type not in allowed_input_types:
@@ -214,7 +214,7 @@ class GeneralValidator:
 
 
 
-    def parse_excel_stream(self):
+    def _parse_excel_stream(self):
 
         xlobj = pd.ExcelFile(BytesIO(self.input_object.stream.read()))
         sheets = xlobj.sheet_names
@@ -238,7 +238,7 @@ class GeneralValidator:
         return dfs
 
 
-    def parse_excel(self):
+    def _parse_excel(self):
 
         sheets = pd.ExcelFile(self.input_object).sheet_names
 
@@ -258,13 +258,13 @@ class GeneralValidator:
         return dfs
 
 
-    def parse_data(self):
+    def _parse_data(self):
 
         if self.required_input_type == "excel-stream":
-            return self.parse_excel_stream()
+            return self._parse_excel_stream()
 
         if self.required_input_type == "excel":
-            return self.parse_excel()
+            return self._parse_excel()
 
             
         elif self.required_input_type == "csv":
@@ -294,10 +294,10 @@ class GeneralValidator:
 
         try:
 
-            self.check_required_input_type()
-            self.validate_type()
+            self._check_required_input_type()
+            self._validate_type()
 
-            data = self.parse_data()
+            data = self._parse_data()
 
             validate_text_contains_all(data, self.text_contains_all)
             validate_text_contains_any(data, self.text_contains_any)

@@ -38,6 +38,11 @@ class DummySchema(Schema):
 class AnotherDummySchema(Schema):
     _id = fields.Str(required=False)
     name = fields.Str(required=True)
+    test_list = fields.List(fields.Raw, required=False)
+    test_list2 = fields.List(fields.Raw, required=False)
+    test_dict = fields.Dict(fields.Raw, required=False)
+    some_field = fields.Str(required=False)
+
 
 
 # Id to be used by test funcs
@@ -54,7 +59,7 @@ dummy_data = \
 
 
 
-def test_md_insert_one():
+def test_insert_one():
     
     id_list = m.insert(
         schema=DummySchema, 
@@ -71,14 +76,14 @@ def test_md_insert_one():
     assert_that(id_list).is_instance_of(list).contains_only(id1)
 
 
-def test_md_fetch_one_with_id():
+def test_fetch_one_with_id():
 
     data_dict = m.fetch(
         match = id1,
         collection="testcollection"
     )
     
-    # print("\n\\ test_md_fetch_with_id:: data_dict, id1", data_dict, list(data_dict), id1)
+    # print("\n\\ test_fetch_with_id:: data_dict, id1", data_dict, list(data_dict), id1)
 
     assert_that(data_dict).contains_entry({"_id": id1})
     assert_that(data_dict['age']).is_instance_of(int)
@@ -86,7 +91,7 @@ def test_md_fetch_one_with_id():
 
 
 
-def test_md_insert_many():
+def test_insert_many():
     
     id_list = m.insert(
         schema=DummySchema, 
@@ -94,18 +99,17 @@ def test_md_insert_many():
         data=[
             dummy_data, 
             dummy_data,
-            dict(dummy_data, **{"_id": str(uuid.uuid4())}),
+            dict(dummy_data, **{"_id": str(uuid.uuid4())})
         ]
     )
     
-    #print("\ntest_md_insert_many:: id_list", id_list)
+    #print("\ntest_insert_many:: id_list", id_list)
 
     assert_that(id_list).is_not_none().is_length(3)
 
 
 
-
-def test_md_fetch_all_with_match():
+def test_fetch_all_with_match():
 
     datagen = m.fetch(
         match = {'name': 'John Show'},
@@ -113,13 +117,69 @@ def test_md_fetch_all_with_match():
         
     )
     
-    # print("\ntest_md_fetch_all_with_match:: datagen", datagen, type(datagen))
+    # print("\ntest_fetch_all_with_match:: datagen", datagen, type(datagen))
 
     assert_that(len(list(datagen))).is_greater_than_or_equal_to(1)
 
 
 
-def test_md_update_one_with_id():
+def test_update_list_with_append():
+
+    data_list = [
+        {
+            "name": "Dan lupin",
+            "some_field": "this should remain unchanged"
+        },
+
+        {
+            "test_list": ["initial_list_value"], 
+            "test_list2": [ "initial_list_value2"],
+            "test_dict": {"initial_dict_key":"initial_dict_value"},
+            "name": "arsene lupin",
+            "some_field": "this should remain unchanged"
+        }
+    ]
+
+    id_list = m.insert(AnotherDummySchema, data_list)
+
+    assert_that(len(id_list)).is_equal_to(len(data_list))
+
+    new_data = {
+        'name': 'Dan', 
+        "test_list": ["appended_value"],
+        "test_list2": [ "appended_value2"],
+        "test_dict": {"new_dict_key":"new_dict_value"},
+    }
+
+    updated_data = m.update(
+        schema = AnotherDummySchema,
+        match      = {'test_list': { "$exists": True }},
+        new_data   = new_data
+    )
+
+    # print(updated_data)
+
+    data = m.fetch(
+        match = {'test_list': { "$exists": True }},
+        collection="AnotherDummySchema",
+    )
+
+    # print(data)
+    
+    assert_that(data[0]['test_list']).contains('initial_list_value')
+    assert_that(data[0]['test_list2']).contains('initial_list_value2')
+    assert_that(data[0]['test_dict']['initial_dict_key']).contains('initial_dict_value')
+    assert_that(data[0]['some_field']).contains('this should remain unchanged')
+
+
+    m.delete(
+        collection="AnotherDummySchema", 
+        match="AnotherDummySchema"
+    )
+
+
+
+def test_update_one_with_id():
 
     response = m.update(
         schema= AnotherDummySchema,
@@ -134,7 +194,7 @@ def test_md_update_one_with_id():
 
 
 
-def test_md_update_all_with_match():
+def test_update_all_with_match():
     
     import re
     regx = re.compile("^New John", re.IGNORECASE)
@@ -152,7 +212,7 @@ def test_md_update_all_with_match():
 
 
 
-def test_md_fetch_with_agreggate():
+def test_fetch_with_agreggate():
 
     doc_list = m.aggregate(
         collection = "testcollection",
@@ -165,7 +225,7 @@ def test_md_fetch_with_agreggate():
     assert_that(doc_list).is_instance_of(list).is_not_empty()
 
 
-def test_md_fetch_distinct():
+def test_fetch_distinct():
 
     doc_list = m.fetch(
         match = 'name',
@@ -179,8 +239,7 @@ def test_md_fetch_distinct():
 
 
 
-
-def test_md_delete_by_id():
+def test_delete_by_id():
 
     deleted_docs_nbr = m.delete(
         collection = "testcollection",
@@ -193,7 +252,7 @@ def test_md_delete_by_id():
 
 
 
-def test_md_delete_with_query():
+def test_delete_with_query():
 
     deleted_docs_nbr = m.delete(
         collection = "testcollection",
@@ -206,7 +265,7 @@ def test_md_delete_with_query():
 
 
 
-def test_md_delete_collection():
+def test_delete_collection():
 
     deleted_col_nbr = m.delete(
         collection = "testcollection",

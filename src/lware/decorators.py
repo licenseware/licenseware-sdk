@@ -19,24 +19,33 @@ from loguru import logger
 
 logger.add("failsafe.log", format="{time:YYYY-MM-DD at HH:mm:ss} [{level}] - {message}", backtrace=False, diagnose=False)
 
-def failsafe(func):
-    def func_wrapper(*args, **kwargs):
+def failsafe(f):
+    """
+        Prevents a function to raise an exception and break the app.
+        Returns a string with the exception and saves the traceback in failsafe.log
+    """
+    @wraps(f)
+    def wrapper(*args, **kwargs):
         try:
-           return func(*args, **kwargs)
+           return f(*args, **kwargs)
         except Exception as err:
             logger.exception("\n\nFailsafe traceback:")
-            return str(err)
-    return func_wrapper
+            return "[ERROR] - " + str(err)
+
+    return wrapper
 
 
 # Auth decorators
 
-url_auth_check = os.getenv('AUTH_SERVICE_URL') + "/verify"
-url_machine_check =  os.getenv('AUTH_SERVICE_URL') + "/machine_authorization"  
+url_auth_check = os.getenv('AUTH_SERVICE_URL', '') + "/verify"
+url_machine_check =  os.getenv('AUTH_SERVICE_URL', '') + "/machine_authorization"  
 
 env = os.getenv("ENVIRONMENT")
 
 def authorization_check(f):
+    """
+        Checks if a user is authorized
+    """
     @wraps(f)
     def decorated(*args, **kwargs):
         if env is not None and env != "local":
@@ -55,6 +64,9 @@ def authorization_check(f):
 
 
 def machine_check(f):
+    """
+        Checks if a machine is authorized
+    """
     @wraps(f)
     def decorated(*args, **kwargs):
         if env is not None and env != "local":
@@ -73,6 +85,9 @@ def machine_check(f):
 
 
 def header_doc_decorator(_api):
+    """
+        Adds auth parameters to header 
+    """
     parser = _api.parser()
     parser.add_argument('Authorization', location='headers')
     parser.add_argument('TenantId', location='headers')

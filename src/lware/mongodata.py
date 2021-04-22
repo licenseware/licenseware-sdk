@@ -5,6 +5,7 @@ Usage:
 import mongodata as m
 
 m.insert(schema, data, collection="myCollection")
+
 * if collection not specified will take schema name
 
 Needs the following environment variables:
@@ -21,22 +22,22 @@ from pymongo.collection import Collection
 from bson.json_util import dumps, loads
 from bson.objectid import ObjectId
 import json
-from lware.decorators import failsafe
+from .decorators import failsafe
 
 
 #Vars
 
-# debug = True
+debug = True
 
-# if debug:
-#     MONGO_ROOT_USERNAME = 'licensewaredev'
-#     MONGO_ROOT_PASSWORD ='license123ware'
-#     MONGO_DATABASE_NAME='db'
-#     MONGO_HOSTNAME= 'localhost' #for a docker environment use 'mongodb' (service name)
-#     MONGO_PORT=27017
+if debug:
+    MONGO_ROOT_USERNAME = 'licensewaredev'
+    MONGO_ROOT_PASSWORD ='license123ware'
+    MONGO_DATABASE_NAME='db'
+    MONGO_HOSTNAME= 'localhost' #for a docker environment use 'mongodb' (service name)
+    MONGO_PORT=27017
 
-#     os.environ['MONGO_DATABASE_NAME'] = MONGO_DATABASE_NAME
-#     os.environ['MONGO_CONNECTION_STRING'] = f"mongodb://{MONGO_ROOT_USERNAME}:{MONGO_ROOT_PASSWORD}@{MONGO_HOSTNAME}:{MONGO_PORT}"
+    os.environ['MONGO_DATABASE_NAME'] = MONGO_DATABASE_NAME
+    os.environ['MONGO_CONNECTION_STRING'] = f"mongodb://{MONGO_ROOT_USERNAME}:{MONGO_ROOT_PASSWORD}@{MONGO_HOSTNAME}:{MONGO_PORT}"
 
 
 
@@ -97,6 +98,34 @@ def _parse_match(match):
     return oid, uid, key, match
 
 
+
+def _update_query(dict_):
+    """ 
+        Force append to mongo document 
+    """
+
+    q = {'$set': {}, '$addToSet': {}}
+    for k in dict_:
+        
+        if isinstance(dict_[k], str):
+            q['$set'].update({k:dict_[k]})
+            
+        if isinstance(dict_[k], dict):
+            for key in dict_[k]:
+                key_ = ".".join([k, key])
+                q['$set'].update({key_:dict_[k][key]})
+                
+        if isinstance(dict_[k], list): 
+            q['$addToSet'].update({k:{}})
+            q['$addToSet'][k].update({ "$each": dict_[k]})
+     
+    if not q['$addToSet']: del q['$addToSet'] 
+    if not q['$set']: del q['$set'] 
+
+    return q or dict_
+
+
+
 #Mongo
 
 
@@ -116,13 +145,12 @@ def get_collection(collection, db_name=None):
 
     # print(db_name, collection, os.getenv("MONGO_CONNECTION_STRING"), mongo_connection)
 
-    if all([db_name, collection]) :
+    if not all([db_name, collection, mongo_connection]) :
         raise Exception("Can't create connection to mongo.")
 
     collection = mongo_connection[db_name][collection]
     
     return collection
-
 
 
 @failsafe
@@ -219,13 +247,15 @@ def update(schema, match, new_data, collection=None, db_name=None):
     new_data = validate_data(schema, new_data)
     if isinstance(new_data, str): return new_data
 
+
     updated_docs_nbr = collection.update_many(
         filter={"_id": match["_id"]} if "_id" in match else match,
-        update={"$set": new_data},
+        update=_update_query(new_data),
         upsert=True
     ).modified_count
 
     return updated_docs_nbr
+
 
 
 

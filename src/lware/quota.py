@@ -15,8 +15,8 @@ import os
 import sys
 import uuid
 import dateutil.parser as dateparser
-import lware.mongodata as m
-from .schemas.app_utilization import AppUtilizationSchema
+import mongodata as m
+from .serializers import AppUtilizationSchema
 
 
 QUOTA = {
