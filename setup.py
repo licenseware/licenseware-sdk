@@ -24,7 +24,7 @@ DEPENDENCIES = [
 
 
 setup (
-	name="lware",
+	name="lware_sdk",
 	version="0.0.1",
 	description="Common utilities for licenseware.",
 	url="https://github.com/licenseware/lware-components",
