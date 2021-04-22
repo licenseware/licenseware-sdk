@@ -12,7 +12,8 @@ pip3 install git+https://git@github.com/licenseware/licenseware-sdk.git
 
 ```
 
-You can use `git+ssh` if you have ssh keys configured.
+You can use `git+ssh` if you have ssh keys configured. 
+Uninstall with `pip3 uninstall lware-sdk`.
 
 To see documentation of the package run:
 ```bash
