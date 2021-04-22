@@ -29,7 +29,7 @@ def failsafe(f):
         try:
            return f(*args, **kwargs)
         except Exception as err:
-            logger.exception("\n\nFailsafe traceback:")
+            logger.exception("\n\n\n\n-------------Failsafe traceback:\n\n")
             return "[ERROR] - " + str(err)
 
     return wrapper

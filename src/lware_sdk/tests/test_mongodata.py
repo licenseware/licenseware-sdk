@@ -41,12 +41,15 @@ class AnotherDummySchema(Schema):
     test_list = fields.List(fields.Raw, required=False)
     test_list2 = fields.List(fields.Raw, required=False)
     test_dict = fields.Dict(fields.Raw, required=False)
+    test_list_of_dict = fields.List(fields.Dict, required=False)
     some_field = fields.Str(required=False)
 
 
 
 # Id to be used by test funcs
 id1 = str(uuid.uuid4())
+existing_id = str(uuid.uuid4())
+
 
 dummy_data = \
 {
@@ -135,6 +138,9 @@ def test_update_list_with_append():
             "test_list": ["initial_list_value"], 
             "test_list2": [ "initial_list_value2"],
             "test_dict": {"initial_dict_key":"initial_dict_value"},
+            "test_list_of_dict": [
+                {"initial_dict_key":"initial_dict_value"}
+            ],
             "name": "arsene lupin",
             "some_field": "this should remain unchanged"
         }
@@ -144,11 +150,25 @@ def test_update_list_with_append():
 
     assert_that(len(id_list)).is_equal_to(len(data_list))
 
+    # new_data = {
+    #     'name': 'Dan', 
+    #     "test_list": ["appended_value"],
+    #     "test_list2": [ "appended_value2"],
+    #     "test_dict": {"new_dict_key":"new_dict_value"},
+    #     "test_list_of_dict": [
+    #         {"new_dict_key":"new_dict_value"}
+    #     ]
+    # }
+
     new_data = {
+        "_id": "thenewid",
         'name': 'Dan', 
         "test_list": ["appended_value"],
         "test_list2": [ "appended_value2"],
         "test_dict": {"new_dict_key":"new_dict_value"},
+        "test_list_of_dict": [
+            {"new_dict_key":"new_dict_value"}
+        ]
     }
 
     updated_data = m.update(
@@ -170,12 +190,94 @@ def test_update_list_with_append():
     assert_that(data[0]['test_list2']).contains('initial_list_value2')
     assert_that(data[0]['test_dict']['initial_dict_key']).contains('initial_dict_value')
     assert_that(data[0]['some_field']).contains('this should remain unchanged')
+    assert_that(data[0]["test_list_of_dict"]).is_length(2)
+
+    # m.delete(
+    #     collection="AnotherDummySchema", 
+    #     match="AnotherDummySchema"
+    # )
 
 
-    m.delete(
-        collection="AnotherDummySchema", 
-        match="AnotherDummySchema"
+
+
+def test_update_new_doc():
+    
+    new_data = {
+        "_id": existing_id,
+        "name": "radu"
+    }
+
+    updated_data = m.update(
+        schema = AnotherDummySchema,
+        match      = new_data["_id"],
+        new_data   = new_data
     )
+
+
+    data = m.fetch(
+        match = new_data["_id"],
+        collection="AnotherDummySchema",
+    )
+
+    print(data)
+
+    assert_that(data["_id"]).is_equal_to(new_data["_id"])
+    
+
+
+def test_update_new_doc_existing_id():
+    
+    new_data = {
+        "_id": existing_id,
+        "name": "cornelia"
+    }
+
+    updated_data = m.update(
+        schema = AnotherDummySchema,
+        match      = new_data["_id"],
+        new_data   = new_data
+    )
+
+
+    data = m.fetch(
+        match = new_data["_id"],
+        collection="AnotherDummySchema",
+    )
+
+    assert_that(data['_id']).is_equal_to(new_data["_id"])
+
+
+
+def test_existing_id():
+    test_update_new_doc()
+    test_update_new_doc_existing_id()
+
+
+
+def test_update_id_field_match():
+
+    new_data = {
+        "_id": existing_id,
+        "name": "razvan",
+        "test_list": ["data"]
+    }
+
+    updated_data = m.update(
+        schema = AnotherDummySchema,
+        match      = {"_id": existing_id,"name": "cornelia"},
+        new_data   = new_data
+    )
+
+    data = m.fetch(
+        match = new_data["_id"],
+        collection="AnotherDummySchema",
+    )
+
+    print(data)
+
+    assert_that(data['_id']).is_equal_to(new_data["_id"])
+
+
 
 
 
@@ -265,16 +367,16 @@ def test_delete_with_query():
 
 
 
-def test_delete_collection():
+# def test_delete_collection():
 
-    deleted_col_nbr = m.delete(
-        collection = "testcollection",
-        match      = "testcollection",
-    )
+#     deleted_col_nbr = m.delete(
+#         collection = "testcollection",
+#         match      = "testcollection",
+#     )
 
-    # print(deleted_col_nbr)
+#     # print(deleted_col_nbr)
 
-    assert_that(deleted_col_nbr).is_equal_to(1)
+#     assert_that(deleted_col_nbr).is_equal_to(1)
 
 
 

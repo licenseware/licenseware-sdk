@@ -103,7 +103,9 @@ def _update_query(dict_):
     """ 
         Force append to mongo document 
     """
-
+    
+    dict_.pop("_id", None)
+    
     q = {'$set': {}, '$addToSet': {}}
     for k in dict_:
         
@@ -112,7 +114,7 @@ def _update_query(dict_):
             
         if isinstance(dict_[k], dict):
             for key in dict_[k]:
-                key_ = ".".join([k, key])
+                key_ = ".".join([k, key]) # files.status
                 q['$set'].update({key_:dict_[k][key]})
                 
         if isinstance(dict_[k], list): 
