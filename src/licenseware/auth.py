@@ -62,7 +62,7 @@ class Authenticator:
 
     def _login(self):
 
-        identity = "machine_name" if os.getenv("AUTH_MACHINES") else "email"
+        identity = "machine_name" if os.getenv("AUTH_SERVICE_MACHINES_URL_PATH") else "email"
         payload = {
             identity: self.email,
             "password": self.password
