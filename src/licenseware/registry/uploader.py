@@ -1,7 +1,18 @@
+"""
+
+Register a processing file/uploader attributes.
+
+from licenseware import Uploader, reason_response
+or 
+from licenseware.registry.uploader import Uploader, reason_response
+
+"""
+
+
 import os
 import logging
 import requests
-from lware.utils import RedisService, save_file
+from licenseware.utils import RedisService, save_file
 
 
 def reason_response(reason, valid_fname, valid_contents, filename_nok_msg='Filename is not valid.'):
@@ -34,8 +45,6 @@ class Uploader:
         Use case:
         ```py
 
-        from lware.uploader import Uploader
-
         UniqueName = Uploader(
             app_id="name-service",
             upload_name="Short description",
@@ -61,11 +70,11 @@ class Uploader:
         Before calling `register_uploader` app must be logged in.
             
         The following environment variables are expected:
-        - APP_BASE_PATH, APP_URL_PREFIX  or `uploads_base_url` parameter filled;     
-        - REGISTRY_SERVICE_URL or `registration_url` parameter filled.
-        - `AUTH_TOKEN` or `auth_token` parameter filled.
+        - APP_BASE_PATH
+        - APP_URL_PREFIX      
+        - REGISTRY_SERVICE_URL
+        - AUTH_TOKEN
                 
-
     """
 
     def __init__(
@@ -83,9 +92,6 @@ class Uploader:
         validate_filename_function,
         status="Idle",
         icon="default.png",
-        uploads_base_url=None,
-        registration_url=None,
-        auth_token=None,
     ):
 
         self.app_id = app_id
@@ -101,9 +107,9 @@ class Uploader:
         self.icon = icon
         self.validate_upload = validate_upload_function
         self.validate_filename = validate_filename_function
-        self.base_url = uploads_base_url or os.getenv("APP_BASE_PATH") + os.getenv("APP_URL_PREFIX") + '/uploads'
-        self.registration_url = registration_url or f'{os.getenv("REGISTRY_SERVICE_URL")}/uploaders'
-        self.auth_token = auth_token or os.getenv('AUTH_TOKEN')
+        self.base_url = os.getenv("APP_BASE_PATH") + os.getenv("APP_URL_PREFIX") + '/uploads'
+        self.registration_url = f'{os.getenv("REGISTRY_SERVICE_URL")}/uploaders'
+        self.auth_token = os.getenv('AUTH_TOKEN')
         
 
     def register_uploader(self):

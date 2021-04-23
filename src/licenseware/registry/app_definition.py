@@ -1,3 +1,29 @@
+"""
+
+Register an app to registry service
+
+
+from licenseware import AppDefinition
+
+app_definition = AppDefinition(
+    id="new-service",
+    name="Short expresive name",
+    description="long description",
+    icon="default.png",
+    app_activation_url='/app/init'
+    activated_tenants_func=get_activated_tenants,
+    tenants_with_data_func=get_tenants_with_data,
+)
+
+app_definition.register_app()
+
+Where:
+- get_activated_tenants : returns a list of tenants ids which have quota initialized
+- get_tenants_with_data : returns a list of dicts where each dict has tenantid, last_update_date fields 
+which represents that tenant has processed files and has saved data as a result 
+
+"""
+
 import os, logging
 import traceback
 import requests

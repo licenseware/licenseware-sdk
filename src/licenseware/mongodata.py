@@ -1,12 +1,19 @@
 """
 
-Usage:
+Abstraction and validation of inserted data in mongodb
 
-import mongodata as m
 
-m.insert(schema, data, collection="myCollection")
+import licenseware.mongodata as m
+or
+from licenseware import mongodata as m
 
-* if collection not specified will take schema name
+Available functions:
+- get_collection
+- insert
+- fetch
+- update
+- delete
+- aggregate
 
 Needs the following environment variables:
 - MONGO_DATABASE_NAME
@@ -130,7 +137,6 @@ def _update_query(dict_):
 
 #Mongo
 
-
 default_db = os.getenv("MONGO_DB_NAME") or os.getenv("MONGO_DATABASE_NAME") or "db"
 default_collection = os.getenv("MONGO_COLLECTION_NAME") or "data"
 mongo_connection = MongoClient(os.getenv("MONGO_CONNECTION_STRING"))
@@ -140,6 +146,8 @@ mongo_connection = MongoClient(os.getenv("MONGO_CONNECTION_STRING"))
 def get_collection(collection, db_name=None):
     """
         Gets the collection on which mongo CRUD operations can be performed
+
+        If something fails will return a string with the error message.
     """
     
     collection = collection or default_collection
@@ -160,12 +168,13 @@ def insert(schema, data, collection=None, db_name=None):
     """
         Insert validated documents in database.
 
-        :collection - collection name
+        :schema     - Marshmallow schema class used to validate `data`
         :data       - data in dict or list of dicts format
-        :schema     - Marshmallow schema class 
+        :collection - collection name, schema name will be taken if not present
         :db_name    - specify other db if needed, by default is MONGO_DATABASE_NAME from .env
 
         returns a list of ids inserted in the database in the order they were added
+        If something fails will return a string with the error message.
     """
 
     collection = get_collection(collection or schema.__name__, db_name)
@@ -193,12 +202,15 @@ def fetch(match, collection, as_list=True, db_name=None):
     """
         Get data from mongo, based on match dict or string id.
         
+        :match      - _id as string (will return a dict)
+                    - mongo dict filter (will return a list of results)
+                    - field_name as string (will return distinct values for that field)
+
         :collection - collection name
-        :match      - id/field as string, mongo filter query
         :as_list    - set as_list to false to get a generator
         :db_name    - specify other db if needed by default is MONGO_DATABASE_NAME from .env
-
-        returns a generator of documents found or if as_list=True a list of documents found  
+        
+        If something fails will return a string with the error message.
 
     """
     
@@ -234,10 +246,12 @@ def update(schema, match, new_data, collection=None, db_name=None):
         :schema      - Marshmallow schema class
         :match       - id as string or dict filter query
         :new_data    - data dict which needs to be updated
-        :collection  - collection name
+        :collection  - collection name, schema name will be used of collection name not specified
         :db_name     - specify other db if needed by default is MONGO_DATABASE_NAME from .env
         
         returns number of modified documents
+
+        If something fails will return a string with the error message.
 
     """
 
@@ -267,11 +281,14 @@ def delete(match, collection, db_name=None):
 
         Delete documents based on match query.
 
+        :match       - id as string or dict filter query, 
+                     - if match == collection: will delete collection           
         :collection  - collection name
-        :match       - id as string or dict filter query, if match == collection: will delete collection
         :db_name     - specify other db if needed by default is MONGO_DATABASE_NAME from .env
         
         returns number of deleted documents
+        
+        If something fails will return a string with the error message.
 
     """
     _, _, key, match = _parse_match(match)
@@ -297,12 +314,12 @@ def aggregate(pipeline, collection, as_list=True, db_name=None):
         Fetch documents based on pipeline queries.
         https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/
         
-        :collection - collection name
         :pipeline   - list of query stages
+        :collection - collection name
         :as_list    - set as_list to false to get a generator
         :db_name    - specify other db if needed by default is MONGO_DATABASE_NAME from .env
-        
-        returns a generator of documents found or a list if as_list=True
+                
+        If something fails will return a string with the error message.
 
     """
 

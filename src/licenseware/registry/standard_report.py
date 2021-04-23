@@ -1,3 +1,13 @@
+"""
+
+Register a report to registry service
+
+from licenseware import StandardReport
+or
+from licenseware.standard_report import StandardReport
+
+"""
+
 import os
 import requests
 import logging

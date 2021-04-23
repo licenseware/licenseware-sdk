@@ -3,8 +3,12 @@ import redis
 
 
 
-redis_connection = redis.Redis(host=os.getenv("REDIS_HOST"), port=os.getenv("REDIS_PORT"))
-redis_stream = os.getenv("REDIS_PROCESSING_STREAM")
+redis_connection = redis.Redis(
+    host=os.getenv("REDIS_HOST", "http://localhost"),
+    port=os.getenv("REDIS_PORT", '6379')
+)
+
+redis_stream = os.getenv("REDIS_PROCESSING_STREAM", "default_redis_stream")
 
 
 class RedisService:

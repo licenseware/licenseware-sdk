@@ -1,4 +1,16 @@
-import os, logging, traceback
+"""
+
+Notification service utilities
+
+from licenseware.notifications import notify_status
+
+or 
+
+from licenseware import notify_status
+
+"""
+
+import os
 import requests
 from loguru import logger
 

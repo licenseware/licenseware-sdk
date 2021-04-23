@@ -1,12 +1,20 @@
 """
-Use case:
 
-from lware.quota import Quota
+Utilization service.
 
-q = Quota(collection="CollectionName")
+from licenseware import Quota
+or 
+from licenseware.quota import Quota
+
+q = Quota(collection="IFMPUtilization")
 
 q.init_quota(tenant_id, unit_type)
+q.update_quota(tenant_id, unit_type, number_of_units)
+q.check_quota(tenant_id, unit_type)
 
+
+To see available unit_type import QUOTA dict
+from licenseware import QUOTA
 
 """
 
@@ -16,7 +24,7 @@ import sys
 import uuid
 import dateutil.parser as dateparser
 import mongodata as m
-from .serializers import AppUtilizationSchema
+from .serializer import AppUtilizationSchema
 
 
 QUOTA = {
@@ -46,9 +54,9 @@ def get_quota_reset_date():
 
 class Quota:
 
-    def __init__(self, collection=None, schema=None):
-        self.schema = schema or AppUtilizationSchema
+    def __init__(self, collection, schema=None):
         self.collection = collection
+        self.schema = schema or AppUtilizationSchema
 
 
     def init_quota(self, tenant_id, unit_type):

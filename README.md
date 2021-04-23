@@ -13,7 +13,7 @@ pip3 install git+https://git@github.com/licenseware/licenseware-sdk.git
 ```
 
 You can use `git+ssh` if you have ssh keys configured. 
-Uninstall with `pip3 uninstall lware-sdk`.
+Uninstall with `pip3 uninstall licenseware`.
 
 To see documentation of the package run:
 ```bash
@@ -23,3 +23,37 @@ python3 -m pydoc -p 0 -b
 ```
 
 It will start a localhost server with the documentation.
+
+
+
+Available components:
+
+```py
+
+import licenseware.mongodata as m
+
+from licenseware import (
+    Authenticator,
+    AppDefinition,
+    Quota,
+    Uploader, 
+    reason_response,
+    save_file,
+    GeneralValidator, 
+    validate_filename,
+    StandardReport, 
+    StandardReportComponent,
+    ReportFilteringComponent,
+    RedisService,
+    get_mongo_connection,
+    notify_status,
+)
+
+from licenseware.decorators import (
+    failsafe,
+    authorization_check,
+    machine_check,
+    header_doc_decorator
+)
+
+```

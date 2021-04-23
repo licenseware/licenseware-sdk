@@ -1,3 +1,15 @@
+"""
+
+Validator for streams of files and files.
+
+from licenseware import GeneralValidator, validate_filename
+
+or 
+
+from licenseware.file_validators import GeneralValidator, validate_filename
+
+"""
+
 import os, re
 import traceback, itertools
 import pandas as pd

@@ -1,12 +1,19 @@
 """
-Usage:
 
-from lware.decorators import (
+Useful decoratators.
+
+from licenseware.decorators import (
     failsafe,
     authorization_check,
     machine_check,
     header_doc_decorator
 )
+
+or 
+
+from licenseware import decorators
+
+
 """
 
 
