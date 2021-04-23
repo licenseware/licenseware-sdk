@@ -34,7 +34,7 @@ class Authenticator:
         self.password = os.getenv("LWARE_IDENTITY_PASSWORD")
         self.auth_url = os.getenv("AUTH_SERVICE_URL")
 
-        if os.getenv("AUTH_MACHINES"):
+        if os.getenv("AUTH_SERVICE_MACHINES_URL_PATH"):
             route = os.getenv('AUTH_SERVICE_MACHINES_URL_PATH')
         else:
             route = os.getenv('AUTH_SERVICE_USERS_URL_PATH')
@@ -78,7 +78,7 @@ class Authenticator:
 
     def _create_machine(self):
 
-        if not os.getenv('AUTH_MACHINES'):
+        if not os.getenv('AUTH_SERVICE_MACHINES_URL_PATH'):
             return {
                 "status": "fail", 
                 "message": "Please create an account before using this Licenseware SDK."
