@@ -1,7 +1,7 @@
 import pytest
 from assertpy import assert_that
 import os
-import lware.mongodata as m
+from licenseware import mongodata as m
 from marshmallow import Schema, fields
 import uuid
 import datetime as dt
