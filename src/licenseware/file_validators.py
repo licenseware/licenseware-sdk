@@ -195,8 +195,10 @@ class GeneralValidator:
         if "stream" in str(dir(self.input_object)):
             if self.required_input_type == 'excel':
                 self.required_input_type = 'excel-stream'
+                return
             else:
                 self.required_input_type = 'stream'
+                return
 
         if (
             self.required_columns == []
@@ -211,10 +213,10 @@ class GeneralValidator:
             if self.input_object.endswith('.xlsx') or self.input_object.endswith('.xls'):
                 self.required_input_type = "excel"
 
-            if self.input_object.endswith('.csv'):
+            elif self.input_object.endswith('.csv'):
                 self.required_input_type = "csv"
             
-            if self.input_object.endswith('.txt'):
+            elif self.input_object.endswith('.txt'):
                 self.required_input_type = "txt"
         else:
             self.required_input_type = "string"
