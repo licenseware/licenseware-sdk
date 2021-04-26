@@ -146,7 +146,7 @@ def test_update_list_with_append():
         }
     ]
 
-    id_list = m.insert(AnotherDummySchema, data_list, "testcollection")
+    id_list = m.insert(AnotherDummySchema, "testcollection", data_list)
 
     assert_that(len(id_list)).is_equal_to(len(data_list))
 
@@ -193,12 +193,6 @@ def test_update_list_with_append():
     assert_that(data[0]['some_field']).contains('this should remain unchanged')
     assert_that(data[0]["test_list_of_dict"]).is_length(2)
 
-    # m.delete(
-    #     collection="testcollection", 
-    #     match="AnotherDummySchema"
-    # )
-
-
 
 
 def test_update_new_doc():
@@ -223,7 +217,7 @@ def test_update_new_doc():
 
     # print(data)
 
-    assert_that(data["_id"]).is_equal_to(new_data["_id"])
+    assert_that(data).is_equal_to(new_data)
     
 
 
@@ -247,7 +241,7 @@ def test_update_new_doc_existing_id():
         collection="testcollection",
     )
 
-    assert_that(data['_id']).is_equal_to(new_data["_id"])
+    assert_that(data).is_equal_to(new_data)
 
 
 
