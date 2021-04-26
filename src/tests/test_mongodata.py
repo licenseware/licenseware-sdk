@@ -139,7 +139,8 @@ def test_update_list_with_append():
             "test_list2": [ "initial_list_value2"],
             "test_dict": {"initial_dict_key":"initial_dict_value"},
             "test_list_of_dict": [
-                {"initial_dict_key":"initial_dict_value"}
+                {"initial_dict_key":"initial_dict_value", "some_id":"asdasdasd"},
+                {"initial_dict_key":"initial_dict_value", "some_id":"dsadsadsa"}
             ],
             "name": "arsene lupin",
             "some_field": "this should remain unchanged"
@@ -149,16 +150,6 @@ def test_update_list_with_append():
     id_list = m.insert(AnotherDummySchema, "testcollection", data_list)
 
     assert_that(len(id_list)).is_equal_to(len(data_list))
-
-    # new_data = {
-    #     'name': 'Dan', 
-    #     "test_list": ["appended_value"],
-    #     "test_list2": [ "appended_value2"],
-    #     "test_dict": {"new_dict_key":"new_dict_value"},
-    #     "test_list_of_dict": [
-    #         {"new_dict_key":"new_dict_value"}
-    #     ]
-    # }
 
     new_data = {
         "_id": "thenewid",
@@ -191,7 +182,7 @@ def test_update_list_with_append():
     assert_that(data[0]['test_list2']).contains('initial_list_value2')
     assert_that(data[0]['test_dict']['initial_dict_key']).contains('initial_dict_value')
     assert_that(data[0]['some_field']).contains('this should remain unchanged')
-    assert_that(data[0]["test_list_of_dict"]).is_length(2)
+
 
 
 
@@ -308,22 +299,6 @@ def test_update_all_with_match():
     assert_that(response).is_greater_than_or_equal_to(1)
 
 
-
-
-def test_update_with_pull_all_id():
-    _id =  '60868665b413133928ebdfde'
-
-    data = m.fetch(
-        match = _id,
-        collection="ODBAnalysisStats",
-    )
-
-    print(data)
-
-
-
-
-
 def test_fetch_with_agreggate():
 
     doc_list = m.aggregate(
@@ -387,4 +362,10 @@ def test_delete_collection():
     # print(deleted_col_nbr)
 
     assert_that(deleted_col_nbr).is_equal_to(1)
+
+
+
+
+
+
 
