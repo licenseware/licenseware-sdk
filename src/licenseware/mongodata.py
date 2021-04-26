@@ -26,7 +26,7 @@ import os
 from uuid import UUID
 from pymongo import MongoClient
 from pymongo.collection import Collection
-from bson.json_util import dumps, loads
+from bson.json_util import dumps
 from bson.objectid import ObjectId
 import json
 from .decorators import failsafe
@@ -34,17 +34,17 @@ from .decorators import failsafe
 
 #Vars
 
-# debug = True
+debug = True
 
-# if debug:
-#     MONGO_ROOT_USERNAME = 'licensewaredev'
-#     MONGO_ROOT_PASSWORD ='license123ware'
-#     MONGO_DATABASE_NAME='db'
-#     MONGO_HOSTNAME= 'localhost' #for a docker environment use 'mongodb' (service name)
-#     MONGO_PORT=27017
+if debug:
+    MONGO_ROOT_USERNAME = 'licensewaredev'
+    MONGO_ROOT_PASSWORD ='license123ware'
+    MONGO_DATABASE_NAME='db'
+    MONGO_HOSTNAME= 'localhost' #for a docker environment use 'mongodb' (service name)
+    MONGO_PORT=27017
 
-#     os.environ['MONGO_DATABASE_NAME'] = MONGO_DATABASE_NAME
-#     os.environ['MONGO_CONNECTION_STRING'] = f"mongodb://{MONGO_ROOT_USERNAME}:{MONGO_ROOT_PASSWORD}@{MONGO_HOSTNAME}:{MONGO_PORT}"
+    os.environ['MONGO_DATABASE_NAME'] = MONGO_DATABASE_NAME
+    os.environ['MONGO_CONNECTION_STRING'] = f"mongodb://{MONGO_ROOT_USERNAME}:{MONGO_ROOT_PASSWORD}@{MONGO_HOSTNAME}:{MONGO_PORT}"
 
 
 
@@ -261,6 +261,7 @@ def update(schema, match, new_data, collection, append=True, db_name=None):
     collection = get_collection(collection, db_name)
     if not isinstance(collection, Collection): return collection 
 
+    
     new_data = validate_data(schema, new_data)
     if isinstance(new_data, str): return new_data
 

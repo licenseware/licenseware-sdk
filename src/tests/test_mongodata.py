@@ -98,7 +98,7 @@ def test_insert_many():
     
     id_list = m.insert(
         schema=DummySchema, 
-        collection="testcollection", 
+        collection="testcollection",
         data=[
             dummy_data, 
             dummy_data,
@@ -146,7 +146,7 @@ def test_update_list_with_append():
         }
     ]
 
-    id_list = m.insert(AnotherDummySchema, data_list)
+    id_list = m.insert(AnotherDummySchema, data_list, "testcollection")
 
     assert_that(len(id_list)).is_equal_to(len(data_list))
 
@@ -173,6 +173,7 @@ def test_update_list_with_append():
 
     updated_data = m.update(
         schema = AnotherDummySchema,
+        collection="testcollection",
         match      = {'test_list': { "$exists": True }},
         new_data   = new_data
     )
@@ -181,7 +182,7 @@ def test_update_list_with_append():
 
     data = m.fetch(
         match = {'test_list': { "$exists": True }},
-        collection="AnotherDummySchema",
+        collection="testcollection",
     )
 
     # print(data)
@@ -193,7 +194,7 @@ def test_update_list_with_append():
     assert_that(data[0]["test_list_of_dict"]).is_length(2)
 
     # m.delete(
-    #     collection="AnotherDummySchema", 
+    #     collection="testcollection", 
     #     match="AnotherDummySchema"
     # )
 
@@ -209,6 +210,7 @@ def test_update_new_doc():
 
     updated_data = m.update(
         schema = AnotherDummySchema,
+        collection="testcollection",
         match      = new_data["_id"],
         new_data   = new_data
     )
@@ -216,10 +218,10 @@ def test_update_new_doc():
 
     data = m.fetch(
         match = new_data["_id"],
-        collection="AnotherDummySchema",
+        collection="testcollection",
     )
 
-    print(data)
+    # print(data)
 
     assert_that(data["_id"]).is_equal_to(new_data["_id"])
     
@@ -234,6 +236,7 @@ def test_update_new_doc_existing_id():
 
     updated_data = m.update(
         schema = AnotherDummySchema,
+        collection="testcollection",
         match      = new_data["_id"],
         new_data   = new_data
     )
@@ -241,7 +244,7 @@ def test_update_new_doc_existing_id():
 
     data = m.fetch(
         match = new_data["_id"],
-        collection="AnotherDummySchema",
+        collection="testcollection",
     )
 
     assert_that(data['_id']).is_equal_to(new_data["_id"])
@@ -263,13 +266,14 @@ def test_update_id_field_match():
 
     updated_data = m.update(
         schema = AnotherDummySchema,
+        collection="testcollection",
         match      = {"_id": existing_id,"name": "cornelia"},
         new_data   = new_data
     )
 
     data = m.fetch(
         match = new_data["_id"],
-        collection="AnotherDummySchema",
+        collection="testcollection",
     )
 
     # print(data)
@@ -375,121 +379,3 @@ def test_delete_collection():
 
     assert_that(deleted_col_nbr).is_equal_to(1)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def test_insert_one_envset_with_chain_assignment():
-
-#     #print("Current: ", dm.db_name)
-
-#     response, status_code = (
-#         dm.db("chaindb") #switch_db_default=False
-#         .schema(DummySchema)
-#         .collection("chain_collection")
-#         .insert_one({ 
-#             "_id": str(uuid.uuid4()), 
-#             "name": "dm db=chaindb collection=chain_collection" 
-#         })
-#     )
-
-#     #dm.switch_to_default_db()
-    
-#     #print("New: ", dm.db_name)
-#     #print(response)
-
-#     assert_that(status_code).is_in(202)
-#     assert_that(response).contains_entry({'status': 'success'})
-
-
-
-# def test_insert_one_envset_with_chain_assignment_defaultdb():
-
-#     #print("Should be `db`: ", dm.db_name)
-
-#     response, status_code = (
-#         dm.schema(DummySchema)
-#         .collection("chain_collection")
-#         .insert_one({ 
-#             "_id": str(uuid.uuid4()), 
-#             "name": "dm db=default(db) collection=chain_collection" 
-#         })
-
-#     )
-    
-#     #print(response)
-
-#     assert_that(status_code).is_in(202)
-#     assert_that(response).contains_entry({'status': 'success'})
-
-
-
-# def test_insert_one_envset_with_chain_assignment_swichdb():
-
-#     #print("Should be `db`: ", dm.db_name)
-
-#     response, status_code = (
-#         dm.schema(DummySchema)
-#         .collection("chain_collection")
-#         .insert_one({ 
-#             "_id": str(uuid.uuid4()), 
-#             "name": "dm db=db collection=chain_collection" 
-#         })
-
-#     )
-    
-#     #print(response)
-
-#     assert_that(status_code).is_in(202)
-#     assert_that(response).contains_entry({'status': 'success'})
-
-
-
-# def test_insert_one_envset_with_schema_collection():
-
-#     dm = DataManagement(schema=DummySchema, collection_name="mycollection")
-
-#     data = { 
-#         "_id": str(uuid.uuid4()), 
-#         "name": "added in mycollection with local instance of dm" 
-#     }
-
-#     response, status_code = dm.insert_one(data)
-
-#     #print(response)
-
-#     assert_that(status_code).is_in(202)
-#     assert_that(response).contains_entry({'status': 'success'})
-    
-
-
-# def test_insert_one_envset_with_schema_collection_db():
-
-#     dm = DataManagement(schema=DummySchema, collection_name="mycollection", db_name="newdb")
-
-#     response, status_code = dm.insert_one({ 
-#                                     "_id": str(uuid.uuid4()), 
-#                                     "name": "added in mycollection with local instance of db newdb" 
-#                                 })
-
-#     #print(response)
-
-#     assert_that(status_code).is_in(202)
-#     assert_that(response).contains_entry({'status': 'success'})
