@@ -221,7 +221,8 @@ def fetch(match, collection, as_list=True, db_name=None):
 
     if oid or uid:
         found_docs = collection.find(match)
-        doc = list(found_docs)[0]
+        doc = []
+        if found_docs: doc = list(found_docs)[0]
         if oid: doc = _parse_doc(doc)
         return doc
 

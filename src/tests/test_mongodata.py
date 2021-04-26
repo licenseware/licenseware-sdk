@@ -309,6 +309,21 @@ def test_update_all_with_match():
 
 
 
+
+def test_update_with_pull_all_id():
+    _id =  '60868665b413133928ebdfde'
+
+    data = m.fetch(
+        match = _id,
+        collection="ODBAnalysisStats",
+    )
+
+    print(data)
+
+
+
+
+
 def test_fetch_with_agreggate():
 
     doc_list = m.aggregate(
