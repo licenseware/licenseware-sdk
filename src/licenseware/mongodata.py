@@ -106,7 +106,7 @@ def _parse_match(match):
 
 
 
-def _update_query(dict_):
+def _append_query(dict_):
     """ 
         Force append to mongo document 
     """
@@ -164,7 +164,7 @@ def get_collection(collection, db_name=None):
 
 
 @failsafe
-def insert(schema, data, collection=None, db_name=None):
+def insert(schema, data, collection, db_name=None):
     """
         Insert validated documents in database.
 
@@ -177,7 +177,7 @@ def insert(schema, data, collection=None, db_name=None):
         If something fails will return a string with the error message.
     """
 
-    collection = get_collection(collection or schema.__name__, db_name)
+    collection = get_collection(collection, db_name)
     if not isinstance(collection, Collection): 
         return collection 
 
@@ -239,14 +239,15 @@ def fetch(match, collection, as_list=True, db_name=None):
 
 
 @failsafe
-def update(schema, match, new_data, collection=None, db_name=None):
+def update(schema, match, new_data, collection, append=True, db_name=None):
     """
         Update documents based on match query.
         
         :schema      - Marshmallow schema class
         :match       - id as string or dict filter query
         :new_data    - data dict which needs to be updated
-        :collection  - collection name, schema name will be used of collection name not specified
+        :collection  - collection name
+        :append      - if true will APPEND new data to existing fields, if false will SET new data to fields  
         :db_name     - specify other db if needed by default is MONGO_DATABASE_NAME from .env
         
         returns number of modified documents
@@ -257,7 +258,7 @@ def update(schema, match, new_data, collection=None, db_name=None):
 
     _, _, _, match = _parse_match(match)
     
-    collection = get_collection(collection or schema.__name__, db_name)
+    collection = get_collection(collection, db_name)
     if not isinstance(collection, Collection): return collection 
 
     new_data = validate_data(schema, new_data)
@@ -266,7 +267,7 @@ def update(schema, match, new_data, collection=None, db_name=None):
 
     updated_docs_nbr = collection.update_many(
         filter={"_id": match["_id"]} if "_id" in match else match,
-        update=_update_query(new_data),
+        update=_append_query(new_data) if append else {"$set": new_data},
         upsert=True
     ).modified_count
 
