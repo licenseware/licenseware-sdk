@@ -142,7 +142,7 @@ class Uploader(Quota):
             'data': [{
                 "app_id": self.app_id,
                 "upload_name": self.upload_name,
-                "uploader_id": self.uploader_id,
+                "upload_id": self.uploader_id, #TODO Field to be later renamed to uploader_id
                 "description": self.description,
                 "upload_url": self.base_url + self.upload_url,
                 "upload_validation_url": self.base_url + self.upload_validation_url,
