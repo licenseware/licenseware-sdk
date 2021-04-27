@@ -36,6 +36,9 @@ QUOTA = {
     #ODB
     "review_lite": 16, # Databases
     "lms_options": 1, # Files
+
+    #FMW
+    "fmw_archive": 1  # 1 Device  == 1 archive
 }
 
 
