@@ -30,7 +30,6 @@ from bson.json_util import dumps
 from bson.objectid import ObjectId
 import json
 from .decorators import failsafe
-import re
 
 
 #Utils
@@ -92,9 +91,6 @@ def _parse_match(match):
 
 
 
-
-regex_id = re.compile("_id", re.IGNORECASE)
-
 def _append_query(dict_):
     """ 
         Force append to mongo document 
@@ -120,7 +116,7 @@ def _append_query(dict_):
     if not q['$addToSet']: del q['$addToSet'] 
     if not q['$set']: del q['$set'] 
 
-    print(q)
+    # print(q)
 
     return q or dict_
 
@@ -129,7 +125,7 @@ def _append_query(dict_):
 #Mongo
 
 default_db = os.getenv("MONGO_DB_NAME") or os.getenv("MONGO_DATABASE_NAME") or "db"
-default_collection = os.getenv("MONGO_COLLECTION_NAME") or "data"
+default_collection = os.getenv("MONGO_COLLECTION_NAME") or "Data"
 mongo_connection = MongoClient(os.getenv("MONGO_CONNECTION_STRING"))
 
 

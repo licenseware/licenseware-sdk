@@ -16,13 +16,12 @@ class RedisService:
         self.last_id = self.get_last_id()
         self.new_events = False
 
-
-    def send_stream_event(self, event_data):
+    @staticmethod
+    def send_stream_event(event_data):
         with redis_connection as r:
             try:
                 return r.xadd(redis_stream, event_data)
             except (ConnectionError, TimeoutError) as e:
-                print(e)
                 return e
 
     def read_stream_events(self, count=3):
