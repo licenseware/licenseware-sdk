@@ -37,7 +37,7 @@ def reason_response(reason, valid_fname, valid_contents, filename_nok_msg='Filen
 
 
 
-class Uploader:
+class Uploader(Quota):
 
     """
         This library is used to register/store information about files 
@@ -117,7 +117,8 @@ class Uploader:
             quota_collection_name or str(app_id).split("-")[0].upper() + "Utilization"
         )
 
-        self.quota = Quota(self.quota_collection_name)        
+        super().__init__(self.quota_collection_name)
+
         self.unit_type = unit_type or self.uploader_id
         
         self.base_url = os.getenv("APP_BASE_PATH") + os.getenv("APP_URL_PREFIX") + '/uploads'
@@ -182,7 +183,7 @@ class Uploader:
         msg, status = self._upload_response(request_obj, event_type=self.unit_type)
 
         if status == 200:
-            response = self.quota.update_quota(
+            response = self.update_quota(
                 tenant_id = request_obj.headers.get("TenantId"), 
                 unit_type = self.unit_type, 
                 number_of_units = msg['units']
@@ -203,7 +204,7 @@ class Uploader:
         
         if status != 200:
             
-            response = self.quota.check_quota(
+            response = self.check_quota(
                 tenant_id = request_obj.headers.get("TenantId"), 
                 unit_type = self.unit_type, 
                 number_of_units = msg['units']
