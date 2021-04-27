@@ -40,11 +40,11 @@ def unzip(file_path, tenant_id=None, extract_path=None):
         
     if not os.path.exists(extract_path): os.mkdir(extract_path)
         
-    file_name = secure_filename((os.path.basename(file_path)))
+    file_name = os.path.basename(file_path)
     extract_path = os.path.join(extract_path, file_name + "_extracted")
     
     shutil.unpack_archive(file_name, extract_path)
     
-    return extract_path
+    return file_name
 
 
