@@ -13,6 +13,7 @@ import os
 import logging
 import requests
 from licenseware.utils import RedisService, save_file
+from licenseware.quota import Quota
 
 
 def reason_response(reason, valid_fname, valid_contents, filename_nok_msg='Filename is not valid.'):
@@ -48,12 +49,14 @@ class Uploader:
         UniqueName = Uploader(
             app_id="name-service",
             upload_name="Short description",
-            upload_id="UniqueName",
+            uploader_id="UniqueName",
             description="Long description",
             upload_url="/UniqueName/files",
             upload_validation_url='/UniqueName/validation',
             validate_upload_function=receive_files_UniqueName, #function that validates file contents and file name
             validate_filename_function=validate_UniqueName, #function that validates file contents and file name
+            quota_collection_name=None, # if not specified will be computed from app_id (check code)
+            unit_type=None, # if not specified uploader_id will be taken
             quota_validation_url='/quota/UniqueName',
             status_check_url='/UniqueName/status',
             history_url='/UniqueName/history'
@@ -81,7 +84,7 @@ class Uploader:
         self,
         app_id,
         upload_name,
-        upload_id,
+        uploader_id,
         description,
         upload_url,
         upload_validation_url,
@@ -90,13 +93,15 @@ class Uploader:
         history_url,
         validate_upload_function,
         validate_filename_function,
+        quota_collection_name=None,
+        unit_type=None,
         status="idle",
         icon="default.png",
     ):
 
         self.app_id = app_id
         self.upload_name = upload_name
-        self.upload_id = upload_id
+        self.uploader_id = uploader_id
         self.description = description
         self.upload_url = upload_url
         self.upload_validation_url = upload_validation_url
@@ -107,9 +112,16 @@ class Uploader:
         self.icon = icon
         self.validate_upload = validate_upload_function
         self.validate_filename = validate_filename_function
+        
+        self.quota_collection_name = quota_collection_name or str(app_id).split("-")[0].upper() + "Utilization"
+        self.quota = Quota(self.quota_collection_name)        
+        self.unit_type = unit_type or self.uploader_id
+        
         self.base_url = os.getenv("APP_BASE_PATH") + os.getenv("APP_URL_PREFIX") + '/uploads'
         self.registration_url = f'{os.getenv("REGISTRY_SERVICE_URL")}/uploaders'
         self.auth_token = os.getenv('AUTH_TOKEN')
+
+
         
 
     def register_uploader(self):
@@ -126,7 +138,7 @@ class Uploader:
             'data': [{
                 "app_id": self.app_id,
                 "upload_name": self.upload_name,
-                "upload_id": self.upload_id,
+                "uploader_id": self.uploader_id,
                 "description": self.description,
                 "upload_url": self.base_url + self.upload_url,
                 "upload_validation_url": self.base_url + self.upload_validation_url,
@@ -163,12 +175,12 @@ class Uploader:
         """ 
             Upload files from request.
 
-            :event_type if None upload_id will be taken as an event_type
+            :event_type if None uploader_id will be taken as an event_type
         """
-
+        self.quota
         return self._upload_response(
             request_obj,  
-            event_type=event_type or self.upload_id
+            event_type=event_type or self.uploader_id
         )
 
 
@@ -176,7 +188,15 @@ class Uploader:
         """
             Validate filenames from flask request.
         """
-        return self._filenames_response(request_obj)
+        
+        msg, status = self._filenames_response(request_obj)
+
+        response = self.quota.check_quota(
+            request_obj.headers.get("TenantId"), 
+            unit_type='fmw_archive', 
+            number_of_units=msg['units']
+        )
+
            
 
     def _filenames_response(self, request_obj, filename_ok_msg='Filename is valid.', filename_nok_msg='Filename is not valid.'):
