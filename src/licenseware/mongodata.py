@@ -30,21 +30,22 @@ from bson.json_util import dumps
 from bson.objectid import ObjectId
 import json
 from .decorators import failsafe
+import re
 
 
 #Vars
 
-# debug = True
+debug = True
 
-# if debug:
-#     MONGO_ROOT_USERNAME = 'licensewaredev'
-#     MONGO_ROOT_PASSWORD ='license123ware'
-#     MONGO_DATABASE_NAME='db'
-#     MONGO_HOSTNAME= 'localhost' #for a docker environment use 'mongodb' (service name)
-#     MONGO_PORT=27017
+if debug:
+    MONGO_ROOT_USERNAME = 'licensewaredev'
+    MONGO_ROOT_PASSWORD ='license123ware'
+    MONGO_DATABASE_NAME='db'
+    MONGO_HOSTNAME= 'localhost' #for a docker environment use 'mongodb' (service name)
+    MONGO_PORT=27017
 
-#     os.environ['MONGO_DATABASE_NAME'] = MONGO_DATABASE_NAME
-#     os.environ['MONGO_CONNECTION_STRING'] = f"mongodb://{MONGO_ROOT_USERNAME}:{MONGO_ROOT_PASSWORD}@{MONGO_HOSTNAME}:{MONGO_PORT}"
+    os.environ['MONGO_DATABASE_NAME'] = MONGO_DATABASE_NAME
+    os.environ['MONGO_CONNECTION_STRING'] = f"mongodb://{MONGO_ROOT_USERNAME}:{MONGO_ROOT_PASSWORD}@{MONGO_HOSTNAME}:{MONGO_PORT}"
 
 
 
@@ -105,6 +106,10 @@ def _parse_match(match):
     return oid, uid, key, match
 
 
+
+
+
+regex_id = re.compile("_id", re.IGNORECASE)
 
 def _append_query(dict_):
     """ 
@@ -267,7 +272,6 @@ def update(schema, match, new_data, collection, append=True, db_name=None):
     
     new_data = validate_data(schema, new_data)
     if isinstance(new_data, str): return new_data
-
 
     updated_docs_nbr = collection.update_many(
         filter={"_id": match["_id"]} if "_id" in match else match,

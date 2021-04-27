@@ -13,7 +13,7 @@ with open("README.md", "r") as fh:
 
 setup(
 	name="licenseware",
-	version="0.0.1",
+	version="0.0.2",
 	description="Common utilities for licenseware.",
 	url="https://github.com/licenseware/licenseware-sdk",
 	author="licenseware",

@@ -299,6 +299,57 @@ def test_update_all_with_match():
     assert_that(response).is_greater_than_or_equal_to(1)
 
 
+
+def test_update_with_pullall():
+
+    _id = str(uuid.uuid4())
+
+    data = {
+        "_id": _id,
+        "name": "licenseware",
+        "test_list": [1,2,3],
+        "test_dict": {"nbr":2},
+        "test_list_of_dict": [
+            {"file_id": "should be unique", "other_data": "some data"},
+            {"file_id": "thefileid", "other_data": "some data"}
+        ]
+    }
+
+    inserted = m.insert(AnotherDummySchema, "testcollection", data)
+
+    assert_that(inserted).contains_only(_id)
+
+    new_data = {
+        "_id": _id,
+        "name": "licenseware_new",
+        "test_list_of_dict": [
+            {"file_id": "should be unique", "other_data": "changed a little"},
+        ]
+    }
+
+
+    m.update(
+        AnotherDummySchema,
+        match=_id,
+        new_data=new_data,
+        collection="testcollection"
+    )
+
+    saved_data = m.fetch(_id, "testcollection")
+
+    print(saved_data)
+
+
+
+
+
+
+
+
+
+
+
+
 def test_fetch_with_agreggate():
 
     doc_list = m.aggregate(
