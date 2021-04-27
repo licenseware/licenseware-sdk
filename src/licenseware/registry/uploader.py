@@ -90,7 +90,7 @@ class Uploader:
         history_url,
         validate_upload_function,
         validate_filename_function,
-        status="Idle",
+        status="idle",
         icon="default.png",
     ):
 
