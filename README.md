@@ -12,6 +12,15 @@ pip3 install git+https://git@github.com/licenseware/licenseware-sdk.git
 
 ```
 
+Install from a specific branch
+
+```bash
+
+pip3 install git+https://git@github.com/licenseware/licenseware-sdk.git@branch_name
+
+```
+
+
 You can use `git+ssh` if you have ssh keys configured. 
 Uninstall with `pip3 uninstall licenseware`.
 

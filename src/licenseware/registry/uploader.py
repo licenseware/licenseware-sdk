@@ -56,7 +56,7 @@ class Uploader:
             validate_upload_function=receive_files_UniqueName, #function that validates file contents and file name
             validate_filename_function=validate_UniqueName, #function that validates file contents and file name
             quota_collection_name=None, # if not specified will be computed from app_id (check code)
-            unit_type=None, # if not specified uploader_id will be taken
+            unit_type=None, # if not specified uploader_id will be taken (this will be also the event_type for redis stream)
             quota_validation_url='/quota/UniqueName',
             status_check_url='/UniqueName/status',
             history_url='/UniqueName/history'
@@ -113,7 +113,10 @@ class Uploader:
         self.validate_upload = validate_upload_function
         self.validate_filename = validate_filename_function
         
-        self.quota_collection_name = quota_collection_name or str(app_id).split("-")[0].upper() + "Utilization"
+        self.quota_collection_name = (
+            quota_collection_name or str(app_id).split("-")[0].upper() + "Utilization"
+        )
+
         self.quota = Quota(self.quota_collection_name)        
         self.unit_type = unit_type or self.uploader_id
         
@@ -171,31 +174,45 @@ class Uploader:
             }, 400
 
 
-    def upload_files(self, request_obj, event_type=None):
+    def upload_files(self, request_obj):
         """ 
             Upload files from request.
-
-            :event_type if None uploader_id will be taken as an event_type
         """
-        self.quota
-        return self._upload_response(
-            request_obj,  
-            event_type=event_type or self.uploader_id
-        )
+
+        msg, status = self._upload_response(request_obj, event_type=self.unit_type)
+
+        if status == 200:
+            response = self.quota.update_quota(
+                tenant_id = request_obj.headers.get("TenantId"), 
+                unit_type = self.unit_type, 
+                number_of_units = msg['units']
+            )
+
+            if response[1] != 200: 
+                return response
+
+        return msg, status
 
 
     def validate_filenames(self, request_obj):
         """
             Validate filenames from flask request.
         """
-        
-        msg, status = self._filenames_response(request_obj)
 
-        response = self.quota.check_quota(
-            request_obj.headers.get("TenantId"), 
-            unit_type='fmw_archive', 
-            number_of_units=msg['units']
-        )
+        msg, status = self._filenames_response(request_obj)
+        
+        if status != 200:
+            
+            response = self.quota.check_quota(
+                tenant_id = request_obj.headers.get("TenantId"), 
+                unit_type = self.unit_type, 
+                number_of_units = msg['units']
+            )
+
+            if response[1] != 200: 
+                return response
+
+        return msg, status
 
            
 
