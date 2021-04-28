@@ -8,10 +8,11 @@ from licenseware.registry.uploader import Uploader, reason_response
 
 """
 
-
-import os
 import logging
+import os
+
 import requests
+
 from licenseware.utils import RedisService, save_file
 
 
@@ -23,7 +24,7 @@ def reason_response(reason, valid_fname, valid_contents, filename_nok_msg='Filen
     """
 
     if reason:
-        if not valid_fname: 
+        if not valid_fname:
             return {
                 'status': 'fail',
                 'message': filename_nok_msg
@@ -34,10 +35,7 @@ def reason_response(reason, valid_fname, valid_contents, filename_nok_msg='Filen
         return all([valid_fname, valid_contents])
 
 
-
-
 class Uploader:
-
     """
         This library is used to register/store information about files 
         that will be uploaded and processed.
@@ -78,20 +76,20 @@ class Uploader:
     """
 
     def __init__(
-        self,
-        app_id,
-        upload_name,
-        upload_id,
-        description,
-        upload_url,
-        upload_validation_url,
-        status_check_url,
-        quota_validation_url,
-        history_url,
-        validate_upload_function,
-        validate_filename_function,
-        status="idle",
-        icon="default.png",
+            self,
+            app_id,
+            upload_name,
+            upload_id,
+            description,
+            upload_url,
+            upload_validation_url,
+            status_check_url,
+            quota_validation_url,
+            history_url,
+            validate_upload_function,
+            validate_filename_function,
+            status="idle",
+            icon="default.png",
     ):
 
         self.app_id = app_id
@@ -110,17 +108,15 @@ class Uploader:
         self.base_url = os.getenv("APP_BASE_PATH") + os.getenv("APP_URL_PREFIX") + '/uploads'
         self.registration_url = f'{os.getenv("REGISTRY_SERVICE_URL")}/uploaders'
         self.auth_token = os.getenv('AUTH_TOKEN')
-        
 
     def register_uploader(self):
 
         if not self.auth_token:
             logging.warning('Uploader not registered, no AUTH_TOKEN available')
             return {
-                "status": "fail", 
-                "message": "Uploader not registered, no AUTH_TOKEN available" 
-            }, 403
-
+                       "status": "fail",
+                       "message": "Uploader not registered, no AUTH_TOKEN available"
+                   }, 403
 
         payload = {
             'data': [{
@@ -139,7 +135,7 @@ class Uploader:
         }
 
         logging.warning(payload)
-        
+
         headers = {"Authorization": self.auth_token}
         registration = requests.post(url=self.registration_url, json=payload, headers=headers)
 
@@ -147,16 +143,40 @@ class Uploader:
 
         if registration.status_code == 200:
             return {
-                "status": "success",
-                "message": "Uploader register successfully"
-            }, 200
+                       "status": "success",
+                       "message": "Uploader register successfully"
+                   }, 200
 
         else:
             logging.warning("Could not register uploader")
             return {
-                "status": "fail",
-                "message": "Could not register uploader"
-            }, 400
+                       "status": "fail",
+                       "message": "Could not register uploader"
+                   }, 400
+
+    def notify_registry(self, tenant_id, status):
+
+        headers = {"Authorization": os.getenv('AUTH_TOKEN')}
+        payload = {
+            'data': [
+                {
+                    'tenant_id': tenant_id,
+                    'upload_id': self.upload_id,
+                    'status': status,
+                    'app_id': self.app_id
+                }
+            ]}
+        notification_sent = requests.post(
+            url=self.registration_url + '/status',
+            headers=headers,
+            json=payload
+        )
+        if notification_sent.status_code == 200:
+            logging.warning("Notification registry service success!")
+            return {"status": "success", "message": payload}, 200
+        else:
+            logging.warning("Notification registry service failed!")
+            return {"status": "fail", "message": payload}, 500
 
 
     def upload_files(self, request_obj, event_type=None):
@@ -167,19 +187,18 @@ class Uploader:
         """
 
         return self._upload_response(
-            request_obj,  
+            request_obj,
             event_type=event_type or self.upload_id
         )
-
 
     def validate_filenames(self, request_obj):
         """
             Validate filenames from flask request.
         """
         return self._filenames_response(request_obj)
-           
 
-    def _filenames_response(self, request_obj, filename_ok_msg='Filename is valid.', filename_nok_msg='Filename is not valid.'):
+    def _filenames_response(self, request_obj, filename_ok_msg='Filename is valid.',
+                            filename_nok_msg='Filename is not valid.'):
 
         filenames = request_obj.json
 
@@ -192,33 +211,32 @@ class Uploader:
             if self.validate_filename(filename):
                 accepted_files.append(filename)
                 status, message = 'success', filename_ok_msg
-                
+
             validation.append({
                 "filename": filename, "status": status, "message": message
             })
-        
+
         if not accepted_files:
             return {
-                'status': 'fail', 
-                'message': filename_nok_msg,
-                'validation': validation,
-                'units': 0
-            }, 400
+                       'status': 'fail',
+                       'message': filename_nok_msg,
+                       'validation': validation,
+                       'units': 0
+                   }, 400
 
         return {
-            'status': 'success', 
-            'message': 'Filenames are valid.',
-            'validation': validation,
-            'units': len(accepted_files)
-        }, 200
-
+                   'status': 'success',
+                   'message': 'Filenames are valid.',
+                   'validation': validation,
+                   'units': len(accepted_files)
+               }, 200
 
     def _upload_response(self, request_obj, event_type):
 
         file_objects = request_obj.files.getlist("files[]")
         if not isinstance(file_objects, list) and file_objects:
             return {"status": "fail", "message": "key needs to be files[]"}, 400
-            
+
         saved_files, validation = [], []
         for file in file_objects:
             res = self.validate_upload(file, reason=True)
@@ -227,17 +245,15 @@ class Uploader:
                 saved_files.append(filename)
             else:
                 filename = file.filename
-            
+
             validation.append({
                 "filename": filename, "status": res['status'], "message": res['message']
             })
 
-
         if not saved_files:
             return {
-                "status": "fail", "message": "no valid files provided", "validation": validation
-            }, 400
-
+                       "status": "fail", "message": "no valid files provided", "validation": validation
+                   }, 400
 
         RedisService.send_stream_event({
             "tenant_id": request_obj.headers.get("TenantId"),
@@ -245,10 +261,7 @@ class Uploader:
             "event_type": event_type
         })
 
-        return {"status": "success", "message": "files uploaded successfuly", 
-            "units": len(saved_files), 
-            "validation": validation
-        }, 200
-
-
-
+        return {"status": "success", "message": "files uploaded successfuly",
+                "units": len(saved_files),
+                "validation": validation
+                }, 200
