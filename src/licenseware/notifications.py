@@ -10,22 +10,19 @@ from licenseware import notify_status
 
 """
 
-import os
+import os, logging
 import requests
-from loguru import logger
-
-logger.add("file_validators.log", format="{time:YYYY-MM-DD at HH:mm:ss} [{level}] - {message}", backtrace=False, diagnose=False)
 
 
-async def notify_status(tenant_id, upload_id, status, app_id):
+async def notify_status(tenant_id, upload_id, status, app_id=None):
     """
         Sends a post request to registry service with the status of the data processing
     """
     
+    if not app_id: app_id = os.getenv("LWARE_IDENTITY_USER")
+    
     url = os.getenv("NOTIFICATION_SERVICE_URL") + "/processing-status"
     
-    headers = {"Authorization": os.getenv('AUTH_TOKEN')}
-
     payload = {
         'tenant_id': tenant_id,
         'upload_id': upload_id,
@@ -33,8 +30,9 @@ async def notify_status(tenant_id, upload_id, status, app_id):
         'app_id': app_id
     }
 
-    try:
-        requests.post(url, json=payload, headers=headers)
-        logger.warning("Notification sent")
-    except:
-        logger.exception("\n\n\n\n-------------Failsafe traceback:\n\n")
+    res = requests.post(
+        url, json=payload, headers={"Authorization": os.getenv('AUTH_TOKEN')}
+    )
+
+    logging.warning("------ notify_status:" + str(res.content))
+    

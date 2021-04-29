@@ -11,7 +11,7 @@ dm = DataManagement(collection="Data", schema=SchemaMarshmallowClass)
 
 from marshmallow import ValidationError
 from pymongo import errors
-from licenseware.utils import get_mongo_connection
+from .utils import get_mongo_connection
 
 mongo_db = get_mongo_connection()
 

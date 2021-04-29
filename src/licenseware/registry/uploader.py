@@ -6,14 +6,53 @@ from licenseware import Uploader, reason_response
 or 
 from licenseware.registry.uploader import Uploader, reason_response
 
+
+#Example on how to use reason_response function
+
+from licenseware import GeneralValidator, validate_filename
+
+def valid_ofmw_archive_name(archive_name):
+    return validate_filename(
+        fname=archive_name, 
+        fname_contains=["Collection"],
+        fname_endswith=[".zip", ".tar.bz2"]
+    )
+
+def valid_xxx_files(file, reason=False):
+    
+    valid_fname, valid_contents = None, None
+    
+    if isinstance(file, str):
+        valid_fname = valid_ofmw_archive_name(file)
+        valid_contents = True
+
+    if "stream" in str(dir(file)):
+        valid_fname = valid_ofmw_archive_name(file.filename)
+        
+        # Cant't check contents of archive until is opened
+        valid_contents = {"status": "success", "message": "File validation succeded"} 
+        
+        # But if you could check contents would be something like bellow:
+        # if valid_fname:
+        #     valid_contents = GeneralValidator(
+        #         input_object=file,
+        #         text_contains_all=[
+        #             'some text', 'another text the file must contain'
+        #         ]).validate(reason)
+
+
+    filename_nok_msg = 'Files must be of type ".zip", ".tar.bz2" and contain "Collection" in filename.'
+
+    return reason_response(reason, valid_fname, valid_contents, filename_nok_msg)
+
 """
 
 
 import os
 import logging
 import requests
-from licenseware.utils import RedisService, save_file
-from licenseware.quota import Quota
+from ..utils import RedisService, save_file
+from ..quota import Quota
 
 
 def reason_response(reason, valid_fname, valid_contents, filename_nok_msg='Filename is not valid.'):
@@ -22,6 +61,8 @@ def reason_response(reason, valid_fname, valid_contents, filename_nok_msg='Filen
         :valid_fname    - the response from validate_filename function from file_validators
         :valid_contents - the response from GeneralValidator.validate()
     """
+
+    # logging.warning(f"reason:{reason}, valid_fname:{valid_fname}, valid_contents:{valid_contents}")
 
     if reason:
         if not valid_fname: 
@@ -33,7 +74,6 @@ def reason_response(reason, valid_fname, valid_contents, filename_nok_msg='Filen
             return valid_contents
     else:
         return all([valid_fname, valid_contents])
-
 
 
 
@@ -53,8 +93,7 @@ class Uploader(Quota):
             description="Long description",
             upload_url="/UniqueName/files",
             upload_validation_url='/UniqueName/validation',
-            validate_upload_function=receive_files_UniqueName, #function that validates file contents and file name
-            validate_filename_function=validate_UniqueName, #function that validates file contents and file name
+            validation_function=valid_xxx_files, #function that validates filname and contents
             quota_collection_name=None, # if not specified will be computed from app_id (check code)
             unit_type=None, # if not specified uploader_id will be taken (this will be also the event_type for redis stream)
             quota_validation_url='/quota/UniqueName',
@@ -91,8 +130,7 @@ class Uploader(Quota):
         status_check_url,
         quota_validation_url,
         history_url,
-        validate_upload_function,
-        validate_filename_function,
+        validation_function,
         quota_collection_name=None,
         unit_type=None,
         status="idle",
@@ -110,17 +148,17 @@ class Uploader(Quota):
         self.history_url = history_url
         self.status = status
         self.icon = icon
-        self.validate_upload = validate_upload_function
-        self.validate_filename = validate_filename_function
+        self.validation_function = validation_function
         
         self.quota_collection_name = (
             quota_collection_name or str(app_id).split("-")[0].upper() + "Utilization"
         )
-
-        super().__init__(self.quota_collection_name)
-
         self.unit_type = unit_type or self.uploader_id
-        
+
+        super().__init__(
+            collection = self.quota_collection_name, _unit_type = self.unit_type
+        )
+
         self.base_url = os.getenv("APP_BASE_PATH") + os.getenv("APP_URL_PREFIX") + '/uploads'
         self.registration_url = f'{os.getenv("REGISTRY_SERVICE_URL")}/uploaders'
         self.auth_token = os.getenv('AUTH_TOKEN')
@@ -175,25 +213,6 @@ class Uploader(Quota):
             }, 400
 
 
-    def upload_files(self, request_obj):
-        """ 
-            Upload files from request.
-        """
-
-        msg, status = self._upload_response(request_obj, event_type=self.unit_type)
-
-        if status == 200:
-            response = self.update_quota(
-                tenant_id = request_obj.headers.get("TenantId"), 
-                unit_type = self.unit_type, 
-                number_of_units = msg['units']
-            )
-
-            if response[1] != 200: 
-                return response
-
-        return msg, status
-
 
     def validate_filenames(self, request_obj):
         """
@@ -204,14 +223,36 @@ class Uploader(Quota):
         
         if status != 200:
             
-            response = self.check_quota(
+            qmsg, qstatus = self.check_quota(
                 tenant_id = request_obj.headers.get("TenantId"), 
                 unit_type = self.unit_type, 
                 number_of_units = msg['units']
             )
 
-            if response[1] != 200: 
-                return response
+            if qstatus != 200: 
+                msg['status'] = qmsg['status'] #check_quota status has priority 
+                return dict(msg, **qmsg), qstatus
+
+        return msg, status
+
+
+    def upload_files(self, request_obj):
+        """ 
+            Upload files from request.
+        """
+
+        msg, status = self._upload_response(request_obj, event_type=self.unit_type)
+
+        if status == 200:
+            qmsg, qstatus = self.update_quota(
+                tenant_id = request_obj.headers.get("TenantId"), 
+                unit_type = self.unit_type, 
+                number_of_units = msg['units']
+            )
+
+            if qstatus != 200: 
+                qmsg['status'] = msg['status'] #probabily quota initilized but files check failed
+                return dict(msg, **qmsg), qstatus
 
         return msg, status
 
@@ -227,7 +268,7 @@ class Uploader(Quota):
         validation, accepted_files = [], []
         for filename in filenames:
             status, message = 'fail', filename_nok_msg
-            if self.validate_filename(filename):
+            if self.validation_function(filename):
                 accepted_files.append(filename)
                 status, message = 'success', filename_ok_msg
                 
@@ -259,7 +300,7 @@ class Uploader(Quota):
             
         saved_files, validation = [], []
         for file in file_objects:
-            res = self.validate_upload(file, reason=True)
+            res = self.validation_function(file, reason=True)
             if res['status'] == "success":
                 filename = save_file(file, request_obj.headers.get("TenantId"))
                 saved_files.append(filename)

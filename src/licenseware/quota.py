@@ -23,8 +23,9 @@ import os
 import sys
 import uuid
 import dateutil.parser as dateparser
-import licenseware.mongodata as m
 from .serializer import AppUtilizationSchema
+from .mongodata import insert, fetch, update
+import logging
 
 
 QUOTA = {
@@ -37,8 +38,8 @@ QUOTA = {
     "review_lite": 16, # Databases
     "lms_options": 1, # Files
 
-    #FMW
-    "fmw_archive": 1  # 1 Device  == 1 archive
+    #OFMW
+    "ofmw_archive": 1  # 1 Device  == 1 archive
 }
 
 
@@ -57,20 +58,26 @@ def get_quota_reset_date():
 
 class Quota:
 
-    def __init__(self, collection, schema=None):
+    def __init__(self, collection, _schema=None, _unit_type=None):
         self.collection = collection
-        self.schema = schema or AppUtilizationSchema
+        self._unit_type = _unit_type
+        self.schema = _schema or AppUtilizationSchema
 
 
-    def init_quota(self, tenant_id, unit_type):
+    def init_quota(self, tenant_id, unit_type=None):
 
-        results = m.fetch(
+        unit_type = unit_type or self._unit_type
+        if not unit_type: 
+            raise ValueError("Please specify a value for 'unit_type' parameter")    
+
+
+        results = fetch(
             match={'tenant_id': tenant_id, 'unit_type': unit_type},
             collection=self.collection
         )
 
         if results:
-            return {'status': 'fail', 'message': 'App already installed'}, 400
+            return {'status': 'success', 'message': 'Quota already initialized'}, 200
 
         init_data = {
             "_id": str(uuid.uuid4()),
@@ -81,20 +88,25 @@ class Quota:
             "quota_reset_date": get_quota_reset_date()
         }
 
-        inserted_ids = m.insert(
+        inserted_ids = insert(
             schema=self.schema, data=init_data, collection=self.collection
         )
 
-        if len(inserted_ids) == 1:
-            return {'status': 'success', 'message': 'Quota initialized'}, 200
-        
+        if isinstance(inserted_ids, list) and len(inserted_ids) == 1:
+            return {'status': 'success', 'message': 'Quota initialized'}, 201
+
         return {'status': 'fail', 'message': 'Quota failed to initialize'}, 500
 
 
 
-    def update_quota(self, tenant_id, unit_type, number_of_units):
+    def update_quota(self, tenant_id, number_of_units, unit_type=None):
+        
+        unit_type = unit_type or self._unit_type
+        if not unit_type: 
+            raise ValueError("Please specify a value for 'unit_type' parameter")    
 
-        current_utilization = m.fetch(
+
+        current_utilization = fetch(
             match={'tenant_id': tenant_id, 'unit_type': unit_type},
             collection=self.collection
         )
@@ -103,11 +115,12 @@ class Quota:
             new_utilization = current_utilization[0]
             new_utilization['monthly_quota_consumed'] += number_of_units
             
-            updated_docs = m.update(
+            updated_docs = update(
                 schema=self.schema,
                 match=current_utilization[0],
                 new_data=new_utilization,
-                collection=self.collection
+                collection=self.collection, 
+                append=False
             )
 
             if updated_docs == 1:
@@ -124,16 +137,21 @@ class Quota:
                 return new_user_status, response
 
 
-    def check_quota(self, tenant_id, unit_type, number_of_units=0):
+    def check_quota(self, tenant_id, number_of_units=0, unit_type=None):
+        
+        unit_type = unit_type or self._unit_type
+        if not unit_type: 
+            raise ValueError("Please specify a value for 'unit_type' parameter")    
+
         
         query = {'tenant_id': tenant_id, 'unit_type': unit_type}
 
-        results = m.fetch(query, self.collection)
+        results = fetch(query, self.collection)
 
         if not results:
             new_user_response, status = self.init_quota(tenant_id, unit_type)
             if status == 200:
-                results = m.fetch(query, self.collection)
+                results = fetch(query, self.collection)
                 if results: quota = results[0]
             else:
                 return new_user_response, status
@@ -147,7 +165,7 @@ class Quota:
         if quota_reset_date < current_date:
             quota['quota_reset_date'] = get_quota_reset_date()
             quota['monthly_quota_consumed'] = 0
-            m.update(results[0], quota, self.collection)
+            update(self.schema, results[0], quota, self.collection)
             # Recall check_quota method with the new reseted date and quota
             self.check_quota(tenant_id, unit_type, number_of_units)
 

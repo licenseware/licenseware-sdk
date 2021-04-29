@@ -21,10 +21,15 @@ import os
 import logging
 import requests
 from functools import wraps
-from flask import request
 from loguru import logger
+# from inspect import iscoroutinefunction, isfunction
+try:
+    from flask import request
+except:
+    pass #we are on the worker side
 
-logger.add("failsafe.log", format="{time:YYYY-MM-DD at HH:mm:ss} [{level}] - {message}", backtrace=False, diagnose=False)
+
+logger.add("failsafe.log", format="{time:YYYY-MM-DD at HH:mm:ss} [{level}] - {message}", backtrace=True, diagnose=False)
 
 
 def failsafe(*dargs, fail_code=0, success_code=0):
@@ -56,16 +61,57 @@ def failsafe(*dargs, fail_code=0, success_code=0):
             try:
                 response = f(*args, **kwargs)
                 if success_code:
-                    return {"status": "Success", "message": response}, success_code
+                    return {"status": "success", "message": response}, success_code
                 return response
             except Exception as err:
                 logger.exception("\n\n\n\n-------------Failsafe traceback:\n\n")
                 if fail_code:
-                    return {"status": "Fail", "message": str(err)}, fail_code
+                    return {"status": "fail", "message": str(err)}, fail_code
                 return str(err)
         return wrapper
 
     return _decorator(dargs[0]) if dargs and callable(dargs[0]) else _decorator
+
+
+
+# def _failsafe_success(response, success_code):
+#     if success_code:
+#         return {"status": "success", "message": response}, success_code
+#     return response
+
+# def _failsafe_fail(fail_code, error):
+#     logger.exception("\n\n\n\n-------------Failsafe traceback:\n\n")
+#     if fail_code:
+#         return {"status": "fail", "message": str(error)}, fail_code
+#     return str(error)
+
+
+# def failsafe_async(*dargs, fail_code=0, success_code=0):
+
+#     def _decorator(f):
+
+#         if isfunction(f):
+#             @wraps(f)
+#             def wrapper(*args, **kwargs):
+#                 try:
+#                     response = f(*args, **kwargs)
+#                     return _failsafe_success(response, success_code)
+#                 except Exception as error:
+#                     return _failsafe_fail(fail_code, error)
+#             return wrapper
+
+#         if iscoroutinefunction(f):
+#             @wraps(f)
+#             async def wrapper(*args, **kwargs):
+#                 try:
+#                     response = await f(*args, **kwargs)
+#                     return _failsafe_success(response, success_code)
+#                 except Exception as error:
+#                     return _failsafe_fail(fail_code, error)
+#             return wrapper
+            
+#     return _decorator(dargs[0]) if dargs and callable(dargs[0]) else _decorator
+
 
 
 
