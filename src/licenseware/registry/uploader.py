@@ -214,6 +214,32 @@ class Uploader(Quota):
 
 
 
+    def notify_registry(self, tenant_id, status):
+
+        headers = {"Authorization": os.getenv('AUTH_TOKEN')}
+        payload = {
+            'data': [
+                {
+                    'tenant_id': tenant_id,
+                    'upload_id': self.uploader_id, #to be changed later to uploader_id
+                    'status': status,
+                    'app_id': self.app_id
+                }
+            ]}
+        notification_sent = requests.post(
+            url=self.registration_url + '/status',
+            headers=headers,
+            json=payload
+        )
+        if notification_sent.status_code == 200:
+            logging.warning("Notification registry service success!")
+            return {"status": "success", "message": payload}, 200
+        else:
+            logging.warning("Notification registry service failed!")
+            return {"status": "fail", "message": payload}, 500
+
+
+
     def validate_filenames(self, request_obj):
         """
             Validate filenames from flask request.
