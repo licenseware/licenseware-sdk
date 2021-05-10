@@ -1,21 +1,26 @@
 """
-Depreciated
+
+Wrapper for mongodb with tuple response (dict, status code)
+
+from licenseware import DataManagement
+
+dm = DataManagement(collection="Data", schema=SchemaMarshmallowClass)
+
 """
 
 
 from marshmallow import ValidationError
 from pymongo import errors
+from .utils import get_mongo_connection
 
-from .utils.mongodb_connection import Connect
-
-mongo_db = Connect.get_connection()
+mongo_db = get_mongo_connection()
 
 
 class DataManagement:
-    def __init__(self, _schema, collection):
+    def __init__(self, collection, schema):
         self.connection = mongo_db
         self.database = self.connection["db"]
-        self.document_schema = _schema()
+        self.document_schema = schema()
         self.collection = collection
 
     def collection_db(self):

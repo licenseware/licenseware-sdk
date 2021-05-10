@@ -6,14 +6,53 @@ from licenseware import Uploader, reason_response
 or 
 from licenseware.registry.uploader import Uploader, reason_response
 
+
+#Example on how to use reason_response function
+
+from licenseware import GeneralValidator, validate_filename
+
+def valid_ofmw_archive_name(archive_name):
+    return validate_filename(
+        fname=archive_name, 
+        fname_contains=["Collection"],
+        fname_endswith=[".zip", ".tar.bz2"]
+    )
+
+def valid_xxx_files(file, reason=False):
+    
+    valid_fname, valid_contents = None, None
+    
+    if isinstance(file, str):
+        valid_fname = valid_ofmw_archive_name(file)
+        valid_contents = True
+
+    if "stream" in str(dir(file)):
+        valid_fname = valid_ofmw_archive_name(file.filename)
+        
+        # Cant't check contents of archive until is opened
+        valid_contents = {"status": "success", "message": "File validation succeded"} 
+        
+        # But if you could check contents would be something like bellow:
+        # if valid_fname:
+        #     valid_contents = GeneralValidator(
+        #         input_object=file,
+        #         text_contains_all=[
+        #             'some text', 'another text the file must contain'
+        #         ]).validate(reason)
+
+
+    filename_nok_msg = 'Files must be of type ".zip", ".tar.bz2" and contain "Collection" in filename.'
+
+    return reason_response(reason, valid_fname, valid_contents, filename_nok_msg)
+
 """
 
-import logging
+
 import os
-
+import logging
 import requests
-
-from licenseware.utils import RedisService, save_file
+from ..utils import RedisService, save_file
+from ..quota import Quota
 
 
 def reason_response(reason, valid_fname, valid_contents, filename_nok_msg='Filename is not valid.'):
@@ -23,8 +62,10 @@ def reason_response(reason, valid_fname, valid_contents, filename_nok_msg='Filen
         :valid_contents - the response from GeneralValidator.validate()
     """
 
+    # logging.warning(f"reason:{reason}, valid_fname:{valid_fname}, valid_contents:{valid_contents}")
+
     if reason:
-        if not valid_fname:
+        if not valid_fname: 
             return {
                 'status': 'fail',
                 'message': filename_nok_msg
@@ -35,7 +76,9 @@ def reason_response(reason, valid_fname, valid_contents, filename_nok_msg='Filen
         return all([valid_fname, valid_contents])
 
 
-class Uploader:
+
+class Uploader(Quota):
+
     """
         This library is used to register/store information about files 
         that will be uploaded and processed.
@@ -46,12 +89,13 @@ class Uploader:
         UniqueName = Uploader(
             app_id="name-service",
             upload_name="Short description",
-            upload_id="UniqueName",
+            uploader_id="UniqueName",
             description="Long description",
             upload_url="/UniqueName/files",
             upload_validation_url='/UniqueName/validation',
-            validate_upload_function=receive_files_UniqueName, #function that validates file contents and file name
-            validate_filename_function=validate_UniqueName, #function that validates file contents and file name
+            validation_function=valid_xxx_files, #function that validates filname and contents
+            quota_collection_name=None, # if not specified will be computed from app_id (check code)
+            unit_type=None, # if not specified uploader_id will be taken (this will be also the event_type for redis stream)
             quota_validation_url='/quota/UniqueName',
             status_check_url='/UniqueName/status',
             history_url='/UniqueName/history'
@@ -76,25 +120,26 @@ class Uploader:
     """
 
     def __init__(
-            self,
-            app_id,
-            upload_name,
-            upload_id,
-            description,
-            upload_url,
-            upload_validation_url,
-            status_check_url,
-            quota_validation_url,
-            history_url,
-            validate_upload_function,
-            validate_filename_function,
-            status="idle",
-            icon="default.png",
+        self,
+        app_id,
+        upload_name,
+        uploader_id,
+        description,
+        upload_url,
+        upload_validation_url,
+        status_check_url,
+        quota_validation_url,
+        history_url,
+        validation_function,
+        quota_collection_name=None,
+        unit_type=None,
+        status="idle",
+        icon="default.png",
     ):
 
         self.app_id = app_id
         self.upload_name = upload_name
-        self.upload_id = upload_id
+        self.uploader_id = uploader_id
         self.description = description
         self.upload_url = upload_url
         self.upload_validation_url = upload_validation_url
@@ -103,26 +148,39 @@ class Uploader:
         self.history_url = history_url
         self.status = status
         self.icon = icon
-        self.validate_upload = validate_upload_function
-        self.validate_filename = validate_filename_function
+        self.validation_function = validation_function
+        
+        self.quota_collection_name = (
+            quota_collection_name or str(app_id).split("-")[0].upper() + "Utilization"
+        )
+        self.unit_type = unit_type or self.uploader_id
+
+        super().__init__(
+            collection = self.quota_collection_name, _unit_type = self.unit_type
+        )
+
         self.base_url = os.getenv("APP_BASE_PATH") + os.getenv("APP_URL_PREFIX") + '/uploads'
         self.registration_url = f'{os.getenv("REGISTRY_SERVICE_URL")}/uploaders'
         self.auth_token = os.getenv('AUTH_TOKEN')
+
+
+        
 
     def register_uploader(self):
 
         if not self.auth_token:
             logging.warning('Uploader not registered, no AUTH_TOKEN available')
             return {
-                       "status": "fail",
-                       "message": "Uploader not registered, no AUTH_TOKEN available"
-                   }, 403
+                "status": "fail", 
+                "message": "Uploader not registered, no AUTH_TOKEN available" 
+            }, 403
+
 
         payload = {
             'data': [{
                 "app_id": self.app_id,
                 "upload_name": self.upload_name,
-                "upload_id": self.upload_id,
+                "upload_id": self.uploader_id, #TODO Field to be later renamed to uploader_id
                 "description": self.description,
                 "upload_url": self.base_url + self.upload_url,
                 "upload_validation_url": self.base_url + self.upload_validation_url,
@@ -135,7 +193,7 @@ class Uploader:
         }
 
         logging.warning(payload)
-
+        
         headers = {"Authorization": self.auth_token}
         registration = requests.post(url=self.registration_url, json=payload, headers=headers)
 
@@ -143,16 +201,18 @@ class Uploader:
 
         if registration.status_code == 200:
             return {
-                       "status": "success",
-                       "message": "Uploader register successfully"
-                   }, 200
+                "status": "success",
+                "message": "Uploader register successfully"
+            }, 200
 
         else:
             logging.warning("Could not register uploader")
             return {
-                       "status": "fail",
-                       "message": "Could not register uploader"
-                   }, 400
+                "status": "fail",
+                "message": "Could not register uploader"
+            }, 400
+
+
 
     def notify_registry(self, tenant_id, status):
 
@@ -161,7 +221,7 @@ class Uploader:
             'data': [
                 {
                     'tenant_id': tenant_id,
-                    'upload_id': self.upload_id,
+                    'upload_id': self.uploader_id, #to be changed later to uploader_id
                     'status': status,
                     'app_id': self.app_id
                 }
@@ -179,26 +239,52 @@ class Uploader:
             return {"status": "fail", "message": payload}, 500
 
 
-    def upload_files(self, request_obj, event_type=None):
-        """ 
-            Upload files from request.
-
-            :event_type if None upload_id will be taken as an event_type
-        """
-
-        return self._upload_response(
-            request_obj,
-            event_type=event_type or self.upload_id
-        )
 
     def validate_filenames(self, request_obj):
         """
             Validate filenames from flask request.
         """
-        return self._filenames_response(request_obj)
 
-    def _filenames_response(self, request_obj, filename_ok_msg='Filename is valid.',
-                            filename_nok_msg='Filename is not valid.'):
+        msg, status = self._filenames_response(request_obj)
+        
+        if status != 200:
+            
+            qmsg, qstatus = self.check_quota(
+                tenant_id = request_obj.headers.get("TenantId"), 
+                unit_type = self.unit_type, 
+                number_of_units = msg['units']
+            )
+
+            if qstatus != 200: 
+                msg['status'] = qmsg['status'] #check_quota status has priority 
+                return dict(msg, **qmsg), qstatus
+
+        return msg, status
+
+
+    def upload_files(self, request_obj):
+        """ 
+            Upload files from request.
+        """
+
+        msg, status = self._upload_response(request_obj, event_type=self.unit_type)
+
+        if status == 200:
+            qmsg, qstatus = self.update_quota(
+                tenant_id = request_obj.headers.get("TenantId"), 
+                unit_type = self.unit_type, 
+                number_of_units = msg['units']
+            )
+
+            if qstatus != 200: 
+                qmsg['status'] = msg['status'] #probabily quota initilized but files check failed
+                return dict(msg, **qmsg), qstatus
+
+        return msg, status
+
+           
+
+    def _filenames_response(self, request_obj, filename_ok_msg='Filename is valid.', filename_nok_msg='Filename is not valid.'):
 
         filenames = request_obj.json
 
@@ -208,52 +294,55 @@ class Uploader:
         validation, accepted_files = [], []
         for filename in filenames:
             status, message = 'fail', filename_nok_msg
-            if self.validate_filename(filename):
+            if self.validation_function(filename):
                 accepted_files.append(filename)
                 status, message = 'success', filename_ok_msg
-
+                
             validation.append({
                 "filename": filename, "status": status, "message": message
             })
-
+        
         if not accepted_files:
             return {
-                       'status': 'fail',
-                       'message': filename_nok_msg,
-                       'validation': validation,
-                       'units': 0
-                   }, 400
+                'status': 'fail', 
+                'message': filename_nok_msg,
+                'validation': validation,
+                'units': 0
+            }, 400
 
         return {
-                   'status': 'success',
-                   'message': 'Filenames are valid.',
-                   'validation': validation,
-                   'units': len(accepted_files)
-               }, 200
+            'status': 'success', 
+            'message': 'Filenames are valid.',
+            'validation': validation,
+            'units': len(accepted_files)
+        }, 200
+
 
     def _upload_response(self, request_obj, event_type):
 
         file_objects = request_obj.files.getlist("files[]")
         if not isinstance(file_objects, list) and file_objects:
             return {"status": "fail", "message": "key needs to be files[]"}, 400
-
+            
         saved_files, validation = [], []
         for file in file_objects:
-            res = self.validate_upload(file, reason=True)
+            res = self.validation_function(file, reason=True)
             if res['status'] == "success":
                 filename = save_file(file, request_obj.headers.get("TenantId"))
                 saved_files.append(filename)
             else:
                 filename = file.filename
-
+            
             validation.append({
                 "filename": filename, "status": res['status'], "message": res['message']
             })
 
+
         if not saved_files:
             return {
-                       "status": "fail", "message": "no valid files provided", "validation": validation
-                   }, 400
+                "status": "fail", "message": "no valid files provided", "validation": validation
+            }, 400
+
 
         RedisService.send_stream_event({
             "tenant_id": request_obj.headers.get("TenantId"),
@@ -261,7 +350,10 @@ class Uploader:
             "event_type": event_type
         })
 
-        return {"status": "success", "message": "files uploaded successfuly",
-                "units": len(saved_files),
-                "validation": validation
-                }, 200
+        return {"status": "success", "message": "files uploaded successfuly", 
+            "units": len(saved_files), 
+            "validation": validation
+        }, 200
+
+
+

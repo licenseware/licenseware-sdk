@@ -73,7 +73,6 @@ def _parse_doc(doc):
     if not "_id" in doc: return doc
 
     return dict(doc, **{"_id": _parse_oid(doc["_id"])})
-    
 
 def _parse_match(match):
     oid, uid, key = None, None, None
@@ -227,7 +226,7 @@ def fetch(match, collection, as_list=True, db_name=None):
 
 
 @failsafe
-def update(schema, match, new_data, collection, append=True, db_name=None):
+def update(schema, match, new_data, collection, append=False, db_name=None):
     """
         Update documents based on match query.
         
