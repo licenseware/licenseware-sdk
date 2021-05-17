@@ -47,6 +47,7 @@ from licenseware import (
     Quota,
     Uploader, 
     reason_response,
+    SchemaApiFactory,
     save_file,
     unzip,
     GeneralValidator, 
