@@ -6,14 +6,17 @@ from setuptools import setup, find_packages
 #cd dist 
 #twine upload *
 
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+with open("requirements.txt", "r") as fh:
+    requirements = fh.readlines()
 
 
 setup(
 	name="licenseware",
-	version="0.0.2",
+	version="0.0.5",
 	description="Common utilities for licenseware.",
 	url="https://github.com/licenseware/licenseware-sdk",
 	author="licenseware",
@@ -21,16 +24,7 @@ setup(
 	license='',
 	long_description=long_description,
     long_description_content_type="text/markdown",
-	install_requires=[
-		"pandas", 
-		"openpyxl",
-		"flask", 
-		"redis",
-		"loguru",
-		"requests",
-		"pymongo",
-		"marshmallow"
-	],
+	install_requires=requirements,
 	package_dir={"":"src"},
 	packages=find_packages(
 		where="src",
