@@ -1,10 +1,13 @@
 """
 
-from licenseware import SchemaApiFactory
-from .utils import authorization_check, machine_check
+This module makes available the `namespace` decorator 
+which can be used to generate flask_restx namespace from marshmallow schema
 
-from flask import request
+```py
+
+from licenseware.decorators import namespace, login_required
 from marshmallow import fields, Schema
+from flask import request
 
 
 class CatSchema(Schema):
@@ -12,86 +15,52 @@ class CatSchema(Schema):
     name = fields.String(required=True)
 
 
-factory_api = SchemaApiFactory(
-    schema = CatSchema, decorators = [authorization_check, machine_check]
-)
+# @namespace(CatSchema, [login_required]) # args works also
+@namespace(schema=CatSchema, decorators=[login_required])
+class CatNamespace:
 
+    # implement get, post, put, delete methods
 
-# Add CRUD implementations
+    def get(self, param1=None, param2=None): 
 
+        param1 = request.args.get('param1)
+        param2 = request.args.get('param1)
 
-def get_data(resource, catName=None, catId: int = None):
-    # Parameter resource is passed by default to all funcs by werkzeug
+        return "your GET request implementation"
     
-    print("catId, catName: ", catId, catName) #will be None
-    print("request.args", request.args)
+    def post(self): 
+        return "your POST request implementation"
 
-    # Function parameters will be considered as request args.
+```
 
-    You can retrieve args with: 
-    - request.args.get('catName')
-    - request.args.get('catId')
-
-    #Your implementation
-   
-
-def insert_data(resource): 
-
-    You can retrieve body with:
-    - request.json
-
-    #Your implementation
-   
-
-def update_data(resource):
-    #Your implementation
-    
-
-def delete_data(resource):
-    #Your implementation
-
-
-# Overwrite default CRUD methods
-
-factory_api.get = get_data
-factory_api.post = insert_data
-factory_api.put = update_data
-factory_api.delete = delete_data
-
-
-api = factory_api.initialize()
-
-
-# In another file
-# Import this api to main Api namespace
-
-from .ns_schema import api as schema_api
-
-api.add_namespace(schema_api, path='/schema')
+As you see in the `get` method param1 and param2 are query parameters.
+You can retrive them with flask's `request.args`.
+Query parameters MUST be set to None (as you see in get method `def get(self, param1=None, param2=None): ...`)
 
 
 
-# Or with inheritance
+Once your CRUD implementation is done you can import `CatNamespace` class in your namespace gatherer file:
 
-class Cat(SchemaApiFactory):
-    def __init__(self, schema: Schema, decorators: list = None):
-        super().__init__(schema, decorators)
+```py
 
-    # Overwrite CRUD methods: get, put, post, delete
+from flask import Blueprint
+from flask_restx import Api
 
+from .mymodule import CatNamespace
 
-factory_api = Cat(schema=CatSchema, decorators=[authorization_check, machine_check])
+blueprint = Blueprint('api', __name__)
 
-api = factory_api.initialize()
-
-# In another file
-# Import this api to main Api namespace
-
-from .ns_schema import api as schema_api
-
-api.add_namespace(schema_api, path='/schema')
+api = Api(blueprint, title='My title', version='1.0')
 
 
+api.add_namespace(CatNamespace(), path='/schema')
+
+```
+
+`CatNamespace()` will return the flask_restx namespace generated.
+OpenAPI/Swagger docs will be automatically be generated from schema model.
+
+ 
 """
 
 import re
@@ -117,13 +86,19 @@ auth_header_doc = {
 
 class SchemaApiFactory:
 
-    def __init__(self, schema: Schema, decorators: list = None, authorizations: dict = None):
-        self.schema = schema
+    # Used by ns decorator
+    schema = None
+    decorators = None
+    authorizations = None
+
+    def __init__(self, schema: Schema = None, decorators: list = None, authorizations: dict = None):
+        self.schema = self.schema or schema
+        self.decorators = self.decorators or decorators
+        self.authorizations = self.authorizations or authorizations or auth_header_doc
+
         self.schema_name = self.schema.__name__
         self.name = self.schema_name.replace("Schema", "")
-        self.decorators = decorators
         self.path = "/" + self.name.lower()
-        self.authorizations = authorizations or auth_header_doc
         self.json_schema = None
         self.ns = None
         self.model = None
@@ -131,7 +106,13 @@ class SchemaApiFactory:
         self.http_methods = None
 
 
-    def initialize(self) -> Namespace:
+    @classmethod
+    def initialize(cls):
+        c = cls(cls.schema, cls.decorators, cls.authorizations)
+        return c.init_namespace()
+
+
+    def init_namespace(self) -> Namespace:
         """ Create restx api namespace from schema """
 
         self.ns = self.create_namespace()
@@ -232,9 +213,58 @@ class SchemaApiFactory:
         self.json_schema = JSONSchema().dump(self.schema())["definitions"][self.schema_name]
 
 
-    def get(self): return "Method Not Allowed", 405
-    def post(self): return "Method Not Allowed", 405
-    def put(self): return "Method Not Allowed", 405
+    def get(self)   : return "Method Not Allowed", 405
+    def post(self)  : return "Method Not Allowed", 405
+    def put(self)   : return "Method Not Allowed", 405
     def delete(self): return "Method Not Allowed", 405
         
+
+
+
+# SchemaApiFactory Decorator 
+
+def get_schema_param(dargs, dkwargs):
+
+    if 'schema' in dkwargs:
+        return dkwargs['schema']
+
+    if len(dargs) > 0:
+        return dargs[0]
+
+def get_decorators_param(dargs, dkwargs):
+
+    if 'decorators' in dkwargs:
+        return dkwargs['decorators']
+
+    if len(dargs) > 1:
+        return dargs[1]
+
+def get_authorizations_param(dargs, dkwargs):
+
+    if 'authorizations' in dkwargs:
+        return dkwargs['authorizations']
+
+    if len(dargs) > 2:
+        return dargs[2]
+
+
+def get_schema_api_factory_params(dargs, dkwargs):
+    return {
+        'schema': get_schema_param(dargs, dkwargs), 
+        'decorators': get_decorators_param(dargs, dkwargs),
+        'authorizations': get_authorizations_param(dargs, dkwargs)
+    }
+
+
+
+
+# Namespace generator 
+def namespace(*dargs, **dkwargs):
+    def wrapper(cls):
+        attrs = get_schema_api_factory_params(dargs, dkwargs)
+        newcls = type(cls.__name__, (cls, SchemaApiFactory,), attrs)
+        return lambda: newcls.initialize()
+    return wrapper
+
+
 
