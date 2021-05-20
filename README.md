@@ -58,6 +58,7 @@ from licenseware import (
     RedisService,
     get_mongo_connection,
     notify_status,
+    RedisEventDispacher
 )
 
 from licenseware.decorators import (
