@@ -64,6 +64,7 @@ OpenAPI/Swagger docs will be automatically be generated from schema model.
 """
 
 import re
+import logging
 from marshmallow import Schema
 from marshmallow_jsonschema import JSONSchema
 from flask_restx import Namespace, Resource
@@ -183,12 +184,13 @@ class SchemaApiFactory:
 
         for k in self.http_methods.keys():
             self.http_methods[k]['docs'] = {
+                'id': f'{k.upper()} request for {self.name}',
                 'description': f'Make a {k.upper()} request on {self.name} data.',
                 'responses':{
-                    200: 'Success',
-                    500: 'Internal Error',
-                    401: 'Authentification Required',
-                    405: 'Method Not Allowed'
+                    200: 'SUCCESS',
+                    500: 'INTERNAL ERROR',
+                    401: 'UNAUTHORIZED',
+                    405: 'METHOD NOT ALLOWED',
                 },
                 'model':self.model,
                 'security': list(self.authorizations.keys())
@@ -199,14 +201,17 @@ class SchemaApiFactory:
 
             sig = signature(self.http_methods[k]['method'])
             raw_params = list(dict(sig.parameters).keys())
-            if len(raw_params) > 1:
+            
+            if raw_params:
                 self.http_methods[k]['docs'].update({"params": {}})
-                for param_name in raw_params[1:]:
+                for param_name in raw_params:
                     param_type = re.search(r"<class '(.*?)'>", str(sig.parameters[param_name].annotation)).group(1)
                     param_type = 'str' if param_type == 'inspect._empty' else param_type
                     self.http_methods[k]['docs']["params"].update(
-                        { param_name:  param_type}
+                        { param_name:  f"Query parameter ({param_type})"}
                     )
+
+            
 
     
     def make_json_schema(self) -> dict:
