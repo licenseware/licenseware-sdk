@@ -118,7 +118,7 @@ class SchemaApiFactory:
 
         self.ns = self.create_namespace()
         self.make_json_schema()
-        self.model = self.ns.schema_model(self.schema_name, self.json_schema)  
+        self.model = self.ns.schema_model(self.name, self.json_schema)  
         self.attach_http_methods()
         self.attach_http_docs()
         
