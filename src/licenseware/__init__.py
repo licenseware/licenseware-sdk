@@ -1,6 +1,6 @@
 from  . import mongodata
 from  . import decorators
-from .decorators import namespace
+from .decorators import namespace, SchemaNamespace
 from .quota import Quota
 from .auth import Authenticator
 from .notifications import notify_status
