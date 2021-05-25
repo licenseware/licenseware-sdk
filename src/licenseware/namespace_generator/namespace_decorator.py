@@ -1,4 +1,4 @@
-from ..namespace_generator import SchemaNamespace
+from .schema_namespace import SchemaNamespace
 
 
 
