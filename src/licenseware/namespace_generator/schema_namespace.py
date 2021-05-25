@@ -39,22 +39,22 @@ class SchemaNamespace(MongoRequest):
 	# Used by namespace decorator
 	schema = None
 	collection = None
-	decorators = None
+	decorators = [authorization_check]
 	methods = allowed_methods # allowed methods(the rest will get a 405)
-	authorizations = None # authorization_check is used by default
+	authorizations = auth_header_doc 
 
 	def __init__(self, 
 	schema: Schema = None, 
 	collection: str = None, 
 	methods: list = allowed_methods, 
 	decorators: list = [authorization_check],
-	authorizations: dict = None
+	authorizations: dict = auth_header_doc
 	):
 		self.schema = self.schema or schema
 		self.collection = self.collection or collection
 		self.decorators = self.decorators or decorators
 		self.methods = self.methods or methods
-		self.authorizations = self.authorizations or authorizations or auth_header_doc
+		self.authorizations = self.authorizations or authorizations
 
 		self.schema_name = self.schema.__name__
 		self.name = self.schema_name.replace("Schema", "")
