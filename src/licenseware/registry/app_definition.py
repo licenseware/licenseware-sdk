@@ -27,7 +27,7 @@ which represents that tenant has processed files and has saved data as a result
 import os, logging
 import traceback
 import requests
-from licenseware import BASE_URL, REGISTRY_SERVICE_URL
+from licenseware.utils.urls import BASE_URL, REGISTRY_SERVICE_URL
 
 
 class AppDefinition:

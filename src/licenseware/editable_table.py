@@ -1,6 +1,6 @@
 import os, re, itertools
 from marshmallow import Schema
-from licenseware import BASE_URL
+from licenseware.utils.urls import BASE_URL
 from urllib.parse import urlencode
 from typing import List
 
