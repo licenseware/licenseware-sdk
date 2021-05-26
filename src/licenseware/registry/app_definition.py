@@ -27,6 +27,7 @@ which represents that tenant has processed files and has saved data as a result
 import os, logging
 import traceback
 import requests
+from licenseware import BASE_URL, REGISTRY_SERVICE_URL
 
 
 class AppDefinition:
@@ -39,17 +40,19 @@ class AppDefinition:
         activated_tenants_func,
         tenants_with_data_func,
         icon="default.png", 
-        app_activation_url='/app/init'
+        app_activation_url='/app/init',
+        editable_tables_url='/editable_tables'
     ):
 
         self.id = id
         self.name = name
         self.description = description
         self.icon = icon 
-        self.app_activation_url = app_activation_url
+        self.app_activation_url = BASE_URL + app_activation_url
         self.activated_tenants_func = activated_tenants_func
         self.tenants_with_data_func = tenants_with_data_func
-        self.refresh_registration_url = os.getenv("APP_BASE_PATH") + os.getenv("APP_URL_PREFIX") + '/register_all'
+        self.refresh_registration_url = BASE_URL  + '/register_all'
+        self.editable_tables_url = BASE_URL  + editable_tables_url
 
 
     def register_app(self):
@@ -61,7 +64,6 @@ class AppDefinition:
                 "message": "App not registered, no auth token available"
             }, 401
 
-
         payload = {
             'data': [{
                 "app_id": self.id,
@@ -71,13 +73,14 @@ class AppDefinition:
                 "description": self.description,
                 "icon": self.icon,
                 "refresh_registration_url": self.refresh_registration_url,
-                "app_activation_url": f'{os.getenv("APP_BASE_PATH")}{os.getenv("APP_URL_PREFIX")}{self.app_activation_url}'
+                "app_activation_url": self.app_activation_url,
+                "editable_tables_url": self.editable_tables_url,
             }]
         }
 
         logging.warning(payload)
         
-        url = f'{os.getenv("REGISTRY_SERVICE_URL")}/apps'
+        url = REGISTRY_SERVICE_URL + '/apps'
         headers = {"Authorization": os.getenv('AUTH_TOKEN')}
         registration = requests.post(url, json=payload, headers=headers)
         

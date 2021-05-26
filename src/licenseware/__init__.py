@@ -8,3 +8,4 @@ from .registry import *
 from .utils import *
 from .namespace_generator import *
 from .data_management import DataManagement
+from .editable_table import EditableTable, editable_tables_from_schemas

@@ -1,4 +1,8 @@
 import os
 
 
-BASE_URL = os.getenv("APP_BASE_PATH", "") + os.getenv("APP_URL_PREFIX", "") 
+BASE_PATH = os.getenv("APP_BASE_PATH", "")
+URL_PREFIX = os.getenv("APP_URL_PREFIX", "")
+BASE_URL = BASE_PATH + URL_PREFIX
+
+REGISTRY_SERVICE_URL = os.getenv("REGISTRY_SERVICE_URL")
