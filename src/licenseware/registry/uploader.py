@@ -53,6 +53,7 @@ import requests
 from ..utils import RedisService, save_file
 from ..quota import Quota
 from licenseware.utils.log_config import log
+from typing import List, Callable
 
 
 def reason_response(reason, valid_fname, valid_contents, filename_nok_msg='Filename is not valid.'):
@@ -90,6 +91,7 @@ class Uploader(Quota):
             app_id="name-service",
             upload_name="Short description",
             uploader_id="UniqueName",
+            accepted_file_types=['.zip', '.tar', '.csv'],
             description="Long description",
             upload_url="/UniqueName/files",
             upload_validation_url='/UniqueName/validation',
@@ -121,25 +123,27 @@ class Uploader(Quota):
 
     def __init__(
         self,
-        app_id,
-        upload_name,
-        uploader_id,
-        description,
-        upload_url,
-        upload_validation_url,
-        status_check_url,
-        quota_validation_url,
-        history_url,
-        validation_function,
-        quota_collection_name=None,
-        unit_type=None,
-        status="idle",
-        icon="default.png",
+        app_id: str,
+        upload_name: str,
+        uploader_id: str,
+        accepted_file_types: List[str],
+        description: str,
+        upload_url: str,
+        upload_validation_url: str,
+        status_check_url: str,
+        quota_validation_url: str,
+        history_url: str,
+        validation_function: Callable[...],
+        quota_collection_name: str = None,
+        unit_type: str = None,
+        status: str = "idle",
+        icon: str = "default.png",
     ):
 
         self.app_id = app_id
         self.upload_name = upload_name
         self.uploader_id = uploader_id
+        self.accepted_file_types = accepted_file_types
         self.description = description
         self.upload_url = upload_url
         self.upload_validation_url = upload_validation_url
@@ -181,6 +185,7 @@ class Uploader(Quota):
                 "app_id": self.app_id,
                 "upload_name": self.upload_name,
                 "upload_id": self.uploader_id, #TODO Field to be later renamed to uploader_id
+                "accepted_file_types": self.accepted_file_types,
                 "description": self.description,
                 "upload_url": self.base_url + self.upload_url,
                 "upload_validation_url": self.base_url + self.upload_validation_url,
