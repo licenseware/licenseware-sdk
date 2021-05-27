@@ -133,7 +133,7 @@ class Uploader(Quota):
         status_check_url: str,
         quota_validation_url: str,
         history_url: str,
-        validation_function: Callable[...],
+        validation_function: Callable,
         quota_collection_name: str = None,
         unit_type: str = None,
         status: str = "idle",
