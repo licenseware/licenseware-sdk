@@ -11,12 +11,10 @@ from licenseware.file_validators import GeneralValidator, validate_filename
 """
 
 import os, re
-import traceback, itertools
+import itertools
 import pandas as pd
 from io import BytesIO
-from loguru import logger
-
-logger.add("file_validators.log", format="{time:YYYY-MM-DD at HH:mm:ss} [{level}] - {message}", backtrace=False, diagnose=False)
+from licenseware.utils.log_config import log
 
 
 def validate_text_contains_all(text, text_contains_all):
@@ -325,7 +323,7 @@ class GeneralValidator:
             return res if show_reason else True
            
         except Exception as e:
-            logger.exception("\n\n\n\n-------------Failsafe traceback:\n\n")
+            log.exception("\n\n\n\n-------------Failsafe traceback:\n\n")
             res = {"status": "fail", "message": str(e)}
             return res if show_reason else False
            

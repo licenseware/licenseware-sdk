@@ -49,10 +49,10 @@ def valid_xxx_files(file, reason=False):
 
 
 import os
-import logging
 import requests
 from ..utils import RedisService, save_file
 from ..quota import Quota
+from licenseware.utils.log_config import log
 
 
 def reason_response(reason, valid_fname, valid_contents, filename_nok_msg='Filename is not valid.'):
@@ -62,7 +62,7 @@ def reason_response(reason, valid_fname, valid_contents, filename_nok_msg='Filen
         :valid_contents - the response from GeneralValidator.validate()
     """
 
-    # logging.warning(f"reason:{reason}, valid_fname:{valid_fname}, valid_contents:{valid_contents}")
+    # log.warning(f"reason:{reason}, valid_fname:{valid_fname}, valid_contents:{valid_contents}")
 
     if reason:
         if not valid_fname: 
@@ -169,7 +169,7 @@ class Uploader(Quota):
     def register_uploader(self):
 
         if not self.auth_token:
-            logging.warning('Uploader not registered, no AUTH_TOKEN available')
+            log.warning('Uploader not registered, no AUTH_TOKEN available')
             return {
                 "status": "fail", 
                 "message": "Uploader not registered, no AUTH_TOKEN available" 
@@ -192,12 +192,12 @@ class Uploader(Quota):
             }]
         }
 
-        logging.warning(payload)
+        log.info(payload)
         
         headers = {"Authorization": self.auth_token}
         registration = requests.post(url=self.registration_url, json=payload, headers=headers)
 
-        logging.warning(registration.content)
+        log.info(registration.content)
 
         if registration.status_code == 200:
             return {
@@ -206,7 +206,7 @@ class Uploader(Quota):
             }, 200
 
         else:
-            logging.warning("Could not register uploader")
+            log.warning("Could not register uploader")
             return {
                 "status": "fail",
                 "message": "Could not register uploader"
@@ -232,10 +232,10 @@ class Uploader(Quota):
             json=payload
         )
         if notification_sent.status_code == 200:
-            logging.warning("Notification registry service success!")
+            log.info("Notification registry service success!")
             return {"status": "success", "message": payload}, 200
         else:
-            logging.warning("Notification registry service failed!")
+            log.warning("Notification registry service failed!")
             return {"status": "fail", "message": payload}, 500
 
 

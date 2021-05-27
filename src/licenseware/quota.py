@@ -25,7 +25,6 @@ import uuid
 import dateutil.parser as dateparser
 from .serializer import AppUtilizationSchema
 from .mongodata import insert, fetch, update
-import logging
 
 
 QUOTA = {

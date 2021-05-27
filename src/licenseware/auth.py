@@ -24,6 +24,7 @@ This is just for internal licenseware use:
 
 import os
 import requests
+from licenseware.utils.log_config import log
 
 
 class Authenticator:
@@ -57,6 +58,7 @@ class Authenticator:
         else:
             os.environ['APP_AUTHENTICATED'] = 'false'
             
+        log.info(response)
         return response
 
 

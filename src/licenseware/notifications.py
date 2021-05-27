@@ -10,8 +10,9 @@ from licenseware import notify_status
 
 """
 
-import os, logging
+import os
 import requests
+from licenseware.utils.log_config import log
 
 
 async def notify_status(tenant_id, upload_id, status, app_id=None):
@@ -34,5 +35,5 @@ async def notify_status(tenant_id, upload_id, status, app_id=None):
         url, json=payload, headers={"Authorization": os.getenv('AUTH_TOKEN')}
     )
 
-    logging.warning("------ notify_status:" + str(res.content))
+    log.info("------ notify_status:" + str(res.content))
     

@@ -51,6 +51,7 @@ from licenseware import (
     SchemaNamespace,
     save_file,
     unzip,
+    log,
     GeneralValidator, 
     validate_filename,
     StandardReport, 

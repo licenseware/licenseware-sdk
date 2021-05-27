@@ -1,6 +1,5 @@
 import os
 import shutil
-import logging
 try:
     from werkzeug.utils import secure_filename
 except:
@@ -8,7 +7,7 @@ except:
 
 
 
-upload_path = os.getenv("UPLOAD_PATH")
+UPLOAD_PATH = os.getenv("UPLOAD_PATH")
 
 
 def save_file(file, tenant_id=None, path=None):
@@ -19,7 +18,7 @@ def save_file(file, tenant_id=None, path=None):
     
     filename = secure_filename(file.filename)
 
-    save_path = path or os.path.join(upload_path, tenant_id)
+    save_path = path or os.path.join(UPLOAD_PATH, tenant_id)
     if not os.path.exists(save_path): os.mkdir(save_path)
 
     file.seek(0)  # move cursor to 0 (stream left it on last read)
@@ -63,7 +62,7 @@ def get_filepaths_from_event(event):
 
     """
 
-    filepath = lambda filename: os.path.join(upload_path, event['tenant_id'], filename)
+    filepath = lambda filename: os.path.join(UPLOAD_PATH, event['tenant_id'], filename)
     filenames = event['files'].split(",")
 
     return [unzip(filepath(filename)) for filename in filenames]

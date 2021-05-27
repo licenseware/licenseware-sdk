@@ -1,9 +1,7 @@
+from licenseware.utils.log_config import log
 from functools import wraps
-from loguru import logger
 # from inspect import iscoroutinefunction, isfunction
 
-
-logger.add("failsafe.log", format="{time:YYYY-MM-DD at HH:mm:ss} [{level}] - {message}", backtrace=True, diagnose=False)
 
 
 def failsafe(*dargs, fail_code=0, success_code=0):
@@ -38,7 +36,7 @@ def failsafe(*dargs, fail_code=0, success_code=0):
                     return {"status": "success", "message": response}, success_code
                 return response
             except Exception as err:
-                logger.exception("\n\n\n\n-------------Failsafe traceback:\n\n")
+                log.exception("\n\n\n\n-------------Failsafe traceback:\n\n")
                 if fail_code:
                     return {"status": "fail", "message": str(err)}, fail_code
                 return str(err)

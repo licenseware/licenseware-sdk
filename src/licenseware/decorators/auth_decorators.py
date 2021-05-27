@@ -1,11 +1,12 @@
 import os
-import logging
 import requests
 from functools import wraps
 try:
     from flask import request
 except:
     pass #we are on the worker side
+
+from licenseware.utils.log_config import log
 
 
 # Auth decorators
@@ -26,7 +27,7 @@ def authorization_check(f):
                 headers = {"TenantId": request.headers.get("TenantId"), "Authorization": request.headers.get("Authorization")}
                 response = requests.get(url=url_auth_check, headers=headers)
                 if response.status_code != 200:
-                    logging.warning("Unauthorized")
+                    log.warning("Unauthorized user")
                     return {"status": "unauthorized"}, 401
                 return f(*args, **kwargs)
             except KeyError:
@@ -50,6 +51,7 @@ def machine_check(f):
                     return {"status": "unauthorized"}, 401
                 return f(*args, **kwargs)
             except KeyError:
+                log.warning("Unauthorized machine")
                 return {"Missing Authorization information"}, 403
         else:
             return f(*args, **kwargs)

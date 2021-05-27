@@ -10,7 +10,7 @@ from licenseware.standard_report import StandardReport
 
 import os
 import requests
-import logging
+from licenseware.utils.log_config import log
 
 
 class StandardReport:
@@ -69,7 +69,7 @@ class StandardReport:
                     "connected_apps": self.connected_apps
                 }]
             }
-            logging.warning(payload)
+            log.info(payload)
             url = f'{os.getenv("REGISTRY_SERVICE_URL")}/reports'
             headers = {"Authorization": os.getenv('AUTH_TOKEN'), 'Accept': 'application/json'}
             registration = requests.post(
@@ -78,10 +78,10 @@ class StandardReport:
             if registration.status_code == 200:
                 return payload
             else:
-                logging.warning("Could not register reports")
+                log.warning("Could not register reports")
                 return False
         else:
-            logging.warning('App not registered, no auth token available')
+            log.warning('App not registered, no auth token available')
             return False
 
 

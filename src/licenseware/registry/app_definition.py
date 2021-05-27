@@ -24,10 +24,10 @@ which represents that tenant has processed files and has saved data as a result
 
 """
 
-import os, logging
-import traceback
+import os
 import requests
 from licenseware.utils.urls import BASE_URL, REGISTRY_SERVICE_URL
+from licenseware.utils.log_config import log
 
 
 class AppDefinition:
@@ -58,7 +58,7 @@ class AppDefinition:
     def register_app(self):
         
         if os.getenv('APP_AUTHENTICATED') != 'true':
-            logging.warning('App not registered, no auth token available')
+            log.warning('App not registered, no auth token available')
             return {
                 "status": "fail",
                 "message": "App not registered, no auth token available"
@@ -78,14 +78,14 @@ class AppDefinition:
             }]
         }
 
-        logging.warning(payload)
+        log.info(payload)
         
         url = REGISTRY_SERVICE_URL + '/apps'
         headers = {"Authorization": os.getenv('AUTH_TOKEN')}
         registration = requests.post(url, json=payload, headers=headers)
         
         if registration.status_code != 200:
-            logging.warning(f"Could not register app {self.name}")
+            log.warning(f"Could not register app {self.name}")
             return { "status": "fail", "message": "Could not register app" }, 500
         
         return {"status": "success","message": "App registered successfully"}, 200
@@ -98,5 +98,5 @@ class AppDefinition:
             [u.register_uploader() for u in uploaders]
             return True
         except:
-            logging.warning(traceback.format_exc())
+            log.exception("Failed to register_all")
             return False
