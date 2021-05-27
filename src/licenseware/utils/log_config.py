@@ -42,6 +42,14 @@ Traceback (most recent call last):
 
 Exception: Demo exception
 
+
+To see log colors in docker logs add the following in docker-compose file:
+
+tty: true
+environment:
+    - 'TERM=xterm-256color'
+
+
 """
 
 import os
@@ -50,6 +58,21 @@ from loguru import logger as log
 
 debug = os.getenv('DEBUG') == 'true'
 log_level = 'INFO' if debug else 'WARNING'
+log_format = """<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | 
 
-log.add("app.log", rotation="monthly", level=log_level)
+Module:<cyan>{name}</cyan>
+Function:<cyan>{function}</cyan>
+Line:<cyan>{line}</cyan>
+
+{level}:
+<level>{message}</level>
+
+"""
+
+log.add(
+    "app.log", 
+    rotation="monthly", 
+    level=log_level, 
+    format=log_format
+)
 
