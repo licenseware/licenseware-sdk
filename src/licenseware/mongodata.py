@@ -30,6 +30,7 @@ from bson.json_util import dumps
 from bson.objectid import ObjectId
 import json
 from .decorators import failsafe
+from .utils.log_config import log
 
 
 #Utils
@@ -75,18 +76,38 @@ def _parse_doc(doc):
     return dict(doc, **{"_id": _parse_oid(doc["_id"])})
 
 def _parse_match(match):
-    oid, uid, key = None, None, None
-    if isinstance(match, str): 
+    # query_tuple - select only fields 
+    # distinct_key - select distinct fields
+
+    categ = {
+        '_id': None,
+        'oid': None, 
+        'uid': None, 
+        'distinct_key': None,  
+        'query_tuple': None, 
+        'query': None
+    }
+
+    if isinstance(match, dict):
+        categ['query'] = match
+    elif isinstance(match, str): 
         if valid_uuid(match): 
             match = {"_id": match}
-            oid, uid = False, True
+            categ['uid'] = match
         elif valid_object_id(match):
             match = {"_id": ObjectId(match)}
-            oid, uid = True, False
+            categ['oid'] = match
         else:
-            key = match
-    return oid, uid, key, match
+            categ['distinct_key'] = match
 
+        categ['_id'] = categ['uid'] or categ['oid']
+
+    elif (isinstance(match, tuple) or isinstance(match, list)) and len(match) == 2:
+        categ['query_tuple'] = match
+    else:
+        raise ValueError("Can't parse match query")
+
+    return categ 
 
 
 
@@ -200,22 +221,24 @@ def fetch(match, collection, as_list=True, db_name=None):
 
     """
     
-    oid, uid, key, match = _parse_match(match)
+    match = _parse_match(match)
 
     collection = get_collection(collection, db_name)
     if not isinstance(collection, Collection): return collection 
 
-    if oid or uid:
-        found_docs = collection.find(match)
+    if match['_id']:
+        found_docs = collection.find(match['_id'])
         doc = []
         if found_docs: doc = list(found_docs)[0]
-        if oid: doc = _parse_doc(doc)
+        if match['oid']: doc = _parse_doc(doc)
         return doc
 
-    if key: 
-        found_docs = collection.distinct(key)
+    if match['distinct_key']: 
+        found_docs = collection.distinct(match['distinct_key'])
+    elif match['query_tuple']:
+        found_docs = collection.find(*match['query_tuple'])
     else:
-        found_docs = collection.find(match)
+        found_docs = collection.find(match['query'])
         
 
     if as_list: 
@@ -243,12 +266,12 @@ def update(schema, match, new_data, collection, append=False, db_name=None):
 
     """
 
-    _, _, _, match = _parse_match(match)
-    
+    match = _parse_match(match)
+    match = match['query'] or match['_id'] 
+
     collection = get_collection(collection, db_name)
     if not isinstance(collection, Collection): return collection 
 
-    
     new_data = validate_data(schema, new_data)
     if isinstance(new_data, str): return new_data
 
@@ -269,8 +292,7 @@ def delete(match, collection, db_name=None):
 
         Delete documents based on match query.
 
-        :match       - id as string or dict filter query, 
-                     - if match == collection: will delete collection           
+        :match       - id as string or dict filter query,           
         :collection  - collection name
         :db_name     - specify other db if needed by default is MONGO_DATABASE_NAME from .env
         
@@ -279,20 +301,29 @@ def delete(match, collection, db_name=None):
         If something fails will return a string with the error message.
 
     """
-    _, _, key, match = _parse_match(match)
+    match = _parse_match(match)
 
     col = get_collection(collection, db_name)
     if not isinstance(col, Collection): return col 
 
-    if match == collection and key == match: 
-        res = col.drop()
-        return 1 if res is None else 0
-
     deleted_docs_nbr = col.delete_many(
-        filter=match,
+        filter=match['query'] or match['_id'],
     ).deleted_count
     
     return deleted_docs_nbr
+
+
+@failsafe
+def delete_collection(collection, db_name=None):
+    """
+        Delete a collection from the database.
+    """
+
+    col = get_collection(collection, db_name)
+    if not isinstance(col, Collection): return col 
+
+    res = col.drop()
+    return 1 if res is None else 0
 
 
 

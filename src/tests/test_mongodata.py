@@ -163,10 +163,11 @@ def test_update_list_with_append():
     }
 
     updated_data = m.update(
-        schema = AnotherDummySchema,
-        collection="testcollection",
+        schema     = AnotherDummySchema,
+        collection ="testcollection",
         match      = {'test_list': { "$exists": True }},
-        new_data   = new_data
+        new_data   = new_data,
+        append     = True
     )
 
     # print(updated_data)
@@ -197,7 +198,8 @@ def test_update_new_doc():
         schema = AnotherDummySchema,
         collection="testcollection",
         match      = new_data["_id"],
-        new_data   = new_data
+        new_data   = new_data,
+        append     = True
     )
 
 
@@ -223,7 +225,8 @@ def test_update_new_doc_existing_id():
         schema = AnotherDummySchema,
         collection="testcollection",
         match      = new_data["_id"],
-        new_data   = new_data
+        new_data   = new_data,
+        append     = True
     )
 
 
@@ -253,7 +256,8 @@ def test_update_id_field_match():
         schema = AnotherDummySchema,
         collection="testcollection",
         match      = {"_id": existing_id,"name": "cornelia"},
-        new_data   = new_data
+        new_data   = new_data,
+        append     = True
     )
 
     data = m.fetch(
@@ -273,7 +277,8 @@ def test_update_one_with_id():
         schema= AnotherDummySchema,
         collection = "testcollection",
         match      = id1,
-        new_data   = {'name': 'New John Show'}
+        new_data   = {'name': 'New John Show'},
+        append     = True
     )
     
     #print(response)
@@ -291,7 +296,8 @@ def test_update_all_with_match():
         schema= AnotherDummySchema,
         collection = "testcollection",
         match      = {'name': regx},
-        new_data   = {'name': 'John'}
+        new_data   = {'name': 'John'},
+        append     = True
     )
 
     #print(response)
@@ -332,7 +338,8 @@ def test_update_with_pullall():
         AnotherDummySchema,
         match=_id,
         new_data=new_data,
-        collection="testcollection"
+        collection="testcollection",
+        append     = True
     )
 
     saved_data = m.fetch(_id, "testcollection")
@@ -405,10 +412,7 @@ def test_delete_with_query():
 
 def test_delete_collection():
 
-    deleted_col_nbr = m.delete(
-        collection = "testcollection",
-        match      = "testcollection",
-    )
+    deleted_col_nbr = m.delete_collection(collection="testcollection")
 
     # print(deleted_col_nbr)
 
