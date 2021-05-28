@@ -52,16 +52,19 @@ environment:
 
 """
 
-import os
+import os, sys
 from loguru import logger as log
 
 
 debug = os.getenv('DEBUG') == 'true'
 log_level = 'DEBUG' if debug else 'WARNING'
 
-log_format = """<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <4}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan>
+log_format = """<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>[ <level>{level}</level> ]
+<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan>
 <level>{message}</level>
 """
+
+log.remove(0)
 
 log.add(
     "app.log", 
@@ -70,6 +73,10 @@ log.add(
     format=log_format
 )
 
+log.add(
+    sys.stderr, 
+    format=log_format
+)
 
 
 
