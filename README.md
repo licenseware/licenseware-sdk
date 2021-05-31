@@ -34,6 +34,14 @@ python3 -m pydoc -p 0 -b
 It will start a localhost server with the documentation.
 
 
+## Create a release
+
+Run command bellow to create a wheel.
+```bash
+python3 setup.py bdist_wheel sdist
+```
+
+
 
 Available components:
 
@@ -73,3 +81,4 @@ from licenseware.decorators import (
 
 
 ```
+
