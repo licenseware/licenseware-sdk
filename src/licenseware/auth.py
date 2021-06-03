@@ -30,8 +30,8 @@ from licenseware.utils.log_config import log
 class Authenticator:
 
     def __init__(self):
-        
-        self.email    = os.getenv("LWARE_IDENTITY_USER")
+
+        self.email = os.getenv("LWARE_IDENTITY_USER")
         self.password = os.getenv("LWARE_IDENTITY_PASSWORD")
         self.auth_url = os.getenv("AUTH_SERVICE_URL")
 
@@ -40,15 +40,14 @@ class Authenticator:
         else:
             route = os.getenv('AUTH_SERVICE_USERS_URL_PATH')
 
-        self.auth_url = self.auth_url +  route
-        
-       
+        self.auth_url = self.auth_url + route
+
     @classmethod
     def connect(cls):
         """
             Connects to licenseware and saves in environment variables auth tokens.
         """
-        
+
         response, status_code = cls()._login()
 
         if status_code == 200:
@@ -61,7 +60,6 @@ class Authenticator:
         log.info(response)
         return response
 
-
     def _login(self):
 
         identity = "machine_name" if os.getenv("AUTH_SERVICE_MACHINES_URL_PATH") else "email"
@@ -69,36 +67,33 @@ class Authenticator:
             identity: self.email,
             "password": self.password
         }
-        
+
         response = requests.post(url=f"{self.auth_url}/login", json=payload)
-        
+
         if response.status_code == 200:
             return response.json(), 200
         else:
             return self._create_machine()
 
-
     def _create_machine(self):
 
         if not os.getenv('AUTH_SERVICE_MACHINES_URL_PATH'):
             return {
-                "status": "fail", 
-                "message": "Please create an account before using this Licenseware SDK."
-            }, 403
+                       "status": "fail",
+                       "message": "Please create an account before using this Licenseware SDK."
+                   }, 403
 
         payload = {
             "machine_name": self.email,
             "password": self.password
         }
-        
+
         response = requests.post(url=f'{self.auth_url}/create', json=payload)
-        
+
         if response.status_code == 201:
             return response.json()
-        
+
         return {
-            "status": "fail",
-            "message": "Could not create account",
-        }, 500
-            
-        
+                   "status": "fail",
+                   "message": "Could not create account",
+               }, 500

@@ -79,6 +79,7 @@ class SchemaNamespace(MongoRequest):
 		""" Create restx api namespace from schema """
 
 		self.ns = self.create_namespace()
+		self.create_indexes()
 		self.make_json_schema()
 		self.model = self.ns.schema_model(self.name, self.json_schema)  
 		self.attach_http_methods()
