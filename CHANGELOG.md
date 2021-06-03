@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.1.2](https://www.github.com/licenseware/licenseware-sdk/compare/v0.1.1...v0.1.2) (2021-06-03)
+
+
+### Bug Fixes
+
+* changed create index to use the mongodata collection object ([5530a17](https://www.github.com/licenseware/licenseware-sdk/commit/5530a17b6bbab3fb6dbf9bfab02d85efdcbd2c15))
+
 ### [0.1.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.1.0...v0.1.1) (2021-06-03)
 
 
