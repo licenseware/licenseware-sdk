@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.1.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.0.11...v0.1.0) (2021-06-03)
+## [0.0.12](https://www.github.com/licenseware/licenseware-sdk/compare/v0.0.11...v0.0.12) (2021-06-03)
 
 
 ### Features
