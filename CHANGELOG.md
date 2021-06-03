@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.1.3](https://www.github.com/licenseware/licenseware-sdk/compare/v0.1.2...v0.1.3) (2021-06-03)
+
+
+### Bug Fixes
+
+* create_index (background=true) was throwing an error ([31dbeab](https://www.github.com/licenseware/licenseware-sdk/commit/31dbeab666d195d96a2df44479a7f9f0cdfdde42))
+
 ### [0.1.2](https://www.github.com/licenseware/licenseware-sdk/compare/v0.1.1...v0.1.2) (2021-06-03)
 
 
