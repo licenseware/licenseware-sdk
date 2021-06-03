@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.1.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.1.0...v0.1.1) (2021-06-03)
+
+
+### Bug Fixes
+
+* bad comment line ([22f9518](https://www.github.com/licenseware/licenseware-sdk/commit/22f9518770be6eedae7213f826a9e7693c874faf))
+
 ## [0.0.12](https://www.github.com/licenseware/licenseware-sdk/compare/v0.0.11...v0.0.12) (2021-06-03)
 
 
