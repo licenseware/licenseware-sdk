@@ -57,13 +57,13 @@ class MongoCrud:
         coll = m.get_collection(self.collection)
         try:
             for i in self.schema.Meta.simple_indexes:
-                coll.create_index(i, background=True)
+                coll.create_index(i)
         except AttributeError:
             logging.info("No simple indexes declared")
         try:
             for ci in self.schema.Meta.compound_indexes:
                 col_list = [(ci_m, 1) for ci_m in ci]
-                coll.create_index(col_list, background=True, unique=True)
+                coll.create_index(col_list, unique=True)
         except AttributeError:
             logging.info("No compound indexes declared")
         return coll.list_indexes()
