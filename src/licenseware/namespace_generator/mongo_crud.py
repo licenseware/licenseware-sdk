@@ -24,20 +24,9 @@ class MongoCrud:
         Create indexes will assume simple_indexes are not unique and compound_indexes are unique.
         Indexes are provided on serializer metadata (simple_indexes, compound_indexes).
 
-	request_obj = None #This will be updated when a http request is made (see MongoRequest)
+    """
 
-	#Fetch togglers for special cases
-	distinct_key = None
-	foreign_key  = None
-
-
-	@property
-	def params(self):
-		params = {}
-		if self.request_obj.args is None: return params
-		params = dict(self.request_obj.args) or {}
-		params.pop('tenant_id', None)
-		return params
+    request_obj = None  # This will be updated when a http request is made (see MongoRequest)
 
     @property
     def params(self):
@@ -47,21 +36,23 @@ class MongoCrud:
         params.pop('tenant_id', None)
         return params
 
-		return payload
-		
-	@property
-	def query(self):
-		tenant = {'tenant_id': self.request_obj.headers.get("TenantId")}
-		query  = { **tenant, **self.params,  **self.payload }
-		# logging.warning(f"----- CRUD Request: {query}")
-		return query
+    @property
+    def payload(self):
+        payload = {}
+        if self.request_obj.json is None: return payload
+        if isinstance(self.request_obj.json, dict):
+            payload = self.request_obj.json
+            payload.pop('tenant_id', None)
 
         return payload
 
-	def fetch_data(self, request_obj):
-		self.request_obj = request_obj
+    @property
+    def query(self):
+        tenant = {'tenant_id': self.request_obj.headers.get("TenantId")}
+        query = {**tenant, **self.params, **self.payload}
+        logging.warning(f"CRUD Request: {query}")
+        return query
 
-		query = self.query
     def create_indexes(self):
         try:
             for i in self.schema.Meta.simple_indexes:
@@ -76,41 +67,10 @@ class MongoCrud:
             logging.info("No compound indexes declared")
         return self.collection.list_indexes()
 
-		# Special queries
-		if 'foreign_key' in query:
-			self.foreign_key = query.pop('foreign_key')
-	
-		if 'distinct_key' in query and self.foreign_key:
-			self.distinct_key = query.pop('distinct_key')
-			query.update({self.distinct_key: {"$exists": True}})
+    def fetch_data(self, request_obj):
+        self.request_obj = request_obj
 
-
-		results = m.fetch(match=query, collection=self.collection)
-
-		if self.foreign_key and len(results) == 1:					
-			foreign_keys = results[0][self.foreign_key]
-			if isinstance(foreign_keys, str): 
-				foreign_keys = [foreign_keys]
-			
-			query = {
-				"tenant_id": self.query['tenant_id'],
-				"_id": {"$in": foreign_keys}	
-			}
-
-			results = m.fetch(match=query, collection=self.collection)
-
-			if self.distinct_key:
-				results = sorted(list(set([v[self.distinct_key] for v in results])))
-
-			# Toggle values back to None
-			self.distinct_key = None
-			self.foreign_key  = None
-
-
-		if isinstance(results, str): abort(500, reason=results)
-		if not results: abort(404, reason='Requested data not found')
-
-		return results
+        results = m.fetch(match=self.query, collection=self.collection)
 
         if isinstance(results, str):
             abort(500, reason=results)
