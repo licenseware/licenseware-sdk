@@ -54,18 +54,19 @@ class MongoCrud:
         return query
 
     def create_indexes(self):
+        coll = m.get_collection(self.collection)
         try:
             for i in self.schema.Meta.simple_indexes:
-                self.collection.create_index(i, background=True)
+                coll.create_index(i, background=True)
         except AttributeError:
             logging.info("No simple indexes declared")
         try:
             for ci in self.schema.Meta.compound_indexes:
                 col_list = [(ci_m, 1) for ci_m in ci]
-                self.collection.create_index(col_list, background=True, unique=True)
+                coll.create_index(col_list, background=True, unique=True)
         except AttributeError:
             logging.info("No compound indexes declared")
-        return self.collection.list_indexes()
+        return coll.list_indexes()
 
     def fetch_data(self, request_obj):
         self.request_obj = request_obj
