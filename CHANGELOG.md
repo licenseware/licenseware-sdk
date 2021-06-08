@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.1.4](https://www.github.com/licenseware/licenseware-sdk/compare/v0.1.3...v0.1.4) (2021-06-08)
+
+
+### Bug Fixes
+
+* auto refresh token ([69468dd](https://www.github.com/licenseware/licenseware-sdk/commit/69468ddfd4861eb7cb7cbb4282804149284ee66c))
+
 ### [0.1.3](https://www.github.com/licenseware/licenseware-sdk/compare/v0.1.2...v0.1.3) (2021-06-03)
 
 
