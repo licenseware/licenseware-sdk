@@ -24,6 +24,8 @@ This is just for internal licenseware use:
 
 import os
 import requests
+from datetime import datetime, timedelta
+from functools import wraps
 from licenseware.utils.log_config import log
 
 
@@ -54,6 +56,7 @@ class Authenticator:
             os.environ['AUTH_TOKEN'] = response.get("Authorization", "Authorization not found")
             os.environ['TENANT_ID'] = response.get("TenantId", "TenantId not found")
             os.environ['APP_AUTHENTICATED'] = 'true'
+            os.environ['AUTH_TOKEN_DATETIME'] = datetime.utcnow().isoformat()
         else:
             os.environ['APP_AUTHENTICATED'] = 'false'
             

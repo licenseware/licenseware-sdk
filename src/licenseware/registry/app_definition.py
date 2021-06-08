@@ -28,6 +28,7 @@ import os
 import requests
 from licenseware.utils.urls import BASE_URL, REGISTRY_SERVICE_URL
 from licenseware.utils.log_config import log
+from licenseware.decorators.auth_decorators import authenticated_machine
 
 
 class AppDefinition:
@@ -55,6 +56,7 @@ class AppDefinition:
         self.editable_tables_url = BASE_URL  + editable_tables_url
 
 
+    @authenticated_machine
     def register_app(self):
         
         if os.getenv('APP_AUTHENTICATED') != 'true':
@@ -89,8 +91,8 @@ class AppDefinition:
             return { "status": "fail", "message": "Could not register app" }, 500
         
         return {"status": "success","message": "App registered successfully"}, 200
-   
 
+    @authenticated_machine
     def register_all(self, reports=[], uploaders=[]):
         try:
             self.register_app()

@@ -11,6 +11,7 @@ from licenseware.standard_report import StandardReport
 import os
 import requests
 from licenseware.utils.log_config import log
+from licenseware.decorators.auth_decorators import authenticated_machine
 
 
 class StandardReport:
@@ -55,6 +56,7 @@ class StandardReport:
     def return_component_url(self, component_id):
         return f'{self.url}{self.components[component_id].url}'
 
+    @authenticated_machine
     def register_report(self):
         if 'true' in os.getenv('APP_AUTHENTICATED', 'false'):
        

@@ -54,6 +54,7 @@ from ..utils import RedisService, save_file
 from ..quota import Quota
 from licenseware.utils.log_config import log
 from typing import List, Callable
+from licenseware.decorators.auth_decorators import authenticated_machine
 
 
 def reason_response(reason, valid_fname, valid_contents, filename_nok_msg='Filename is not valid.'):
@@ -167,9 +168,7 @@ class Uploader(Quota):
         self.registration_url = f'{os.getenv("REGISTRY_SERVICE_URL")}/uploaders'
         self.auth_token = os.getenv('AUTH_TOKEN')
 
-
-        
-
+    @authenticated_machine
     def register_uploader(self):
 
         if not self.auth_token:
@@ -217,8 +216,7 @@ class Uploader(Quota):
                 "message": "Could not register uploader"
             }, 400
 
-
-
+    @authenticated_machine
     def notify_registry(self, tenant_id, status):
 
         headers = {"Authorization": os.getenv('AUTH_TOKEN')}
