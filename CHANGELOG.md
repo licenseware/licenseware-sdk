@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.1.4...v0.2.0) (2021-06-09)
+
+
+### Features
+
+* added dedupe library, update by str index mongodata ([32e4114](https://www.github.com/licenseware/licenseware-sdk/commit/32e41142ebbb7ed6c23d3aa55248385f74d06c75))
+
+
+### Bug Fixes
+
+* removed test setup mongodata ([2988f58](https://www.github.com/licenseware/licenseware-sdk/commit/2988f58e98ec428c5dd07de645cd80e028c4aa2c))
+
 ### [0.1.4](https://www.github.com/licenseware/licenseware-sdk/compare/v0.1.3...v0.1.4) (2021-06-08)
 
 
