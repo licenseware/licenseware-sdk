@@ -33,6 +33,18 @@ from .decorators import failsafe
 from .utils.log_config import log
 
 
+MONGO_ROOT_USERNAME = 'licensewaredev'
+MONGO_ROOT_PASSWORD ='license123ware'
+MONGO_DATABASE_NAME='db'
+MONGO_HOSTNAME= 'localhost' #for a docker environment use 'mongodb' (service name)
+MONGO_PORT=27017
+
+os.environ['MONGO_DATABASE_NAME'] = MONGO_DATABASE_NAME
+os.environ['MONGO_CONNECTION_STRING'] = f"mongodb://{MONGO_ROOT_USERNAME}:{MONGO_ROOT_PASSWORD}@{MONGO_HOSTNAME}:{MONGO_PORT}"
+
+
+
+
 #Utils
 
 @failsafe
@@ -239,7 +251,6 @@ def fetch(match, collection, as_list=True, db_name=None):
         found_docs = collection.find(*match['query_tuple'])
     else:
         found_docs = collection.find(match['query'])
-        
 
     if as_list: 
         return [_parse_doc(doc) for doc in found_docs]
@@ -268,7 +279,10 @@ def update(schema, match, new_data, collection, append=False, db_name=None):
 
     match = _parse_match(match)
     match = match['query'] or match['_id'] 
-
+    if not match:
+        match = match['_id'] = match['distinct_key']
+    
+    
     collection = get_collection(collection, db_name)
     if not isinstance(collection, Collection): return collection 
 
