@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.2.0...v0.3.0) (2021-06-10)
+
+
+### Features
+
+* added pandas-dedupe dependency ([ab3f1a2](https://www.github.com/licenseware/licenseware-sdk/commit/ab3f1a297151f1c5659cf56bb4cf0418e2d8ccba))
+
 ## [0.2.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.1.4...v0.2.0) (2021-06-09)
 
 
