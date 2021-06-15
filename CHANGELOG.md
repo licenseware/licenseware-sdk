@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.3.2](https://www.github.com/licenseware/licenseware-sdk/compare/v0.3.1...v0.3.2) (2021-06-15)
+
+
+### Bug Fixes
+
+* removed test setup ([097b545](https://www.github.com/licenseware/licenseware-sdk/commit/097b545ea315d11d05c7ae81854384a63520a552))
+
 ### [0.3.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.3.0...v0.3.1) (2021-06-15)
 
 
