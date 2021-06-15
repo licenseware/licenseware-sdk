@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.3.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.3.0...v0.3.1) (2021-06-15)
+
+
+### Bug Fixes
+
+* mongodata with append on list of dicts created duplicates, added a pipeline to remove duplicates if field with with list of dicts is found ([a126427](https://www.github.com/licenseware/licenseware-sdk/commit/a1264276a884043c57af3718e1630cbcad60b089))
+
 ## [0.3.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.2.0...v0.3.0) (2021-06-10)
 
 
