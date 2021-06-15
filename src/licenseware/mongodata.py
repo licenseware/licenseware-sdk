@@ -23,6 +23,7 @@ Needs the following environment variables:
 """
 
 import os
+from typing import List
 from uuid import UUID
 from pymongo import MongoClient
 from pymongo.collection import Collection
@@ -31,6 +32,17 @@ from bson.objectid import ObjectId
 import json
 from .decorators import failsafe
 from .utils.log_config import log
+
+
+MONGO_ROOT_USERNAME = 'licensewaredev'
+MONGO_ROOT_PASSWORD ='license123ware'
+MONGO_DATABASE_NAME='db'
+MONGO_HOSTNAME= 'localhost' #for a docker environment use 'mongodb' (service name)
+MONGO_PORT=27017
+
+os.environ['MONGO_DATABASE_NAME'] = MONGO_DATABASE_NAME
+os.environ['MONGO_CONNECTION_STRING'] = f"mongodb://{MONGO_ROOT_USERNAME}:{MONGO_ROOT_PASSWORD}@{MONGO_HOSTNAME}:{MONGO_PORT}"
+
 
 
 #Utils
@@ -110,8 +122,52 @@ def _parse_match(match):
     return categ 
 
 
+def _create_del_dups_pipeline(collection_name: str, fields:list) -> List[dict]:
+    """
+        Remove duplicates aggregation pipeline generated from fields which contain list of dicts.
 
-def _append_query(dict_):
+        $addToSet + $each works on removing duplicates only with simple lists like: [1,2,2,3] or ['val1', 'val2', 'val2']
+        $addToSet + $each can't remove duplicates from list of objects: [{5:5}, {3:4}, {5:5}]
+    """
+
+    # collection_name = 'TestCollection'
+    # fields = ['test_list_of_dict', 'etc']
+
+    set_stage = {'$set': {}}
+    for field_name in fields:
+        field_nodups = {
+            field_name: {
+                '$setIntersection': {
+                    '$reduce': {
+                    'input': '$'+field_name,
+                    'initialValue': '$'+field_name,
+                    'in': { '$setUnion': ["$$value", ["$$this"]] }
+                }}
+                }
+            }
+        
+        set_stage['$set'].update(field_nodups)
+        
+    merge_stage = {
+        '$merge': {
+            'into': collection_name
+        }
+    }
+
+    pipeline_remove_dups = [set_stage, merge_stage] 
+
+    return pipeline_remove_dups
+
+
+
+def _get_fields_with_listof_dicts(new_data: dict) -> List[str]:
+    fields_with_lists = [k for k in new_data if isinstance(new_data[k], list) and new_data[k]]
+    fields_with_listof_dicts = [k for k in fields_with_lists if isinstance(new_data[k][0], dict)]
+    return fields_with_listof_dicts
+
+
+
+def _append_query(dict_: dict) -> dict:
     """ 
         Force append to mongo document 
     """
@@ -139,6 +195,20 @@ def _append_query(dict_):
     # print(q)
 
     return q or dict_
+
+
+
+def remove_duplicates_from_list_of_objects(match:dict, data: dict, collection: str) -> None:
+    """
+        Remove duplicates from fields which contain list of objects
+    """
+
+    fields = _get_fields_with_listof_dicts(data)
+    if fields:
+        del_dups_pipeline = _create_del_dups_pipeline(collection, fields)
+        del_dups_pipeline = [{'$match':match}] + del_dups_pipeline
+        # print(del_dups_pipeline)
+        aggregate(pipeline=del_dups_pipeline, collection=collection)
 
 
 
@@ -248,6 +318,33 @@ def fetch(match, collection, as_list=True, db_name=None):
 
 
 @failsafe
+def aggregate(pipeline, collection, as_list=True, db_name=None):
+    """
+        Fetch documents based on pipeline queries.
+        https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/
+        
+        :pipeline   - list of query stages
+        :collection - collection name
+        :as_list    - set as_list to false to get a generator
+        :db_name    - specify other db if needed by default is MONGO_DATABASE_NAME from .env
+                
+        If something fails will return a string with the error message.
+
+    """
+
+    collection = get_collection(collection, db_name)
+    if not isinstance(collection, Collection): return collection 
+
+    found_docs = collection.aggregate(pipeline, allowDiskUse=True)
+
+    if as_list: return [_parse_doc(doc) for doc in found_docs]
+        
+    return (_parse_doc(doc) for doc in found_docs)    
+        
+
+
+
+@failsafe
 def update(schema, match, new_data, collection, append=False, db_name=None):
     """
         Update documents based on match query.
@@ -270,18 +367,28 @@ def update(schema, match, new_data, collection, append=False, db_name=None):
     if not match:
         match = match['_id'] = match['distinct_key']
     
-    
+    collection_name = collection
     collection = get_collection(collection, db_name)
     if not isinstance(collection, Collection): return collection 
 
     new_data = validate_data(schema, new_data)
     if isinstance(new_data, str): return new_data
 
+    _filter = {"_id": match["_id"]} if "_id" in match else match
     updated_docs_nbr = collection.update_many(
-        filter={"_id": match["_id"]} if "_id" in match else match,
+        filter=_filter,
         update=_append_query(new_data) if append else {"$set": new_data},
         upsert=True
     ).modified_count
+
+    if isinstance(updated_docs_nbr, str): return updated_docs_nbr
+
+    if append:
+        remove_duplicates_from_list_of_objects(
+            match = _filter, 
+            data = new_data, 
+            collection = collection_name
+        )
 
     return updated_docs_nbr
 
@@ -327,29 +434,3 @@ def delete_collection(collection, db_name=None):
     res = col.drop()
     return 1 if res is None else 0
 
-
-
-@failsafe
-def aggregate(pipeline, collection, as_list=True, db_name=None):
-    """
-        Fetch documents based on pipeline queries.
-        https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/
-        
-        :pipeline   - list of query stages
-        :collection - collection name
-        :as_list    - set as_list to false to get a generator
-        :db_name    - specify other db if needed by default is MONGO_DATABASE_NAME from .env
-                
-        If something fails will return a string with the error message.
-
-    """
-
-    collection = get_collection(collection, db_name)
-    if not isinstance(collection, Collection): return collection 
-
-    found_docs = collection.aggregate(pipeline, allowDiskUse=True)
-
-    if as_list: return [_parse_doc(doc) for doc in found_docs]
-        
-    return (_parse_doc(doc) for doc in found_docs)    
-        

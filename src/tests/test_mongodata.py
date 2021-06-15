@@ -66,7 +66,7 @@ def test_insert_one():
     
     id_list = m.insert(
         schema=DummySchema, 
-        collection="testcollection", 
+        collection="TestCollection", 
         data={
             "_id": id1,
             "name": "John Show",
@@ -83,7 +83,7 @@ def test_fetch_one_with_id():
 
     data_dict = m.fetch(
         match = id1,
-        collection="testcollection"
+        collection="TestCollection"
     )
     
     # print("\n\\ test_fetch_with_id:: data_dict, id1", data_dict, list(data_dict), id1)
@@ -98,7 +98,7 @@ def test_insert_many():
     
     id_list = m.insert(
         schema=DummySchema, 
-        collection="testcollection",
+        collection="TestCollection",
         data=[
             dummy_data, 
             dummy_data,
@@ -116,7 +116,7 @@ def test_fetch_all_with_match():
 
     datagen = m.fetch(
         match = {'name': 'John Show'},
-        collection="testcollection",
+        collection="TestCollection",
         
     )
     
@@ -125,47 +125,50 @@ def test_fetch_all_with_match():
     assert_that(len(list(datagen))).is_greater_than_or_equal_to(1)
 
 
+# pytest -s tests/test_mongodata.py::test_update_list_with_append
 
 def test_update_list_with_append():
 
     data_list = [
-        {
-            "name": "Dan lupin",
-            "some_field": "this should remain unchanged"
-        },
+        # {
+        #     "name": "Dan lupin",
+        #     "some_field": "this should remain unchanged"
+        # },
 
         {
+            "name": 'Alin',
+            "some_field": "this should remain unchanged",
             "test_list": ["initial_list_value"], 
             "test_list2": [ "initial_list_value2"],
             "test_dict": {"initial_dict_key":"initial_dict_value"},
             "test_list_of_dict": [
-                {"initial_dict_key":"initial_dict_value", "some_id":"asdasdasd"},
-                {"initial_dict_key":"initial_dict_value", "some_id":"dsadsadsa"}
+                {"initial_dict_key":"initial_dict_value", "some_id":"1"},
+                {"initial_dict_key":"initial_dict_value", "some_id":"1"} #intentionally duplicate
             ],
-            "name": "arsene lupin",
-            "some_field": "this should remain unchanged"
         }
     ]
 
-    id_list = m.insert(AnotherDummySchema, "testcollection", data_list)
+    id_list = m.insert(AnotherDummySchema, "TestCollection", data_list)
 
     assert_that(len(id_list)).is_equal_to(len(data_list))
 
+    #Trying to see if duplicates from new_date are removed
     new_data = {
-        "_id": "thenewid",
-        'name': 'Dan', 
-        "test_list": ["appended_value"],
-        "test_list2": [ "appended_value2"],
-        "test_dict": {"new_dict_key":"new_dict_value"},
+        # "_id": "thenewid",
+        'name': 'Alin', 
+        "test_list": ["initial_list_value", "appended_value"],
+        "test_list2": ['initial_list_value2', "appended_value2"],
+        "test_dict": {"initial_dict_key":"initial_dict_value", "new_dict_key":"new_dict_value"},
         "test_list_of_dict": [
+            {"initial_dict_key":"initial_dict_value", "some_id":"1"},
             {"new_dict_key":"new_dict_value"}
         ]
     }
 
     updated_data = m.update(
         schema     = AnotherDummySchema,
-        collection ="testcollection",
-        match      = {'test_list': { "$exists": True }},
+        collection ="TestCollection",
+        match      = {'name': 'Alin'},
         new_data   = new_data,
         append     = True
     )
@@ -173,16 +176,38 @@ def test_update_list_with_append():
     # print(updated_data)
 
     data = m.fetch(
-        match = {'test_list': { "$exists": True }},
-        collection="testcollection",
+        match = {'name': 'Alin'},
+        collection="TestCollection",
     )
+    
+    {
+        '_id': '60c8338a22feee05163bc3d5', 
+        'name': 'Alin', 
+        'test_list': ['initial_list_value', 'appended_value'], 
+        'test_list2': ['initial_list_value2', 'appended_value2'], 
+        'test_dict': {'initial_dict_key': 'initial_dict_value', 'new_dict_key': 'new_dict_value'}, 
+        'test_list_of_dict': [
+            {"initial_dict_key":"initial_dict_value", "some_id":"1"}, 
+            {"initial_dict_key":"initial_dict_value", "some_id":"1"}, 
+            {'new_dict_key': 'new_dict_value'}
+        ], 
+        'some_field': 'this should remain unchanged'
+    }
 
     # print(data)
+
+    dict_ = data[0]
+
+    assert_that(dict_['test_list']).is_length(2)
+    assert_that(dict_['test_list2']).is_length(2)
+    assert_that(dict_['test_dict'].keys()).is_length(2)
+    assert_that(dict_['test_list_of_dict']).is_length(2)
+
+
+
+
+
     
-    assert_that(data[0]['test_list']).contains('initial_list_value')
-    assert_that(data[0]['test_list2']).contains('initial_list_value2')
-    assert_that(data[0]['test_dict']['initial_dict_key']).contains('initial_dict_value')
-    assert_that(data[0]['some_field']).contains('this should remain unchanged')
 
 
 
@@ -196,7 +221,7 @@ def test_update_new_doc():
 
     updated_data = m.update(
         schema = AnotherDummySchema,
-        collection="testcollection",
+        collection="TestCollection",
         match      = new_data["_id"],
         new_data   = new_data,
         append     = True
@@ -205,7 +230,7 @@ def test_update_new_doc():
 
     data = m.fetch(
         match = new_data["_id"],
-        collection="testcollection",
+        collection="TestCollection",
     )
 
     # print(data)
@@ -223,7 +248,7 @@ def test_update_new_doc_existing_id():
 
     updated_data = m.update(
         schema = AnotherDummySchema,
-        collection="testcollection",
+        collection="TestCollection",
         match      = new_data["_id"],
         new_data   = new_data,
         append     = True
@@ -232,7 +257,7 @@ def test_update_new_doc_existing_id():
 
     data = m.fetch(
         match = new_data["_id"],
-        collection="testcollection",
+        collection="TestCollection",
     )
 
     assert_that(data).is_equal_to(new_data)
@@ -254,7 +279,7 @@ def test_update_id_field_match():
 
     updated_data = m.update(
         schema = AnotherDummySchema,
-        collection="testcollection",
+        collection="TestCollection",
         match      = {"_id": existing_id,"name": "cornelia"},
         new_data   = new_data,
         append     = True
@@ -262,7 +287,7 @@ def test_update_id_field_match():
 
     data = m.fetch(
         match = new_data["_id"],
-        collection="testcollection",
+        collection="TestCollection",
     )
 
     # print(data)
@@ -275,7 +300,7 @@ def test_update_one_with_id():
 
     response = m.update(
         schema= AnotherDummySchema,
-        collection = "testcollection",
+        collection = "TestCollection",
         match      = id1,
         new_data   = {'name': 'New John Show'},
         append     = True
@@ -294,7 +319,7 @@ def test_update_all_with_match():
 
     response = m.update(
         schema= AnotherDummySchema,
-        collection = "testcollection",
+        collection = "TestCollection",
         match      = {'name': regx},
         new_data   = {'name': 'John'},
         append     = True
@@ -321,7 +346,7 @@ def test_update_with_pullall():
         ]
     }
 
-    inserted = m.insert(AnotherDummySchema, "testcollection", data)
+    inserted = m.insert(AnotherDummySchema, "TestCollection", data)
 
     assert_that(inserted).contains_only(_id)
 
@@ -338,13 +363,13 @@ def test_update_with_pullall():
         AnotherDummySchema,
         match=_id,
         new_data=new_data,
-        collection="testcollection",
+        collection="TestCollection",
         append     = True
     )
 
-    saved_data = m.fetch(_id, "testcollection")
+    saved_data = m.fetch(_id, "TestCollection")
 
-    print(saved_data)
+    # print(saved_data)
 
 
 
@@ -360,7 +385,7 @@ def test_update_with_pullall():
 def test_fetch_with_agreggate():
 
     doc_list = m.aggregate(
-        collection = "testcollection",
+        collection = "TestCollection",
         pipeline   = [{ "$match": {'name': 'John'} }],
         as_list = True        
     )
@@ -374,7 +399,7 @@ def test_fetch_distinct():
 
     doc_list = m.fetch(
         match = 'name',
-        collection = "testcollection",
+        collection = "TestCollection",
         as_list = True        
     )
 
@@ -387,7 +412,7 @@ def test_fetch_distinct():
 def test_delete_by_id():
 
     deleted_docs_nbr = m.delete(
-        collection = "testcollection",
+        collection = "TestCollection",
         match      = id1,
     )
 
@@ -400,7 +425,7 @@ def test_delete_by_id():
 def test_delete_with_query():
 
     deleted_docs_nbr = m.delete(
-        collection = "testcollection",
+        collection = "TestCollection",
         match      = {'name': 'John'},
     )
 
@@ -412,7 +437,7 @@ def test_delete_with_query():
 
 def test_delete_collection():
 
-    deleted_col_nbr = m.delete_collection(collection="testcollection")
+    deleted_col_nbr = m.delete_collection(collection="TestCollection")
 
     # print(deleted_col_nbr)
 
