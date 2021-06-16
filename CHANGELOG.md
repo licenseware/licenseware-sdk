@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.3.3](https://www.github.com/licenseware/licenseware-sdk/compare/v0.3.2...v0.3.3) (2021-06-16)
+
+
+### Bug Fixes
+
+* duplicates on list of objects ([e58ff14](https://www.github.com/licenseware/licenseware-sdk/commit/e58ff148e7049390e6e4ed5e5d0cb3798577787d))
+
 ### [0.3.2](https://www.github.com/licenseware/licenseware-sdk/compare/v0.3.1...v0.3.2) (2021-06-15)
 
 
