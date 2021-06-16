@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.3.4](https://www.github.com/licenseware/licenseware-sdk/compare/v0.3.3...v0.3.4) (2021-06-16)
+
+
+### Bug Fixes
+
+* droped dups changes, mongo doesn't preserve field order ([e34aabd](https://www.github.com/licenseware/licenseware-sdk/commit/e34aabdece2151caead9a0ebf783c370c4d7b073))
+
 ### [0.3.3](https://www.github.com/licenseware/licenseware-sdk/compare/v0.3.2...v0.3.3) (2021-06-16)
 
 
