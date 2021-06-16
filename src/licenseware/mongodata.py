@@ -282,7 +282,7 @@ def insert(schema, collection, data, db_name=None):
 
     data = validate_data(schema, data)
     if isinstance(data, str): return data
-    data = sorted_data(data)
+    # data = sorted_data(data)
 
 
     if isinstance(data, dict):
@@ -397,7 +397,7 @@ def update(schema, match, new_data, collection, append=False, db_name=None):
 
     new_data = validate_data(schema, new_data)
     if isinstance(new_data, str): return new_data
-    new_data = sorted_data(new_data)
+    # new_data = sorted_data(new_data)
 
     _filter = {"_id": match["_id"]} if "_id" in match else match
     updated_docs_nbr = collection.update_many(
@@ -408,12 +408,12 @@ def update(schema, match, new_data, collection, append=False, db_name=None):
 
     if isinstance(updated_docs_nbr, str): return updated_docs_nbr
 
-    if append:
-        _remove_duplicates_from_list_of_objects(
-            match = _filter, 
-            data = new_data, 
-            collection = collection_name
-        )
+    # if append:
+    #     _remove_duplicates_from_list_of_objects(
+    #         match = _filter, 
+    #         data = new_data, 
+    #         collection = collection_name
+    #     )
         
     return updated_docs_nbr
 
