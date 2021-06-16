@@ -128,6 +128,17 @@ def test_fetch_all_with_match():
 # pytest -s tests/test_mongodata.py::test_update_list_with_append
 
 def test_update_list_with_append():
+    
+    dupdict = {
+        'product_catalog_id': 'internet_application_server_standard',
+        'product_name': 'Internet Application Server Standard',
+        'result': 'Used',
+        'tenant_id': '2ac111c7-fd19-463e-96c2-1493aea18bed',
+        '_id': '57077fca-daae-582d-8335-8f413876c140',
+        'version': '',
+        'install_location': '',
+        'product_category': 'Application Server Products',
+    }
 
     data_list = [
         # {
@@ -136,6 +147,7 @@ def test_update_list_with_append():
         # },
 
         {
+            # "_id": "append_test",
             "name": 'Alin',
             "some_field": "this should remain unchanged",
             "test_list": ["initial_list_value"], 
@@ -143,32 +155,34 @@ def test_update_list_with_append():
             "test_dict": {"initial_dict_key":"initial_dict_value"},
             "test_list_of_dict": [
                 {"initial_dict_key":"initial_dict_value", "some_id":"1"},
-                {"initial_dict_key":"initial_dict_value", "some_id":"1"} #intentionally duplicate
+                dupdict, dupdict, dupdict, dupdict
             ],
         }
     ]
 
     id_list = m.insert(AnotherDummySchema, "TestCollection", data_list)
-
     assert_that(len(id_list)).is_equal_to(len(data_list))
-
+    
+    # print(id_list)
+    
     #Trying to see if duplicates from new_date are removed
     new_data = {
-        # "_id": "thenewid",
+        "_id": id_list[0],
         'name': 'Alin', 
         "test_list": ["initial_list_value", "appended_value"],
         "test_list2": ['initial_list_value2', "appended_value2"],
         "test_dict": {"initial_dict_key":"initial_dict_value", "new_dict_key":"new_dict_value"},
         "test_list_of_dict": [
             {"initial_dict_key":"initial_dict_value", "some_id":"1"},
-            {"new_dict_key":"new_dict_value"}
+            {"new_dict_key":"new_dict_value"}, 
+            dupdict, dupdict, dupdict, dupdict
         ]
     }
 
     updated_data = m.update(
         schema     = AnotherDummySchema,
         collection ="TestCollection",
-        match      = {'name': 'Alin'},
+        match      = {"_id": id_list[0]},
         new_data   = new_data,
         append     = True
     )
@@ -176,24 +190,10 @@ def test_update_list_with_append():
     # print(updated_data)
 
     data = m.fetch(
-        match = {'name': 'Alin'},
+        match = {"_id": id_list[0]},
         collection="TestCollection",
     )
     
-    {
-        '_id': '60c8338a22feee05163bc3d5', 
-        'name': 'Alin', 
-        'test_list': ['initial_list_value', 'appended_value'], 
-        'test_list2': ['initial_list_value2', 'appended_value2'], 
-        'test_dict': {'initial_dict_key': 'initial_dict_value', 'new_dict_key': 'new_dict_value'}, 
-        'test_list_of_dict': [
-            {"initial_dict_key":"initial_dict_value", "some_id":"1"}, 
-            {"initial_dict_key":"initial_dict_value", "some_id":"1"}, 
-            {'new_dict_key': 'new_dict_value'}
-        ], 
-        'some_field': 'this should remain unchanged'
-    }
-
     # print(data)
 
     dict_ = data[0]
@@ -201,7 +201,7 @@ def test_update_list_with_append():
     assert_that(dict_['test_list']).is_length(2)
     assert_that(dict_['test_list2']).is_length(2)
     assert_that(dict_['test_dict'].keys()).is_length(2)
-    assert_that(dict_['test_list_of_dict']).is_length(2)
+    assert_that(dict_['test_list_of_dict']).is_length(3)
 
 
 

@@ -23,6 +23,7 @@ Needs the following environment variables:
 """
 
 import os
+from re import I
 from typing import List
 from uuid import UUID
 from pymongo import MongoClient
@@ -32,6 +33,7 @@ from bson.objectid import ObjectId
 import json
 from .decorators import failsafe
 from .utils.log_config import log
+
 
 
 #Utils
@@ -76,6 +78,8 @@ def _parse_doc(doc):
 
     return dict(doc, **{"_id": _parse_oid(doc["_id"])})
 
+
+
 def _parse_match(match):
     # query_tuple - select only fields 
     # distinct_key - select distinct fields
@@ -90,7 +94,13 @@ def _parse_match(match):
     }
 
     if isinstance(match, dict):
+        
+        if '_id' in match:
+            if valid_object_id(match['_id']):
+                match['_id'] = ObjectId(match['_id'])
+                
         categ['query'] = match
+        
     elif isinstance(match, str): 
         if valid_uuid(match): 
             match = {"_id": match}
@@ -111,6 +121,7 @@ def _parse_match(match):
     return categ 
 
 
+
 def _create_del_dups_pipeline(collection_name: str, fields:list) -> List[dict]:
     """
         Remove duplicates aggregation pipeline generated from fields which contain list of dicts.
@@ -118,15 +129,16 @@ def _create_del_dups_pipeline(collection_name: str, fields:list) -> List[dict]:
         $addToSet + $each works on removing duplicates only with simple lists like: [1,2,2,3] or ['val1', 'val2', 'val2']
         $addToSet + $each can't remove duplicates from list of objects: [{5:5}, {3:4}, {5:5}]
     """
-
-    # collection_name = 'TestCollection'
-    # fields = ['test_list_of_dict', 'etc']
+    
+    #TODO if fields order is different than it's considered a different object 
+    # that's way on insert and update we added `sorted_data` function
+    # in the $reduce we need to include $cond '_id' if present (that way we can get rid of _get_unique_ids_pipeline)
 
     set_stage = {'$set': {}}
     for field_name in fields:
         field_nodups = {
             field_name: {
-                '$setIntersection': {
+                '$setUnion': {
                     '$reduce': {
                     'input': '$'+field_name,
                     'initialValue': '$'+field_name,
@@ -144,6 +156,8 @@ def _create_del_dups_pipeline(collection_name: str, fields:list) -> List[dict]:
     }
 
     pipeline_remove_dups = [set_stage, merge_stage] 
+    
+    # print(pipeline_remove_dups)
 
     return pipeline_remove_dups
 
@@ -187,7 +201,7 @@ def _append_query(dict_: dict) -> dict:
 
 
 
-def remove_duplicates_from_list_of_objects(match:dict, data: dict, collection: str) -> None:
+def _remove_duplicates_from_list_of_objects(match:dict, data: dict, collection: str) -> None:
     """
         Remove duplicates from fields which contain list of objects
     """
@@ -198,6 +212,25 @@ def remove_duplicates_from_list_of_objects(match:dict, data: dict, collection: s
         del_dups_pipeline = [{'$match':match}] + del_dups_pipeline
         # print(del_dups_pipeline)
         aggregate(pipeline=del_dups_pipeline, collection=collection)
+    
+    
+
+def sorted_data(data):   
+    """
+        Hack for _remove_duplicates_from_list_of_objects to work
+        $setUnion considers object with different fields order by same data as different..
+    """
+    sort_dict = lambda data: {k:data[k] for k in sorted(data)}
+    
+    if isinstance(data, dict):
+        data = sort_dict(data)
+
+    if isinstance(data, list) and len(data) > 0:
+        if isinstance(data[0], dict):
+            data = [sort_dict(d) for d in data]
+    
+    return data
+
 
 
 
@@ -249,6 +282,8 @@ def insert(schema, collection, data, db_name=None):
 
     data = validate_data(schema, data)
     if isinstance(data, str): return data
+    data = sorted_data(data)
+
 
     if isinstance(data, dict):
         inserted_id = _parse_oid(collection.insert_one(data).inserted_id)
@@ -362,6 +397,7 @@ def update(schema, match, new_data, collection, append=False, db_name=None):
 
     new_data = validate_data(schema, new_data)
     if isinstance(new_data, str): return new_data
+    new_data = sorted_data(new_data)
 
     _filter = {"_id": match["_id"]} if "_id" in match else match
     updated_docs_nbr = collection.update_many(
@@ -373,12 +409,12 @@ def update(schema, match, new_data, collection, append=False, db_name=None):
     if isinstance(updated_docs_nbr, str): return updated_docs_nbr
 
     if append:
-        remove_duplicates_from_list_of_objects(
+        _remove_duplicates_from_list_of_objects(
             match = _filter, 
             data = new_data, 
             collection = collection_name
         )
-
+        
     return updated_docs_nbr
 
 
