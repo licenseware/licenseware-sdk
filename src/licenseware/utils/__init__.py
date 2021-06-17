@@ -3,4 +3,4 @@ from .redis_service import RedisService
 from .mongodb_connection import get_mongo_connection
 from .redis_event_dispacher import RedisEventDispacher
 from .urls import *
-from .log_config import log
+from .log_config import log, log_dict

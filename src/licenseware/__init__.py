@@ -1,4 +1,4 @@
-from  . import mongodata
+from  .mongodata import mongodata
 from  . import decorators
 from .quota import Quota
 from .auth import Authenticator

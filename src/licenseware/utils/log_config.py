@@ -52,11 +52,11 @@ environment:
 
 """
 
-import os, sys
+import os, sys, json
 from loguru import logger as log
 
 
-debug = os.getenv('DEBUG') == 'true'
+debug = os.getenv('DEBUG', '').lower() == 'true'
 log_level = 'DEBUG' if debug else 'WARNING'
 
 log_format = """<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green>[ <level>{level}</level> ]
@@ -79,6 +79,8 @@ log.add(
 )
 
 
+# Pretty logs for dict data 
+log_dict = lambda dict_: log.info(json.dumps(dict_, indent=4, sort_keys=True))
 
 
 ## Test
