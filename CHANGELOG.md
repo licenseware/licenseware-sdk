@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.3.4...v0.4.0) (2021-06-18)
+
+
+### Features
+
+* added google document AI sdk ([602cb73](https://www.github.com/licenseware/licenseware-sdk/commit/602cb73040f6163cb758fa506b8f4c5c689324be))
+
 ### [0.3.4](https://www.github.com/licenseware/licenseware-sdk/compare/v0.3.3...v0.3.4) (2021-06-16)
 
 
