@@ -68,11 +68,7 @@ def authenticated_machine(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         try:
-            # random old date, means there's no auth token for some reason
-            token_date = datetime.fromisoformat(os.getenv('AUTH_TOKEN_DATETIME', '1990-06-08T12:23:31.498766'))
-            token_age = (datetime.utcnow() - token_date).total_seconds() / 60
-            if token_age < 30:
-                Authenticator().connect()
+            Authenticator().connect()
             return f(*args, **kwargs)
         except KeyError:
             log.warning("Could not refresh token")
