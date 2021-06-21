@@ -1,5 +1,14 @@
 # Changelog
 
+### [0.4.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.4.0...v0.4.1) (2021-06-21)
+
+
+### Bug Fixes
+
+* auto refresh token before every request ([ba830d9](https://www.github.com/licenseware/licenseware-sdk/commit/ba830d9636083e78bf3965ca8b04303ab77aafc6))
+* fix relative import ([b9a561f](https://www.github.com/licenseware/licenseware-sdk/commit/b9a561f97d285c38f789e4550f1e10f3ef46e5b4))
+* fixed relative import for mongodata ([ceaa765](https://www.github.com/licenseware/licenseware-sdk/commit/ceaa7659fe5b83549df9bbebdb80d82bd4965e93))
+
 ## [0.4.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.3.4...v0.4.0) (2021-06-18)
 
 
