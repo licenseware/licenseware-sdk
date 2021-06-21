@@ -1,1 +1,1 @@
-from . import mongodata
+from . import interface

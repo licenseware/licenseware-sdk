@@ -31,10 +31,6 @@ from ..decorators import failsafe
 from .mongo_utils import *
 
 
-add_test_environment_vars()
-
-
-#Mongo
 
 default_db = os.getenv("MONGO_DB_NAME") or os.getenv("MONGO_DATABASE_NAME") or "db"
 default_collection = os.getenv("MONGO_COLLECTION_NAME") or "Data"
