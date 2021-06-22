@@ -3,8 +3,7 @@
 Example of use:
 
 from licenseware import AppCreator
-
-from ..uploaders import valid_file #function that validates file upload
+from ..uploaders import valid_Names
 from ..util.data_utils import (
     clear_tenant_data, 
     get_processing_status,
@@ -13,54 +12,61 @@ from ..util.data_utils import (
 )
 
 
-app_id = "My-service"
+# NamesUtilization
+# NamesData
+# NamesAnalysisStats
 
 
-app_kwargs = dict(
+app_id = "names-service"
+
+
+app = dict(
     id=app_id,
-    name="My Manager App",
-    description="Analyze My data",
+    name="Names Manager App",
+    description="Analyze Names data provided in xxx format",
     activated_tenants_func=get_activated_tenants,
     tenants_with_data_func=get_tenants_with_data,
 )
 
 
-uploaders_kwargs_list = [
+uploaders = [
     dict(
     app_id=app_id,
-    description="Uploader description",
-    upload_name="Uploader name",
-    uploader_id="some_id",
-    accepted_file_types=".pdf",
+    description="xxx Names to be processed",
+    upload_name="Names Manager Uploader",
+    uploader_id="xxx_Name",
+    accepted_file_types=".xxx",
     upload_url="/cm/files",
     upload_validation_url='/cm/validation',
     quota_validation_url='/quota/cm',
     status_check_url='/cm/status',
     history_url='/cm/history',
-    validation_function=valid_file,
-    quota_collection_name="MyUtilization",
-    unit_type="some_id", #ideally same as uploader_id
+    validation_function=valid_Names,
+    quota_collection_name="NamesUtilization",
+    unit_type="xxx_Name",
     ),
+    
 ]
 
 
 
-reports_kwargs_list = [
-    #add init report kwargs here similar to uploaders_kwargs_list
+reports = [
+    #add init report kwargs here
 ]
 
 
-MyApp = AppCreator(
-    app_kwargs,
-    uploaders_kwargs_list,
-    reports_kwargs_list,
+NamesApp = AppCreator(
+    app_kwargs=app,
+    uploaders_kwargs_list=uploaders,
+    reports_kwargs_list=reports,
     processing_status_func=get_processing_status,
-    clear_tenant_data_func=clear_tenant_data
+    clear_tenant_data_func=clear_tenant_data,
+    editable_tables_schemas_list = []
 )
 
 
 
-api = MyApp.initialize()
+api = NamesApp.initialize()
 
 
 """
@@ -68,6 +74,7 @@ api = MyApp.initialize()
 from typing import List
 from flask import request
 from flask_restx import Namespace, Resource
+from licenseware import log
 from licenseware.namespace_generator.schema_namespace import auth_header_doc
 from licenseware.registry import AppDefinition, Uploader
 from licenseware.editable_table import editable_tables_from_schemas
@@ -95,19 +102,24 @@ class AppCreator:
         self.kwargs = kwargs
         
         self.ns = None
-        self.app_definition = AppDefinition(**app_kwargs)
-        self.uploaders = [ Uploader(**kwargs) for kwargs in uploaders_kwargs_list ]
-        self.reports = []
+        self.app_definition = None
+        self.uploaders = None
+        self.reports = None
         
         
     def initialize(self):
         # Entrypoint
+        
+        self.app_definition = AppDefinition(**self.app_kwargs)
+        self.uploaders = [ Uploader(**kwargs) for kwargs in self.uploaders_kwargs_list ]
+        self.reports = [] #TODO initialize reports
+        
         self.create_namespace()
         
-        self.add_app_route()
-        self.add_app_activation_route()
-        self.add_register_all_route()
-        self.add_editable_tables_route()
+        self.add_app_route(self.app_definition)
+        self.add_app_activation_route(self.app_definition, self.uploaders)
+        self.add_register_all_route(self.app_definition, self.reports, self.uploaders)
+        self.add_editable_tables_route(self.kwargs)
         
         self.add_uploads_filenames_validation_routes()
         self.add_uploads_filestream_validation_routes()
@@ -116,8 +128,8 @@ class AppCreator:
         self.add_uploads_history_routes()
         
         self.app_definition.register_all(
-            uploaders = self.uploaders,
-            reports   = self.reports
+            uploaders = self.uploaders if self.uploaders is not None else [],
+            reports   = self.reports if self.reports is not None else [],
         )
         
         return self.ns
@@ -133,16 +145,16 @@ class AppCreator:
         )
                 
                 
-    def add_register_all_route(self):
+    def add_register_all_route(self, app_definition, reports, uploaders):
         
         class RegisterAll(Resource):
             @machine_check
             @self.ns.doc("Register all reports and uploaders")
             def get(self):
-
-                response_ok = self.app_definition.register_all(
-                    reports = self.reports_kwargs_list.get('reports_list', []), 
-                    uploaders = self.uploaders_kwargs_list.get('uploaders_list', [])
+                
+                response_ok = app_definition.register_all(
+                    reports = reports, 
+                    uploaders = uploaders
                 )
                 
                 if response_ok:
@@ -160,32 +172,34 @@ class AppCreator:
         self.ns.add_resource(RegisterAll, '/register_all')
         
                     
-    def add_editable_tables_route(self):
+    def add_editable_tables_route(self, kwargs):
         
         class EditableTables(Resource):
             @failsafe(fail_code=500)
             @authorization_check
+            @self.ns.doc("Get Editable tables shape")
             def get(self):
                     return editable_tables_from_schemas(
-                        self.app_kwargs['editable_tables_schemas_list']
+                        kwargs['editable_tables_schemas_list']
                     )
         
         self.ns.add_resource(EditableTables, '/editable_tables')
                     
                          
-    def add_app_route(self):
+    def add_app_route(self, app_definition):
         
         class AppRegistration(Resource):
             @failsafe(fail_code=500)
             @machine_check
             @self.ns.doc("Send post with app information to /apps")
             def get(self):
-                return self.app_definition.register_app() 
+                return app_definition.register_app() 
             
         self.ns.add_resource(AppRegistration, '/app')
                   
                   
-    def add_app_activation_route(self):
+    def add_app_activation_route(self, app_definition, uploaders):
+        
         
         class InitializeTenantApp(Resource):
             @failsafe(fail_code=500)
@@ -195,12 +209,12 @@ class AppCreator:
                 
                 tenant_id = request.headers.get("TenantId")
 
-                for uploader in self.uploaders:
+                for uploader in uploaders:
                     qmsg, _ = uploader.init_quota(tenant_id)
                     if qmsg['status'] != 'success':
                         return {'status': 'fail', 'message': 'App failed to install'}, 500
                 
-                dmsg, _ = self.app_definition.register_app()
+                dmsg, _ = app_definition.register_app()
                 
                 if dmsg['status'] != 'success':
                     return {'status': 'fail', 'message': 'App failed to register'}, 500
