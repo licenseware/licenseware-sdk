@@ -1,3 +1,70 @@
+"""
+
+Example of use:
+
+from licenseware import AppCreator
+
+from ..uploaders import valid_file #function that validates file upload
+from ..util.data_utils import (
+    clear_tenant_data, 
+    get_processing_status,
+    get_activated_tenants, 
+    get_tenants_with_data
+)
+
+
+app_id = "My-service"
+
+
+app_kwargs = dict(
+    id=app_id,
+    name="My Manager App",
+    description="Analyze My data",
+    activated_tenants_func=get_activated_tenants,
+    tenants_with_data_func=get_tenants_with_data,
+)
+
+
+uploaders_kwargs_list = [
+    dict(
+    app_id=app_id,
+    description="Uploader description",
+    upload_name="Uploader name",
+    uploader_id="some_id",
+    accepted_file_types=".pdf",
+    upload_url="/cm/files",
+    upload_validation_url='/cm/validation',
+    quota_validation_url='/quota/cm',
+    status_check_url='/cm/status',
+    history_url='/cm/history',
+    validation_function=valid_file,
+    quota_collection_name="MyUtilization",
+    unit_type="some_id", #ideally same as uploader_id
+    ),
+]
+
+
+
+reports_kwargs_list = [
+    #add init report kwargs here similar to uploaders_kwargs_list
+]
+
+
+MyApp = AppCreator(
+    app_kwargs,
+    uploaders_kwargs_list,
+    reports_kwargs_list,
+    processing_status_func=get_processing_status,
+    clear_tenant_data_func=clear_tenant_data
+)
+
+
+
+api = MyApp.initialize()
+
+
+"""
+
 from typing import List
 from flask import request
 from flask_restx import Namespace, Resource
@@ -10,6 +77,8 @@ from licenseware.decorators import (
     failsafe
 )
 
+
+#TODO reports not yet implemented
 
 
 class AppCreator:
