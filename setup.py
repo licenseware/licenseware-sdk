@@ -15,7 +15,7 @@ with open("requirements.txt", "r") as fh:
 
 setup(
     name="licenseware",
-    version="0.5.0",
+    version="0.5.1",
     description="Common utilities for licenseware.",
     url="https://github.com/licenseware/licenseware-sdk",
     author="licenseware",

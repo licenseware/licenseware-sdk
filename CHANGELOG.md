@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.5.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.5.0...v0.5.1) (2021-06-22)
+
+
+### Bug Fixes
+
+* removed dependency clutter ([f270ab5](https://www.github.com/licenseware/licenseware-sdk/commit/f270ab5b142275bc3977956b39825b9c2e2ff2b0))
+
 ## [0.5.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.4.1...v0.5.0) (2021-06-22)
 
 
