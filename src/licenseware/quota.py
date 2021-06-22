@@ -24,7 +24,7 @@ import sys
 import uuid
 import dateutil.parser as dateparser
 from .serializer import AppUtilizationSchema
-from .mongodata.interface import insert, fetch, update
+from .mongodata import insert, fetch, update
 
 
 QUOTA = {
@@ -38,7 +38,10 @@ QUOTA = {
     "lms_options": 1, # Files
 
     #OFMW
-    "ofmw_archive": 1  # 1 Device  == 1 archive
+    "ofmw_archive": 1,  # 1 Device  == 1 archive
+    
+    #CM
+    "pdf_contract": 1 # 1 pdf contract
 }
 
 
