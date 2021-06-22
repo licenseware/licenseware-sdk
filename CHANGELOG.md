@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.5.2](https://www.github.com/licenseware/licenseware-sdk/compare/v0.5.1...v0.5.2) (2021-06-22)
+
+
+### Bug Fixes
+
+* AppCreator issues fixed ([9e37fef](https://www.github.com/licenseware/licenseware-sdk/commit/9e37fefdbf585fe3a251ed096ebb39037484cc2f))
+
 ### [0.5.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.5.0...v0.5.1) (2021-06-22)
 
 
