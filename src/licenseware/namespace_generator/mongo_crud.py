@@ -1,7 +1,7 @@
 import uuid
 import datetime
 import logging
-import licenseware.mongodata.interface as m
+import licenseware.mongodata as m
 from flask_restx import abort
 
 

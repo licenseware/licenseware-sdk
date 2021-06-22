@@ -1,7 +1,6 @@
 import os
 import requests
 from functools import wraps
-from datetime import datetime
 
 try:
     from flask import request
@@ -68,7 +67,7 @@ def authenticated_machine(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         try:
-            Authenticator().connect()
+            Authenticator.connect()
             return f(*args, **kwargs)
         except KeyError:
             log.warning("Could not refresh token")

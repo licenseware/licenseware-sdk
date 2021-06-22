@@ -1,4 +1,4 @@
-from  .mongodata import interface
+from  . import mongodata
 from  . import decorators
 from .quota import Quota
 from .auth import Authenticator
@@ -9,3 +9,4 @@ from .utils import *
 from .namespace_generator import *
 from .data_management import DataManagement
 from .editable_table import EditableTable, editable_tables_from_schemas
+from .serializer import AppUtilizationSchema
