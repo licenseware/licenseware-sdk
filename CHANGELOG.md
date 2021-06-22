@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.5.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.4.1...v0.5.0) (2021-06-22)
+
+
+### Features
+
+* added AppCreator which allows register of uploder, history, quota, app_definition all in one go ([0aae36a](https://www.github.com/licenseware/licenseware-sdk/commit/0aae36ad015943f63d2920ee8d027f6ebad54d31))
+
+
+### Bug Fixes
+
+* revert to mongodata module to solve imports ([b536b9a](https://www.github.com/licenseware/licenseware-sdk/commit/b536b9a7c3e7a6c8bb2c5808022a605457df9a78))
+
+
+### Documentation
+
+* added docs for AppCreator ([62ddefc](https://www.github.com/licenseware/licenseware-sdk/commit/62ddefc17d44bdf553758ec926552b8289283bd6))
+
 ### [0.4.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.4.0...v0.4.1) (2021-06-21)
 
 
