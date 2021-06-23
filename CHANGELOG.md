@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.5.3](https://www.github.com/licenseware/licenseware-sdk/compare/v0.5.2...v0.5.3) (2021-06-23)
+
+
+### Bug Fixes
+
+* added authentication to notifications from workers ([71108a3](https://www.github.com/licenseware/licenseware-sdk/commit/71108a39c54c692a80a2aab52545a13d39f437b6))
+
 ### [0.5.2](https://www.github.com/licenseware/licenseware-sdk/compare/v0.5.1...v0.5.2) (2021-06-22)
 
 
