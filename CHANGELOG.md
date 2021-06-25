@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.6.2](https://www.github.com/licenseware/licenseware-sdk/compare/v0.6.1...v0.6.2) (2021-06-25)
+
+
+### Bug Fixes
+
+* added notify_registry to Uploader ([164c307](https://www.github.com/licenseware/licenseware-sdk/commit/164c307beae3241dd90a3bebd732a4335176e30b))
+
 ### [0.6.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.6.0...v0.6.1) (2021-06-25)
 
 
