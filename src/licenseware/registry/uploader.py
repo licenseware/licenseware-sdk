@@ -139,6 +139,7 @@ class Uploader(Quota):
         unit_type: str = None,
         status: str = "idle",
         icon: str = "default.png",
+        beta_flag: str = 'false'
     ):
 
         self.app_id = app_id
@@ -154,6 +155,7 @@ class Uploader(Quota):
         self.status = status
         self.icon = icon
         self.validation_function = validation_function
+        self.beta_flag = beta_flag
         
         self.quota_collection_name = (
             quota_collection_name or str(app_id).split("-")[0].upper() + "Utilization"
@@ -186,6 +188,7 @@ class Uploader(Quota):
                 "upload_id": self.uploader_id, #TODO Field to be later renamed to uploader_id
                 "accepted_file_types": self.accepted_file_types,
                 "description": self.description,
+                "beta_flag": self.beta_flag,
                 "upload_url": self.base_url + self.upload_url,
                 "upload_validation_url": self.base_url + self.upload_validation_url,
                 "quota_validation_url": self.base_url + self.quota_validation_url,

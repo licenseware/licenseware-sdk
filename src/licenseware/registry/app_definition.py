@@ -37,9 +37,10 @@ class AppDefinition:
         self, 
         id, 
         name, 
-        description, 
+        description,
         activated_tenants_func,
         tenants_with_data_func,
+        beta_flag='false',
         icon="default.png", 
         app_activation_url='/app/init',
         editable_tables_url='/editable_tables'
@@ -48,7 +49,8 @@ class AppDefinition:
         self.id = id
         self.name = name
         self.description = description
-        self.icon = icon 
+        self.icon = icon
+        self.beta_flag=beta_flag
         self.app_activation_url = BASE_URL + app_activation_url
         self.activated_tenants_func = activated_tenants_func
         self.tenants_with_data_func = tenants_with_data_func
@@ -73,6 +75,7 @@ class AppDefinition:
                 "tenants_with_app_activated": self.activated_tenants_func(),
                 "tenants_with_data_available": self.tenants_with_data_func(),
                 "description": self.description,
+                "beta_flag": self.beta_flag,
                 "icon": self.icon,
                 "refresh_registration_url": self.refresh_registration_url,
                 "app_activation_url": self.app_activation_url,
