@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.6.2...v0.7.0) (2021-06-25)
+
+
+### Features
+
+* added beta_flag to registration payload ([070d428](https://www.github.com/licenseware/licenseware-sdk/commit/070d428f9680aaf0271cb3cdc9fee78df707137d))
+
 ### [0.6.2](https://www.github.com/licenseware/licenseware-sdk/compare/v0.6.1...v0.6.2) (2021-06-25)
 
 
