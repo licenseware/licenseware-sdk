@@ -209,8 +209,10 @@ class ReportCreator:
     def api(self):
         """Get the restx namespace api"""
         
-        self.initialize_report()
-        
+        self.create_standard_report()
+        self.register_components()
+        self.register_filters()
+    
         self.create_namespace()
         self.create_filter_model()
         self.add_report_register_route()
