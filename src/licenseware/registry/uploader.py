@@ -269,12 +269,14 @@ class Uploader(Quota):
         """ 
             Upload files from request.
         """
-
+        
         msg, status = self._upload_response(request_obj, event_type=self.unit_type)
+        
+        tenant_id = request_obj.headers.get("TenantId")
 
         if status == 200:
             qmsg, qstatus = self.update_quota(
-                tenant_id = request_obj.headers.get("TenantId"), 
+                tenant_id = tenant_id, 
                 unit_type = self.unit_type, 
                 number_of_units = msg['units']
             )
@@ -283,6 +285,9 @@ class Uploader(Quota):
                 qmsg['status'] = msg['status'] #probabily quota initilized but files check failed
                 return dict(msg, **qmsg), qstatus
 
+
+        self.notify_registry(tenant_id, 'running')
+        
         return msg, status
 
            
