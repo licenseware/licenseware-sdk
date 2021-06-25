@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.5.3...v0.6.0) (2021-06-25)
+
+
+### Features
+
+* added ReportCreator which generates the restx api from given data ([8e39a35](https://www.github.com/licenseware/licenseware-sdk/commit/8e39a353fb5ef64c372b9c7685dde2200382e865))
+* automatically get wheel version from CHANGELOG ([0174683](https://www.github.com/licenseware/licenseware-sdk/commit/0174683b40c728b17bb3b1e2b79f31f8185a3900))
+
 ### [0.5.3](https://www.github.com/licenseware/licenseware-sdk/compare/v0.5.2...v0.5.3) (2021-06-23)
 
 
