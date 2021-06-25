@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.6.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.6.0...v0.6.1) (2021-06-25)
+
+
+### Bug Fixes
+
+* forgot report init ([0912735](https://www.github.com/licenseware/licenseware-sdk/commit/09127350f72cb8826f72552abb45b07e8cc86b08))
+
 ## [0.6.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.5.3...v0.6.0) (2021-06-25)
 
 
