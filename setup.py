@@ -9,22 +9,21 @@ import re
 # twine upload *
 
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+with open("README.md", "r") as f:
+    long_description = f.read()
 
-with open("requirements.txt", "r") as fh:
-    REQUIREMENTS = fh.readlines()
+with open("requirements.txt", "r") as f:
+    REQUIREMENTS = f.readlines()
     
     
     
 VERSION = 'UNKNOWN'
 
-with open("CHANGELOG.md", "r") as fh:
-    changelog = fh.readlines()
+with open("CHANGELOG.md", "r") as f:
+    changelog = f.read()
 
-if len(changelog) > 2:    
-    raw_version = changelog[2]
-    version_match = re.search(r'### \[(\d+\.\d+\.\d+)\]', raw_version)
+if '# Changelog' in changelog:    
+    version_match = re.match(f'#\s+Changelog\n+#+\s*\[((\d+\.\d+\.\d+))\]\(', changelog)
     if version_match:
         VERSION = version_match.group(1)
 

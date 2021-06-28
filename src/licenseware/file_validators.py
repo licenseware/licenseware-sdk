@@ -23,10 +23,10 @@ def validate_text_contains_all(text, text_contains_all):
     """
 
     if not text_contains_all: return
-
+    
     matches = []
     for txt_to_find in text_contains_all:
-        match = re.search(re.escape(txt_to_find), text, re.IGNORECASE)
+        match = re.search(txt_to_find, text)
         if match:
             if match[0] not in matches:
                 matches.append(match[0])
@@ -44,7 +44,7 @@ def validate_text_contains_any(text, text_contains_any):
 
     matches = []
     for txt_to_find in text_contains_any:
-        match = re.search(re.escape(txt_to_find), text, re.IGNORECASE)
+        match = re.search(txt_to_find, text)
         if match:
             if match.group(0) not in matches:
                 matches.append(match.group(0))

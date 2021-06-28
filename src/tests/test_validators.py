@@ -1,7 +1,34 @@
 import pytest
 from assertpy import assert_that
-from lware.file_validators import GeneralValidator, validate_filename
+from licenseware.file_validators import GeneralValidator, validate_filename
+import os
 
+
+# pytest -s tests/test_validators.py
+
+test_files_path = "/home/acmt/Documents/files_test"
+
+
+def test_powercli():
+    
+    columns_required = ['VCenterServerName', 'VCenterVersion',
+    'HostName','IsStandAlone', 'Datacenter',
+    'Cluster', 'VMs', 'Vendor',
+    'Model', 'FullName', 'Version',
+    'CpuModel', 'CpuMhz', 'CPU',
+    'CpuCores', 'HyperThreading', 'CpuThreads',
+    'PowerState', 'ConnectionState', 'Datastores']
+
+
+    v = GeneralValidator(
+        input_object = os.path.join(test_files_path, "PowerCLI/seskusvcenter-HW-Inventory-Information.csv"), 
+        required_input_type = "csv",
+        text_contains_all = columns_required
+    )
+
+    assert_that(v.validate()).is_true()
+
+    
 
 
 def test_validate_filename():
@@ -13,31 +40,19 @@ def test_validate_filename():
 def test_validate_cpuq_file_ok():
 
     v = GeneralValidator(
-        input_object = "../files_test/cpuq.txt", 
+        input_object = os.path.join(test_files_path, "cpuq.txt"), 
         required_input_type = "txt",
         text_contains_all   = ["[BEGIN SCRIPT INFO]", "Virtual CPUs"]
     )
 
     assert_that(v.validate()).is_true()
-
-
-
-def test_validate_cpuq_file_nok():
-
-    v = GeneralValidator(
-        input_object = "../files_test/cpuq_altered.txt", 
-        required_input_type = "txt",
-        text_contains_all   = ["[BEGIN SCRIPT INFO]", "Virtual CPUs"]
-    )
-
-    assert_that(v.validate()).is_false()
 
 
 
 def test_validate_lms_detail_file_ok():
 
     v = GeneralValidator(
-        input_object = "../files_test/lms_detail.csv", 
+        input_object = os.path.join(test_files_path, "lms_detail.csv"), 
         required_input_type = "csv",
         min_rows_number = 1,
         required_columns = [
@@ -64,37 +79,6 @@ def test_validate_lms_detail_file_ok():
 
     assert_that(v.validate()).is_true()
 
-
-
-def test_validate_lms_detail_file_nok():
-
-    v = GeneralValidator(
-        input_object = "../files_test/lms_detail_altered.csv", 
-        required_input_type = "csv",
-        min_rows_number = 1,
-        required_columns = [
-            'RL_SCRIPT_VERSION',
-            'TIMESTAMP',
-            'MACHINE_ID',
-            'VMACHINE_ID',
-            'BANNER',
-            'DB_NAME',
-            'USER_COUNT',
-            'SERVER_MANUFACTURER',
-            'SERVER_MODEL',
-            'OPERATING_SYSTEM',
-            'SOCKETS_POPULATED_PHYS',
-            'TOTAL_PHYSICAL_CORES',
-            'PROCESSOR_IDENTIFIER',
-            'PROCESSOR_SPEED',
-            'TOTAL_LOGICAL_CORES',
-            'PARTITIONING_METHOD',
-            'DB_ROLE',
-            'INSTALL_DATE'
-        ]
-    )
-
-    assert_that(v.validate()).is_false()
 
 
 
@@ -102,7 +86,7 @@ def test_validate_lms_detail_file_nok():
 def test_validate_rvtools_file_ok():
 
     v = GeneralValidator(
-        input_object = "../files_test/RVTools.xlsx", 
+        input_object = os.path.join(test_files_path, "RVTools.xlsx"), 
         required_input_type = "excel",
         min_rows_number = 1,
         required_sheets = ['tabvInfo', 'tabvCPU', 'tabvHost', 'tabvCluster'],
@@ -129,41 +113,10 @@ def test_validate_rvtools_file_ok():
 
 
 
-def test_validate_rvtools_file_nok():
-
-    v = GeneralValidator(
-        input_object = "../files_test/RVTools_altered.xlsx", 
-        required_input_type = "excel",
-        min_rows_number = 1,
-        required_sheets = ['tabvInfo', 'tabvCPU', 'tabvHost', 'tabvCluster'],
-        required_columns = [
-            'VM', 
-            'Host', 
-            'OS',
-            'Sockets', 
-            'CPUs',
-            'Model',
-            'CPU Model',
-            'Cluster',
-            '# CPU',
-            '# Cores',
-            'ESX Version',
-            'HT Active',
-            'Name', 
-            'NumCpuThreads', 
-            'NumCpuCores'
-        ] 
-    )
-
-    assert_that(v.validate()).is_false()
-
-
-
-
 def test_validate_lms_options_file_ok():
 
     v = GeneralValidator(
-        input_object = "../files_test/lms_options_small.csv", 
+        input_object = os.path.join(test_files_path, "lms_options_small.csv"), 
         required_input_type = "csv",
         min_rows_number = 1,
         required_columns = [
@@ -204,7 +157,7 @@ def test_validate_review_lite_dba_feature_file_ok():
     # server-name_database-name_filename.csv
 
     v = GeneralValidator(
-        input_object = "../files_test/anjin_SD2213_dba_feature.csv", 
+        input_object = os.path.join(test_files_path, "anjin_SD2213_dba_feature.csv"), 
         required_input_type = "csv",
         text_contains_any   = [
             'DBA_FEATURE_USAGE_STATISTICS',
@@ -221,7 +174,7 @@ def test_validate_review_lite_options_file_ok():
     # server-name_database-name_filename.csv
 
     v = GeneralValidator(
-        input_object = "../files_test/anjin_SD2213_options.csv", 
+        input_object = os.path.join(test_files_path, "anjin_SD2213_options.csv"), 
         required_input_type = "csv",
         text_contains_any   = [
             'DBA_FEATURE_USAGE_STATISTICS',
@@ -238,7 +191,7 @@ def test_validate_review_lite_version_file_ok():
     # server-name_database-name_filename.csv
 
     v = GeneralValidator(
-        input_object = "../files_test/anjin_SD2213_version.csv", 
+        input_object = os.path.join(test_files_path, "anjin_SD2213_version.csv"), 
         required_input_type = "csv",
         text_contains_any   = [
             'DBA_FEATURE_USAGE_STATISTICS',
