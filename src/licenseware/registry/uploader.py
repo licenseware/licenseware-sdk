@@ -129,12 +129,13 @@ class Uploader(Quota):
         uploader_id: str,
         accepted_file_types: List[str],
         description: str,
-        upload_url: str,
-        upload_validation_url: str,
-        status_check_url: str,
-        quota_validation_url: str,
-        history_url: str,
         validation_function: Callable,
+        # Optional parameters
+        upload_url: str = None,
+        upload_validation_url: str = None,
+        status_check_url: str = None,
+        quota_validation_url: str = None,
+        history_url: str = None,
         quota_collection_name: str = None,
         unit_type: str = None,
         status: str = "idle",
@@ -147,11 +148,13 @@ class Uploader(Quota):
         self.uploader_id = uploader_id
         self.accepted_file_types = accepted_file_types
         self.description = description
-        self.upload_url = upload_url
-        self.upload_validation_url = upload_validation_url
-        self.quota_validation_url = quota_validation_url
-        self.status_check_url = status_check_url
-        self.history_url = history_url
+        
+        self.upload_url = upload_url or f"/{uploader_id}/files"
+        self.upload_validation_url = upload_validation_url or f"/{uploader_id}/validation"
+        self.quota_validation_url = quota_validation_url or f"/quota/{uploader_id}"
+        self.status_check_url = status_check_url or f"/{uploader_id}/status"
+        self.history_url = history_url or f"/{uploader_id}/history"
+        
         self.status = status
         self.icon = icon
         self.validation_function = validation_function
