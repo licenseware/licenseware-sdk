@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.8.1...v0.9.0) (2021-06-28)
+
+
+### Features
+
+* added powercli quota ([d358450](https://www.github.com/licenseware/licenseware-sdk/commit/d358450e6993ea3f35c9a3cfef6d7ac8456fcca6))
+
 ### [0.8.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.8.0...v0.8.1) (2021-06-28)
 
 
