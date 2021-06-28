@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.8.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.8.0...v0.8.1) (2021-06-28)
+
+
+### Bug Fixes
+
+* re.IGNORE caused issues on file_validator ([0688260](https://www.github.com/licenseware/licenseware-sdk/commit/068826032aa1d7a8ee57ddd6fab209dc86fb33a3))
+
 ## [0.8.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.7.2...v0.8.0) (2021-06-28)
 
 
