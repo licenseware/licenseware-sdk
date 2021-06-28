@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.7.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.7.0...v0.7.1) (2021-06-28)
+
+
+### Bug Fixes
+
+* added flask request on service method, moved report initialization in class instantiation ([719efda](https://www.github.com/licenseware/licenseware-sdk/commit/719efda379b892de27be74c168bcfc1a1531f9b2))
+
 ## [0.7.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.6.2...v0.7.0) (2021-06-25)
 
 
