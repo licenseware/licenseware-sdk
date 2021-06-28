@@ -74,12 +74,12 @@ history_overview_data = {
 class HistoryService:
     
     @staticmethod
-    def history_overview(tenant_id, _filter=None):
+    def history_overview(_request, _filter=None):
         
         pipeline = [
             {
                 '$match': {
-                    'tenant_id': tenant_id,#'b7e61825-531c-4e85-b85d-4e267e08464f'
+                    'tenant_id': _request.headers.get('TenantId'),
                 }
             }, {
                 '$unwind': {
@@ -176,7 +176,6 @@ from typing import List, Tuple, Callable
 
 
 
-
 class ReportCreator:
     
     def __init__(
@@ -204,22 +203,22 @@ class ReportCreator:
         self.filter_model = None
         self.standard_report = None
         
+        # Create report on init
+        self.create_standard_report()
+        self.register_components()
+        self.register_filters()
+        self.standard_report.register_report()
+        
         
     @property
     def api(self):
         """Get the restx namespace api"""
         
-        self.create_standard_report()
-        self.register_components()
-        self.register_filters()
-    
         self.create_namespace()
         self.create_filter_model()
         self.add_report_register_route()
         self.add_report_route()
         self.add_components_routes()
-        
-        self.standard_report.register_report()
         
         return self.ns
     
@@ -227,10 +226,6 @@ class ReportCreator:
     @property
     def report(self):
         """ Get the instantiated report """
-        
-        self.create_standard_report()
-        self.register_components()
-        self.register_filters()
     
         return self.standard_report
         
@@ -303,7 +298,7 @@ class ReportCreator:
         
         class ReportController(Resource):
             @failsafe(fail_code=500)
-            @self.ns.doc("Get json payload") #TODO better doc
+            @self.ns.doc("Get components metadata") 
             def get(self):
                 return Report.return_json_payload()
             
@@ -324,7 +319,7 @@ class ReportCreator:
                 @self.ns.doc(f"Get data for {component_id}")
                 def get(self):
                     return Report.components[component_id] \
-                .return_component_data(tenant_id=request.headers.get("TenantId"))
+                .return_component_data(_request=request)
                 
                 @failsafe(fail_code=500)
                 @self.ns.doc(f"Filter data for {component_id}")
@@ -333,7 +328,7 @@ class ReportCreator:
                     filter_payload = request.json
                     parsed_filters = Report._filter.build_match_expression(filter_payload)
                     return Report.components[component_id] \
-                .return_component_data(tenant_id=request.headers.get("TenantId"), _filter=parsed_filters)
+                .return_component_data(_request=request, _filter=parsed_filters)
 
             self.ns.add_resource( ReportData, Report.return_component_url(component_id) ) 
 
