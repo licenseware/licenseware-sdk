@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.7.2...v0.8.0) (2021-06-28)
+
+
+### Features
+
+* made uploader url parameters optional ([2f10d40](https://www.github.com/licenseware/licenseware-sdk/commit/2f10d402d6506b43b66e98d27b5aad0a26d86513))
+
 ### [0.7.2](https://www.github.com/licenseware/licenseware-sdk/compare/v0.7.1...v0.7.2) (2021-06-28)
 
 
