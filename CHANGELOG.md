@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.7.2](https://www.github.com/licenseware/licenseware-sdk/compare/v0.7.1...v0.7.2) (2021-06-28)
+
+
+### Bug Fixes
+
+* namespace generator generates now only specified http methods ([72f65b9](https://www.github.com/licenseware/licenseware-sdk/commit/72f65b96ef5eaa90c27cbb55baf3be9a08c059b5))
+
 ### [0.7.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.7.0...v0.7.1) (2021-06-28)
 
 
