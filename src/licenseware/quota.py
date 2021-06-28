@@ -32,6 +32,7 @@ QUOTA = {
     "cpuq": 10,  # Databases
     "rv_tools": 1,  # Files
     "lms_detail": 1,  # Files
+    "powercli": 1,  # Files
     
     #ODB
     "review_lite": 16, # Databases
