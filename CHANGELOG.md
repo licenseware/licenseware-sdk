@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.10.0...v0.11.0) (2021-06-29)
+
+
+### Features
+
+* added quota for sccm ([0f96afd](https://www.github.com/licenseware/licenseware-sdk/commit/0f96afd57ab4e3f17c7e905f1da3644ded84cb71))
+
 ## [0.10.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.9.0...v0.10.0) (2021-06-29)
 
 
