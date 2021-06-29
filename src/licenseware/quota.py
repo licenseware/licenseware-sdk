@@ -42,7 +42,10 @@ QUOTA = {
     "ofmw_archive": 1,  # 1 Device  == 1 archive
     
     #CM
-    "pdf_contract": 1 # 1 pdf contract
+    "pdf_contract": 1, # 1 pdf contract
+    
+    #MDM
+    "sccm_queries": 1 # 1 pack of 3 csv files
 }
 
 
