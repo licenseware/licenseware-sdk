@@ -65,6 +65,7 @@ history_overview_data = {
     },
     "title": "Overview",
     "type": "summary",
+    "icon": "name_of_icon.png",
 }
 
 

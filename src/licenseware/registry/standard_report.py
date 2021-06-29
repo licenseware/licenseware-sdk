@@ -17,7 +17,16 @@ from licenseware.decorators.auth_decorators import authenticated_machine
 class StandardReport:
 
     def __init__(
-        self, app_id, report_id, report_name, description, url, connected_apps, beta_flag='false', _filter=None):
+        self, 
+        app_id, 
+        report_id, 
+        report_name, 
+        description, 
+        url, 
+        connected_apps, 
+        beta_flag='false', 
+        _filter=None
+    ):
         self.app_id = app_id
         self.report_id = report_id
         self.report_name = report_name
@@ -98,6 +107,7 @@ class StandardReportComponent:
         self.order = data["order"]
         self.title = data["title"]
         self.type = data["type"]
+        self.icon = data.get("icon") #only for summary
         self.style_attributes = data["style_attributes"]
         self.attributes = data["attributes"]
         self.data_method = data_method
@@ -110,7 +120,8 @@ class StandardReportComponent:
             "style_attributes": self.style_attributes,
             "attributes": self.attributes,
             "title": self.title,
-            "type": self.type
+            "type": self.type,
+            "icon": self.icon
         }
 
     def return_component_data(self, *args, **kwargs):
