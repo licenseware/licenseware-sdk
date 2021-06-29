@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.9.0...v0.10.0) (2021-06-29)
+
+
+### Features
+
+* added icon to StandardReportComponent ([0363bc2](https://www.github.com/licenseware/licenseware-sdk/commit/0363bc2b6140ee61a4c6760539fb1a97984e0381))
+
 ## [0.9.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.8.1...v0.9.0) (2021-06-28)
 
 
