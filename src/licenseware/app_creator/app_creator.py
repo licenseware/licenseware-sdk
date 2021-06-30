@@ -1,49 +1,27 @@
 """
-
-Example of use:
-
 from licenseware import AppCreator
-from ..uploaders import valid_Names
-from ..util.data_utils import (
-    clear_tenant_data, 
-    get_processing_status,
-    get_activated_tenants, 
-    get_tenants_with_data
-)
+from ..uploaders import valid_sccm_file
 
 
-# NamesUtilization
-# NamesData
-# NamesAnalysisStats
 
-
-app_id = "names-service"
+app_id = "mdm-service"
 
 
 app = dict(
     id=app_id,
-    name="Names Manager App",
-    description="Analyze Names data provided in xxx format",
-    activated_tenants_func=get_activated_tenants,
-    tenants_with_data_func=get_tenants_with_data,
+    name="Microsoft Deployment Manager service",
+    description="This app analyses Microsoft Data from SCCM"
 )
 
 
 uploaders = [
     dict(
     app_id=app_id,
-    description="xxx Names to be processed",
-    upload_name="Names Manager Uploader",
-    uploader_id="xxx_Name",
-    accepted_file_types=".xxx",
-    upload_url="/cm/files",
-    upload_validation_url='/cm/validation',
-    quota_validation_url='/quota/cm',
-    status_check_url='/cm/status',
-    history_url='/cm/history',
-    validation_function=valid_Names,
-    quota_collection_name="NamesUtilization",
-    unit_type="xxx_Name",
+    description="Microsoft Query CSV files",
+    upload_name="Microsoft Query CSVs",
+    uploader_id="sccm_queries",
+    accepted_file_types=".csv",
+    validation_function=valid_sccm_file,
     ),
     
 ]
@@ -51,22 +29,53 @@ uploaders = [
 
 
 reports = [
-    #add init report kwargs here
+    dict( #same kwargs as in ReportCreator
+        app_id=app_id,
+        report_id="mdm_history",
+        report_name="MDM History Report",
+        description="History of MDM actions",
+        url='/history_report',
+        connected_apps=['mdm-service'],
+        # TODO components and filters not created see ReportsCreator
+        components=[],#history_components,
+        filters=[],#history_filters
+    ),
+
 ]
 
 
-NamesApp = AppCreator(
+MDM = AppCreator(
     app_kwargs=app,
     uploaders_kwargs_list=uploaders,
     reports_kwargs_list=reports,
-    processing_status_func=get_processing_status,
-    clear_tenant_data_func=clear_tenant_data,
     editable_tables_schemas_list = []
 )
 
 
+# Then init app in the file where you gather resources 
 
-api = NamesApp.initialize()
+
+from flask import Blueprint
+from flask_restx import Api
+
+from .main.controller import MDM
+
+
+
+blueprint = Blueprint('api', __name__)
+
+api = Api(
+    blueprint,
+    title='mdm-service',
+    version='1.0',
+    description="Microsoft Data Analysis App"
+)
+
+
+api = MDM.init_app(api)
+
+
+api.add_namespace(etc)
 
 
 """
@@ -74,18 +83,25 @@ api = NamesApp.initialize()
 from typing import List
 from flask import request
 from flask_restx import Namespace, Resource
-from licenseware import log
 from licenseware.namespace_generator.schema_namespace import auth_header_doc
-from licenseware.registry import AppDefinition, Uploader
 from licenseware.editable_table import editable_tables_from_schemas
+from licenseware.report_creator import ReportCreator
+from licenseware.registry import (
+    AppDefinition, 
+    Uploader
+)
+
 from licenseware.decorators import (
     authorization_check, 
     machine_check,
     failsafe
 )
 
+from .tenant_utils import TenantUtils
+from licenseware.utils.urls import URL_PREFIX
 
-#TODO reports not yet implemented
+
+
 
 
 class AppCreator:
@@ -102,24 +118,45 @@ class AppCreator:
         self.kwargs = kwargs
         
         self.ns = None
+        
+        self.tenant_utils = None 
         self.app_definition = None
+        
         self.uploaders = None
         self.reports = None
+        self.reports_api = None
+        
+        
+    def init_app(self, api):
+        
+        api.add_namespace( self.api, path=URL_PREFIX )
+
+        for report in self.reports_api:
+            api.add_namespace( report, path=URL_PREFIX + "/reports")
+            
+        return api
+
+
+        
+    @property
+    def api(self):
+        return self.initialize()
         
         
     def initialize(self):
         # Entrypoint
         
-        self.app_definition = AppDefinition(**self.app_kwargs)
-        self.uploaders = [ Uploader(**kwargs) for kwargs in self.uploaders_kwargs_list ]
-        self.reports = [] #TODO initialize reports
+        self.init_tenant_utils()
+        self.init_app_definition()
+        self.init_uploaders()
+        self.init_reports()
         
         self.create_namespace()
         
-        self.add_app_route(self.app_definition)
-        self.add_app_activation_route(self.app_definition, self.uploaders)
-        self.add_register_all_route(self.app_definition, self.reports, self.uploaders)
-        self.add_editable_tables_route(self.kwargs)
+        self.add_app_route()
+        self.add_app_activation_route()
+        self.add_register_all_route()
+        self.add_editable_tables_route()
         
         self.add_uploads_filenames_validation_routes()
         self.add_uploads_filestream_validation_routes()
@@ -135,6 +172,56 @@ class AppCreator:
         return self.ns
         
         
+    def init_reports(self):
+        
+        self.reports = []
+        self.reports_api = []
+        for kwargs in self.reports_kwargs_list:
+            r = ReportCreator(**kwargs)
+            self.reports.append(r.report)
+            self.reports_api.append(r.api)
+            setattr(AppCreator, r.report_id + '_report', r.report)
+            setattr(AppCreator, r.report_id + '_api', r.api)
+            
+    
+    def init_uploaders(self):
+        
+        self.uploaders = []
+        for kwargs in self.uploaders_kwargs_list:
+            u = Uploader(**kwargs)
+            self.uploaders.append(u)
+            setattr(AppCreator, u.uploader_id + '_uploader', u) 
+        
+        
+                
+    def init_tenant_utils(self):
+        
+        self.tenant_utils = TenantUtils(
+            app_id=self.app_kwargs['id'],
+            data_collection_name = self.kwargs.get('data_collection_name'),
+            utilization_collection_name = self.kwargs.get('utilization_collection_name'),
+            analysis_collection_name = self.kwargs.get('analysis_collection_name')
+        )
+        
+        if not self.kwargs.get('processing_status_func'):
+            self.kwargs['processing_status_func'] = self.tenant_utils.get_processing_status
+        
+        if not self.kwargs.get('clear_tenant_data_func'):
+            self.kwargs['clear_tenant_data_func'] = self.tenant_utils.clear_tenant_data
+        
+        
+    def init_app_definition(self):
+        
+        if not self.app_kwargs.get('activated_tenants_func'):
+            self.app_kwargs['activated_tenants_func'] = self.tenant_utils.get_activated_tenants
+            
+        if not self.app_kwargs.get('tenants_with_data_func'):
+            self.app_kwargs['tenants_with_data_func'] = self.tenant_utils.get_tenants_with_data
+    
+        self.app_definition = AppDefinition(**self.app_kwargs)
+        
+        
+        
     def create_namespace(self):
         
         self.ns = Namespace(
@@ -145,7 +232,9 @@ class AppCreator:
         )
                 
                 
-    def add_register_all_route(self, app_definition, reports, uploaders):
+    def add_register_all_route(self):
+        
+        app_definition, reports, uploaders = self.app_definition, self.reports, self.uploaders
         
         class RegisterAll(Resource):
             @machine_check
@@ -172,7 +261,9 @@ class AppCreator:
         self.ns.add_resource(RegisterAll, '/register_all')
         
                     
-    def add_editable_tables_route(self, kwargs):
+    def add_editable_tables_route(self):
+        
+        kwargs = self.kwargs
         
         class EditableTables(Resource):
             @failsafe(fail_code=500)
@@ -186,7 +277,9 @@ class AppCreator:
         self.ns.add_resource(EditableTables, '/editable_tables')
                     
                          
-    def add_app_route(self, app_definition):
+    def add_app_route(self):
+        
+        app_definition = self.app_definition
         
         class AppRegistration(Resource):
             @failsafe(fail_code=500)
@@ -198,7 +291,9 @@ class AppCreator:
         self.ns.add_resource(AppRegistration, '/app')
                   
                   
-    def add_app_activation_route(self, app_definition, uploaders):
+    def add_app_activation_route(self):
+        
+        app_definition, uploaders = self.app_definition, self.uploaders
         
         
         class InitializeTenantApp(Resource):
