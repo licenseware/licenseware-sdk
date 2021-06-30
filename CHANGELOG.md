@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.11.0...v0.12.0) (2021-06-30)
+
+
+### Features
+
+* added reports to app_creator, now all urls related to app definition, reports, uploads are created from dictionaries ([a3c337f](https://www.github.com/licenseware/licenseware-sdk/commit/a3c337f986a884b821a9fb73793fe4843d56a370))
+
 ## [0.11.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.10.0...v0.11.0) (2021-06-29)
 
 
