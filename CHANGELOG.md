@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.13.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.13.0...v0.13.1) (2021-07-01)
+
+
+### Bug Fixes
+
+* stream decode errors ([2c9ca28](https://www.github.com/licenseware/licenseware-sdk/commit/2c9ca287317442965d36d6078f2f395e270f96b8))
+
 ## [0.13.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.12.1...v0.13.0) (2021-07-01)
 
 
