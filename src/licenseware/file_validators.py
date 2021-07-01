@@ -181,7 +181,8 @@ class GeneralValidator:
         self.min_rows_number = min_rows_number
         self.header_starts_at = header_starts_at
         self.skip_validate_type = False
-        self.buffer = buffer
+        #Making sure we don't miss characters
+        self.buffer = buffer + sum([len(c) for c in required_columns]) + len(text_contains_all) + len(text_contains_any)
 
 
     def _validate_type(self):
@@ -287,7 +288,7 @@ class GeneralValidator:
             )
 
         elif self.required_input_type == "txt":
-            with open(self.input_object, 'r') as f:
+            with open(self.input_object, 'r', encoding='utf8', errors='ignore') as f:
                 text = f.read(self.buffer)
             return text
 
@@ -295,8 +296,8 @@ class GeneralValidator:
             return self.input_object
 
         elif self.required_input_type == "stream":
-            return self.input_object.stream.read(self.buffer).decode('utf-8')
-
+            return self.input_object.stream.read(self.buffer).decode('utf8', 'ignore')
+            
         else:
             raise Exception("File contents are badly formated and cannot be read!")
 
@@ -323,7 +324,7 @@ class GeneralValidator:
             return res if show_reason else True
            
         except Exception as e:
-            log.exception("\n\n\n\n-------------Failsafe traceback:\n\n")
+            log.error(e)
             res = {"status": "fail", "message": str(e)}
             return res if show_reason else False
            
