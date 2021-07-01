@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.12.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.12.0...v0.12.1) (2021-07-01)
+
+
+### Bug Fixes
+
+* resource var overwrite issue ([80b28cc](https://www.github.com/licenseware/licenseware-sdk/commit/80b28cc16e45a44aeeeb399ee46eef6c2e087c77))
+
 ## [0.12.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.11.0...v0.12.0) (2021-06-30)
 
 
