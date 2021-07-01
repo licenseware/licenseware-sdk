@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.12.1...v0.13.0) (2021-07-01)
+
+
+### Features
+
+* added history url to app definition ([e6b4f9c](https://www.github.com/licenseware/licenseware-sdk/commit/e6b4f9c86d9dbf694230749235fe441a535b0a04))
+
 ### [0.12.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.12.0...v0.12.1) (2021-07-01)
 
 
