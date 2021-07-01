@@ -157,6 +157,8 @@ filters = [
 """
 
 
+from copy import deepcopy
+
 from flask import request
 from flask_restx import Namespace, Resource, fields
 
@@ -171,9 +173,10 @@ from licenseware.decorators import (
     authorization_check
 )
 
-
 from typing import List, Tuple, Callable
+import time
 
+from licenseware import log
 
 
 
@@ -203,6 +206,7 @@ class ReportCreator:
         self.ns = None
         self.filter_model = None
         self.standard_report = None
+        # self.resource_list = []
         
         # Create report on init
         self.create_standard_report()
@@ -220,6 +224,7 @@ class ReportCreator:
         self.add_report_register_route()
         self.add_report_route()
         self.add_components_routes()
+        # self.add_resources()
         
         return self.ns
     
@@ -305,6 +310,39 @@ class ReportCreator:
             
         self.ns.add_resource(ReportController, Report.url)
 
+
+
+    def create_component_resource(self, Report, data):
+        
+        class Data:
+                component_id = data['component_id']
+                
+        class BaseResource(Resource):
+            
+            @failsafe(fail_code=500)
+            @self.ns.doc(f"Get data for {Data.component_id}")
+            def get(self):
+                
+                return Report.components[Data.component_id].return_component_data(_request=request)
+            
+            @failsafe(fail_code=500)
+            @self.ns.doc(f"Filter data for {Data.component_id}")
+            @self.ns.marshal_list_with(self.filter_model)
+            def post(self):
+                filter_payload = request.json
+                parsed_filters = Report._filter.build_match_expression(filter_payload)
+                return Report.components[Data.component_id].return_component_data(_request=request, _filter=parsed_filters)
+        
+        
+        ComponentResource = type(
+            "Report_" + Data.component_id, 
+            (BaseResource, Data), 
+            {}
+        )
+        
+        
+        return ComponentResource, Report.return_component_url(Data.component_id)
+        
         
     def add_components_routes(self):
         
@@ -312,24 +350,9 @@ class ReportCreator:
         
         for data, _ in self.components:
             
-            component_id = data["component_id"]
+            ComponentResource, url = self.create_component_resource(Report, data)
             
-            class ReportData(Resource):
-                
-                @failsafe(fail_code=500)
-                @self.ns.doc(f"Get data for {component_id}")
-                def get(self):
-                    return Report.components[component_id] \
-                .return_component_data(_request=request)
-                
-                @failsafe(fail_code=500)
-                @self.ns.doc(f"Filter data for {component_id}")
-                @self.ns.marshal_list_with(self.filter_model)
-                def post(self):
-                    filter_payload = request.json
-                    parsed_filters = Report._filter.build_match_expression(filter_payload)
-                    return Report.components[component_id] \
-                .return_component_data(_request=request, _filter=parsed_filters)
-
-            self.ns.add_resource( ReportData, Report.return_component_url(component_id) ) 
-
+            self.ns.add_resource( ComponentResource, url ) 
+            
+            
+            
