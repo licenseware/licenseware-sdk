@@ -43,7 +43,8 @@ class AppDefinition:
         beta_flag='false',
         icon="default.png", 
         app_activation_url='/app/init',
-        editable_tables_url='/editable_tables'
+        editable_tables_url='/editable_tables',
+        history_report_url='/reports/history_report',
     ):
 
         self.id = id
@@ -56,6 +57,8 @@ class AppDefinition:
         self.tenants_with_data_func = tenants_with_data_func
         self.refresh_registration_url = BASE_URL  + '/register_all'
         self.editable_tables_url = BASE_URL  + editable_tables_url
+        self.history_report_url = BASE_URL  + history_report_url
+        
 
 
     @authenticated_machine
@@ -80,6 +83,7 @@ class AppDefinition:
                 "refresh_registration_url": self.refresh_registration_url,
                 "app_activation_url": self.app_activation_url,
                 "editable_tables_url": self.editable_tables_url,
+                "history_report_url": self.history_report_url
             }]
         }
 
