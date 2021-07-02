@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.13.2](https://www.github.com/licenseware/licenseware-sdk/compare/v0.13.1...v0.13.2) (2021-07-02)
+
+
+### Bug Fixes
+
+* moved stream cursor to 0 on file_validator ([9e133cc](https://www.github.com/licenseware/licenseware-sdk/commit/9e133ccece3915e946888ad70034d1ac4c2144df))
+
 ### [0.13.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.13.0...v0.13.1) (2021-07-01)
 
 
