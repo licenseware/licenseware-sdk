@@ -8,7 +8,40 @@ or
 
 from licenseware.file_validators import GeneralValidator, validate_filename
 
+
+A class that validates files and text
+    
+Usage
+
+from file_validators import GeneralValidator, validate_filename
+
+v = GeneralValidator(
+    input_object,           - required: file path, string or stream
+    required_input_type = None,    - required: 'excel', 'csv', 'txt', 'string', 'stream'
+    required_sheets   = [], - sheets names list that needs to be found in 'excel'
+    required_columns  = [], - columns names list that needs to be found in 'excel', 'csv'
+    text_contains_all = [], - text list that needs to be found in 'txt', 'string', 'stream'
+    text_contains_any = [], - text list that needs to be found in 'txt', 'string', 'stream'
+    min_rows_number   = 0,  - minimum rows needed for 'excel', 'csv'
+    header_starts_at  = 0   - row number where the header with columns starts (count starts from 0)
+    buffer = 9000           - bytes buffer to read from stream FileStorage object
+)
+
+if v.validate():
+    # stuff
+
+
+# or with json message
+
+res = v.validate(show_reason=True)
+if res['status'] == 'success':
+    return res['message']
+elif res['status'] == 'fail':
+    return res['message']
+
+
 """
+
 
 import os, re
 import itertools
@@ -33,7 +66,7 @@ def validate_text_contains_all(text, text_contains_all):
 
     if sorted(matches) != sorted(text_contains_all):
         raise Exception(f'File must contain the all following keywords: {", ".join(text_contains_all)}')
-
+    
 
 def validate_text_contains_any(text, text_contains_any):
     """
@@ -127,37 +160,6 @@ def validate_filename(fname, fname_contains=[], fname_endswith=[]):
 
 
 class GeneralValidator:
-    """
-        A class that validates files and text
-    
-        Usage
-
-        from file_validators import GeneralValidator, validate_filename
-
-        v = GeneralValidator(
-            input_object,           - required: file path, string or stream
-            required_input_type = None,    - required: 'excel', 'csv', 'txt', 'string', 'stream'
-            required_sheets   = [], - sheets names list that needs to be found in 'excel'
-            required_columns  = [], - columns names list that needs to be found in 'excel', 'csv'
-            text_contains_all = [], - text list that needs to be found in 'txt', 'string', 'stream'
-            text_contains_any = [], - text list that needs to be found in 'txt', 'string', 'stream'
-            min_rows_number   = 0,  - minimum rows needed for 'excel', 'csv'
-            header_starts_at  = 0   - row number where the header with columns starts (count starts from 0)
-            buffer = 9000           - bytes buffer to read from stream FileStorage object
-        )
-
-        if v.validate():
-            # stuff
-
-        #OR
-
-        res = v.validate(show_reason=True)
-        if res['status'] == 'success':
-            return res['message']
-        elif res['status'] == 'fail':
-            return res['message']
-
-    """
 
     def __init__(
             self,
@@ -226,7 +228,8 @@ class GeneralValidator:
             raise Exception('Only ".xlsx", ".xls", ".csv", ".txt" files types are accepted!')
 
     def _parse_excel_stream(self):
-
+        
+        self.input_object.seek(0)
         xlobj = pd.ExcelFile(BytesIO(self.input_object.stream.read()))
         sheets = xlobj.sheet_names
 
@@ -289,6 +292,7 @@ class GeneralValidator:
             return self.input_object
 
         elif self.required_input_type == "stream":
+            self.input_object.seek(0)
             return self.input_object.stream.read(self.buffer).decode('utf8', 'ignore')
 
         else:
@@ -316,6 +320,7 @@ class GeneralValidator:
             return res if show_reason else True
 
         except Exception as e:
-            log.error(e)
+            # log.warning(e)
+            # print(traceback.format_exc())
             res = {"status": "fail", "message": str(e)}
             return res if show_reason else False
