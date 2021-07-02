@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.13.3](https://www.github.com/licenseware/licenseware-sdk/compare/v0.13.2...v0.13.3) (2021-07-02)
+
+
+### Bug Fixes
+
+* filename validation is now case insensitive ([ea9b037](https://www.github.com/licenseware/licenseware-sdk/commit/ea9b037b869e07f907d7739d0e2a30d9fd49ae34))
+
 ### [0.13.2](https://www.github.com/licenseware/licenseware-sdk/compare/v0.13.1...v0.13.2) (2021-07-02)
 
 
