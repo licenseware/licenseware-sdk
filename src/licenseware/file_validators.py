@@ -23,10 +23,10 @@ def validate_text_contains_all(text, text_contains_all):
     """
 
     if not text_contains_all: return
-    
+
     matches = []
     for txt_to_find in text_contains_all:
-        match = re.search(txt_to_find, text)
+        match = re.search(txt_to_find, text, flags=re.IGNORECASE)
         if match:
             if match[0] not in matches:
                 matches.append(match[0])
@@ -44,7 +44,7 @@ def validate_text_contains_any(text, text_contains_any):
 
     matches = []
     for txt_to_find in text_contains_any:
-        match = re.search(txt_to_find, text)
+        match = re.search(txt_to_find, text, flags=re.IGNORECASE)
         if match:
             if match.group(0) not in matches:
                 matches.append(match.group(0))
@@ -101,9 +101,9 @@ def validate_sheets(file, required_sheets):
 
     sheets = pd.ExcelFile(file).sheet_names
 
-    commun_sheets = list(set.intersection(set(sheets), set(required_sheets)))
+    common_sheets = list(set.intersection(set(sheets), set(required_sheets)))
 
-    if sorted(required_sheets) != sorted(commun_sheets):
+    if sorted(required_sheets) != sorted(common_sheets):
         missing_sheets = set.difference(set(required_sheets), set(sheets))
         raise Exception(f"File doesn't contain the following needed sheets: {missing_sheets}")
 
@@ -160,16 +160,16 @@ class GeneralValidator:
     """
 
     def __init__(
-        self,
-        input_object,
-        required_input_type=None,
-        required_sheets=[],
-        required_columns=[],
-        text_contains_all=[],
-        text_contains_any=[],
-        min_rows_number=0,
-        header_starts_at=0,
-        buffer=9000,
+            self,
+            input_object,
+            required_input_type=None,
+            required_sheets=[],
+            required_columns=[],
+            text_contains_all=[],
+            text_contains_any=[],
+            min_rows_number=0,
+            header_starts_at=0,
+            buffer=9000,
     ):
 
         self.input_object = input_object
@@ -181,9 +181,8 @@ class GeneralValidator:
         self.min_rows_number = min_rows_number
         self.header_starts_at = header_starts_at
         self.skip_validate_type = False
-        #Making sure we don't miss characters
+        # Making sure we don't miss characters
         self.buffer = buffer + sum([len(c) for c in required_columns]) + len(text_contains_all) + len(text_contains_any)
-
 
     def _validate_type(self):
         """
@@ -200,13 +199,13 @@ class GeneralValidator:
                 return
 
         if (
-            self.required_columns == []
-            and
-            self.text_contains_any or self.text_contains_all
+                self.required_columns == []
+                and
+                self.text_contains_any or self.text_contains_all
         ):
             self.required_input_type = 'txt'
-            return 
-            
+            return
+
         if os.path.exists(self.input_object):
 
             if self.input_object.endswith('.xlsx') or self.input_object.endswith('.xls'):
@@ -214,20 +213,17 @@ class GeneralValidator:
 
             elif self.input_object.endswith('.csv'):
                 self.required_input_type = "csv"
-            
+
             elif self.input_object.endswith('.txt'):
                 self.required_input_type = "txt"
         else:
             self.required_input_type = "string"
-
 
     def _check_required_input_type(self):
         allowed_input_types = ['excel', 'csv', 'txt', 'string', 'stream', 'excel-stream']
         if not self.required_input_type: return
         if self.required_input_type not in allowed_input_types:
             raise Exception('Only ".xlsx", ".xls", ".csv", ".txt" files types are accepted!')
-
-
 
     def _parse_excel_stream(self):
 
@@ -236,22 +232,21 @@ class GeneralValidator:
 
         if len(sheets) == 1:
             return pd.read_excel(
-                        xlobj, 
-                        nrows=self.min_rows_number, 
-                        skiprows=self.header_starts_at
-                    )
+                xlobj,
+                nrows=self.min_rows_number,
+                skiprows=self.header_starts_at
+            )
 
         dfs = {}
         for sheet in sheets:
             if sheet not in self.required_sheets: continue
             dfs[sheet] = pd.read_excel(
-                                xlobj, 
-                                sheet_name=sheet, 
-                                nrows=self.min_rows_number,
-                                skiprows=self.header_starts_at
-                            )
+                xlobj,
+                sheet_name=sheet,
+                nrows=self.min_rows_number,
+                skiprows=self.header_starts_at
+            )
         return dfs
-
 
     def _parse_excel(self):
 
@@ -262,7 +257,6 @@ class GeneralValidator:
                 self.input_object, nrows=self.min_rows_number, skiprows=self.header_starts_at
             )
 
-
         dfs = {}
         for sheet in sheets:
             if sheet not in self.required_sheets: continue
@@ -272,7 +266,6 @@ class GeneralValidator:
 
         return dfs
 
-
     def _parse_data(self):
 
         if self.required_input_type == "excel-stream":
@@ -281,7 +274,7 @@ class GeneralValidator:
         if self.required_input_type == "excel":
             return self._parse_excel()
 
-            
+
         elif self.required_input_type == "csv":
             return pd.read_csv(
                 self.input_object, nrows=self.min_rows_number, skiprows=self.header_starts_at
@@ -297,10 +290,9 @@ class GeneralValidator:
 
         elif self.required_input_type == "stream":
             return self.input_object.stream.read(self.buffer).decode('utf8', 'ignore')
-            
+
         else:
             raise Exception("File contents are badly formated and cannot be read!")
-
 
     def validate(self, show_reason=False):
         """ 
@@ -320,11 +312,10 @@ class GeneralValidator:
             validate_columns(data, self.required_columns, self.required_sheets)
             validate_rows_number(data, self.min_rows_number, self.required_sheets)
 
-            res = {"status": "success", "message": "File validation succeded"} 
+            res = {"status": "success", "message": "File validation succeded"}
             return res if show_reason else True
-           
+
         except Exception as e:
             log.error(e)
             res = {"status": "fail", "message": str(e)}
             return res if show_reason else False
-           
