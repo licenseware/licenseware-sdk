@@ -30,5 +30,3 @@ def send_notification(f):
             )
             rd.set(status_key, 'idle')
         return result
-
-    return decorated
