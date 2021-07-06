@@ -4,7 +4,7 @@ from licenseware.utils.redis_service import redis_connection as rd
 from licenseware.notifications import notify_status
 
 
-async def send_notification(f):
+def send_notification(f):
     @wraps(f)
     async def decorated(*args, **kwargs):
         event = args[0]
