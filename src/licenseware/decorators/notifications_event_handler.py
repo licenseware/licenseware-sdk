@@ -2,6 +2,7 @@ from licenseware.utils.log_config import log
 from functools import wraps
 from licenseware.utils.redis_service import redis_connection as rd
 from licenseware.notifications import notify_status
+from asyncio import sleep
 
 
 def send_notification(f):
@@ -19,7 +20,7 @@ def send_notification(f):
             )
             rd.set(status_key, 'running')
         rd.incrby(number_key, 1)
-        result = await f(*args, **kwargs)
+        await f(*args, **kwargs)
         rd.decrby(number_key, 1)
         currently_running = rd.get(number_key)
         if currently_running == 0:
@@ -29,5 +30,4 @@ def send_notification(f):
                 status='idle'
             )
             rd.set(status_key, 'idle')
-        return result
-    return decorated
+    return sleep(1)
