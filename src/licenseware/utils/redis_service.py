@@ -6,7 +6,7 @@ redis_pass = os.getenv("REDIS_PASSWORD", None)
 redis_db_id = os.getenv("REDIS_DB_ID", None)
 
 if redis_pass and redis_db_id:
-    redis_connection = redis.Redis(
+    redis_connection = redis.StrictRedis(
         host=os.getenv("REDIS_HOST"),
         port=os.getenv("REDIS_PORT"),
         decode_responses=True,
