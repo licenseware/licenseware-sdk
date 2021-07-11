@@ -4,7 +4,11 @@ import redis
 
 
 redis_connection = redis.Redis(
-    host=os.getenv("REDIS_HOST"), port=os.getenv("REDIS_PORT"), decode_responses=True
+    host=os.getenv("REDIS_HOST"),
+    port=os.getenv("REDIS_PORT"),
+    decode_responses=True,
+    password=os.getenv("REDIS_PASSWORD"),
+    db=os.getenv("REDIS_DB_ID")
 )
 
 redis_stream = os.getenv("REDIS_PROCESSING_STREAM")
