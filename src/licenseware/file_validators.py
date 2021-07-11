@@ -50,7 +50,7 @@ from io import BytesIO
 from licenseware.utils.log_config import log
 
 
-def validate_text_contains_all(text, text_contains_all):
+def validate_text_contains_all(text, text_contains_all, ignorecase=False):
     """
         Raise exception if contents of the text file don't contain all items in text_contains_all list
     """
@@ -59,7 +59,7 @@ def validate_text_contains_all(text, text_contains_all):
 
     matches = []
     for txt_to_find in text_contains_all:
-        match = re.search(txt_to_find, text, flags=re.IGNORECASE)
+        match = re.search(txt_to_find, text, flags=re.IGNORECASE if ignorecase else None)
         if match:
             if match[0] not in matches:
                 matches.append(match[0])
@@ -68,7 +68,7 @@ def validate_text_contains_all(text, text_contains_all):
         raise Exception(f'File must contain the all following keywords: {", ".join(text_contains_all)}')
     
 
-def validate_text_contains_any(text, text_contains_any):
+def validate_text_contains_any(text, text_contains_any, ignorecase=False):
     """
         Raise exception if contents of the text file don't contain at least one item in text_contains_any list
     """
@@ -77,7 +77,7 @@ def validate_text_contains_any(text, text_contains_any):
 
     matches = []
     for txt_to_find in text_contains_any:
-        match = re.search(txt_to_find, text, flags=re.IGNORECASE)
+        match = re.search(txt_to_find, text, flags=re.IGNORECASE if ignorecase else None)
         if match:
             if match.group(0) not in matches:
                 matches.append(match.group(0))
@@ -149,12 +149,12 @@ def validate_filename(fname, fname_contains=[], fname_endswith=[]):
     if not isinstance(fname, str): raise ValueError("fname must be a string")
 
     try:
-        validate_text_contains_any(fname, fname_contains)
+        validate_text_contains_any(fname, fname_contains, True)
     except:
         return False
 
     for file_type in fname_endswith:
-        if fname.endswith(file_type): return True
+        if fname.lower().endswith(file_type): return True
 
     return False
 
