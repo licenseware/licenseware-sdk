@@ -78,7 +78,7 @@ def validate_text_contains_any(text, text_contains_any, ignorecase=False):
 
     matches = []
     for txt_to_find in text_contains_any:
-        pattern = re.compile(re.escape(txt_to_find), flags=re.IGNORECASE if ignorecase else 0)
+        pattern = re.compile(re.escape(txt_to_find), flags=re.IGNORECASE)
         match = re.search(pattern, text)
         if match:
             if match.group(0) not in matches:
