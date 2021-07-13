@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.14.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.13.3...v0.14.0) (2021-07-13)
+
+
+### Features
+
+* notifications decorator for event handler ([cbd3aa1](https://www.github.com/licenseware/licenseware-sdk/commit/cbd3aa16a0a9d791e34b24039dc506ae996dce01))
+* notifications decorator for event handler ([aa85eae](https://www.github.com/licenseware/licenseware-sdk/commit/aa85eae0dbbc193b6c5c7ad16267d949e419d613))
+* notifications decorator for event handler ([207f59b](https://www.github.com/licenseware/licenseware-sdk/commit/207f59b46ddc4e5f08c87278bf6df91835debab6))
+* notifications decorator for event handler ([da129d2](https://www.github.com/licenseware/licenseware-sdk/commit/da129d2a640436f254748f0057b2827653da17e6))
+* **redis:** password and db_id are now supported ([d35521c](https://www.github.com/licenseware/licenseware-sdk/commit/d35521c474ae14138656c3e0198006c6ba60514c))
+
+
+### Bug Fixes
+
+* always ignore case ([16ae307](https://www.github.com/licenseware/licenseware-sdk/commit/16ae307f17141f64e0ca059595c113e4142e1912))
+* file_validators flags default to 0 insead of None, mongodata getmongoconnection on getcollection ([2f6b492](https://www.github.com/licenseware/licenseware-sdk/commit/2f6b492c3bdaf9f34af4a8bd8313c12fa58efc4a))
+* make notification decorator async ([9a026c4](https://www.github.com/licenseware/licenseware-sdk/commit/9a026c4a05d2ecbe4015230b14cbfdef158b48dd))
+* make only wrapped function async ([7cd78bd](https://www.github.com/licenseware/licenseware-sdk/commit/7cd78bd91cf3b62e0a9fa462a87f1cbc89220e57))
+* optional ignorecase ([98e5a16](https://www.github.com/licenseware/licenseware-sdk/commit/98e5a167d379e04582c5ad70d762f81835333b7c))
+* redis service password optional; auth service create_machine bug ([426fa3f](https://www.github.com/licenseware/licenseware-sdk/commit/426fa3ff5aac79c8f77c6fce06f07f23b79aaff1))
+* removed the notifications decorator ([a48b246](https://www.github.com/licenseware/licenseware-sdk/commit/a48b2464f41f77c1c8b152091ea9be6057a8ae76))
+* return StrictRedis when using password ([d1f8de1](https://www.github.com/licenseware/licenseware-sdk/commit/d1f8de15baa31278cd4880f137d74d6ac9dee01f))
+
 ### [0.13.3](https://www.github.com/licenseware/licenseware-sdk/compare/v0.13.2...v0.13.3) (2021-07-02)
 
 
