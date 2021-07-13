@@ -123,10 +123,7 @@ def parse_match(match):
 
 # sort_dict = lambda data: {k:data[k] for k in sorted(data)}
 
-
-default_db = os.getenv("MONGO_DB_NAME") or os.getenv("MONGO_DATABASE_NAME") or "db"
-default_collection = os.getenv("MONGO_COLLECTION_NAME") or "Data"
-mongo_connection = MongoClient(os.getenv("MONGO_CONNECTION_STRING"))
+mongo_connection = None
 
 
 @failsafe
@@ -137,6 +134,15 @@ def get_collection(collection, db_name=None):
         If something fails will return a string with the error message.
     """
     
+    global mongo_connection
+    
+    default_db = os.getenv("MONGO_DB_NAME") or os.getenv("MONGO_DATABASE_NAME") or "db"
+    default_collection = os.getenv("MONGO_COLLECTION_NAME") or "Data"
+    
+    if not mongo_connection:
+        mongo_connection = MongoClient(os.getenv("MONGO_CONNECTION_STRING"))
+
+
     collection = collection or default_collection
     db_name = db_name or default_db
 

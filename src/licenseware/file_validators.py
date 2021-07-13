@@ -59,7 +59,8 @@ def validate_text_contains_all(text, text_contains_all, ignorecase=False):
 
     matches = []
     for txt_to_find in text_contains_all:
-        match = re.search(txt_to_find, text, flags=re.IGNORECASE if ignorecase else None)
+        pattern = re.compile(re.escape(txt_to_find), flags=re.IGNORECASE if ignorecase else 0)
+        match = re.search(pattern, text)
         if match:
             if match[0] not in matches:
                 matches.append(match[0])
@@ -77,7 +78,8 @@ def validate_text_contains_any(text, text_contains_any, ignorecase=False):
 
     matches = []
     for txt_to_find in text_contains_any:
-        match = re.search(txt_to_find, text, flags=re.IGNORECASE if ignorecase else None)
+        pattern = re.compile(re.escape(txt_to_find), flags=re.IGNORECASE if ignorecase else 0)
+        match = re.search(pattern, text)
         if match:
             if match.group(0) not in matches:
                 matches.append(match.group(0))
@@ -321,6 +323,7 @@ class GeneralValidator:
 
         except Exception as e:
             # log.warning(e)
-            # print(traceback.format_exc())
+            import traceback
+            print(traceback.format_exc())
             res = {"status": "fail", "message": str(e)}
             return res if show_reason else False

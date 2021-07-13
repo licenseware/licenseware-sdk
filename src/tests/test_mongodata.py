@@ -7,6 +7,9 @@ import uuid
 import datetime as dt
 
 
+# pytest -s tests/test_mongodata.py
+
+
 # Add init file in src for tests
 # You need a running mongodb instance running 
 # mongo express is useful for visualizing data
