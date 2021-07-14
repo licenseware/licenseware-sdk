@@ -1,6 +1,7 @@
 import datetime
 import licenseware.mongodata as m
-from licenseware.serializer.app_utilization import AppUtilizationSchema, log
+from licenseware.serializer.app_utilization import AppUtilizationSchema
+from licenseware.utils.log_config import log
 from licenseware.utils.urls import APP_ID
 
 
