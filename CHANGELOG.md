@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.14.3](https://www.github.com/licenseware/licenseware-sdk/compare/v0.14.2...v0.14.3) (2021-07-14)
+
+
+### Bug Fixes
+
+* backward_compatibility for notify_status function params ([d66eb60](https://www.github.com/licenseware/licenseware-sdk/commit/d66eb60d565ed907cd7147183ec335076f7ebd44))
+
 ### [0.14.2](https://www.github.com/licenseware/licenseware-sdk/compare/v0.14.1...v0.14.2) (2021-07-14)
 
 
