@@ -1,5 +1,14 @@
 # Changelog
 
+### [0.14.2](https://www.github.com/licenseware/licenseware-sdk/compare/v0.14.1...v0.14.2) (2021-07-14)
+
+
+### Bug Fixes
+
+* import error ([f4da1be](https://www.github.com/licenseware/licenseware-sdk/commit/f4da1be7aae4e2420619d251eb6ca96d294daa37))
+* import.. ([6fc7767](https://www.github.com/licenseware/licenseware-sdk/commit/6fc77671fbacb00e71a90fd59b3cf655759c3807))
+* relative import fix ([76c5c59](https://www.github.com/licenseware/licenseware-sdk/commit/76c5c59b204f157b68bd2fff2fbf944e72f0d821))
+
 ### [0.14.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.14.0...v0.14.1) (2021-07-14)
 
 
