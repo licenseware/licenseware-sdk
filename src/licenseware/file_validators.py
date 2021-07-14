@@ -50,7 +50,7 @@ from io import BytesIO
 from licenseware.utils.log_config import log
 
 
-def validate_text_contains_all(text, text_contains_all, ignorecase=False):
+def validate_text_contains_all(text, text_contains_all):
     """
         Raise exception if contents of the text file don't contain all items in text_contains_all list
     """
@@ -59,7 +59,7 @@ def validate_text_contains_all(text, text_contains_all, ignorecase=False):
 
     matches = []
     for txt_to_find in text_contains_all:
-        pattern = re.compile(re.escape(txt_to_find), flags=re.IGNORECASE if ignorecase else 0)
+        pattern = re.compile(re.escape(txt_to_find), flags=re.IGNORECASE)
         match = re.search(pattern, text)
         if match:
             if match[0] not in matches:
@@ -69,7 +69,7 @@ def validate_text_contains_all(text, text_contains_all, ignorecase=False):
         raise Exception(f'File must contain the all following keywords: {", ".join(text_contains_all)}')
     
 
-def validate_text_contains_any(text, text_contains_any, ignorecase=False):
+def validate_text_contains_any(text, text_contains_any):
     """
         Raise exception if contents of the text file don't contain at least one item in text_contains_any list
     """
@@ -145,13 +145,13 @@ def validate_sheets(file, required_sheets):
 
 def validate_filename(fname, fname_contains=[], fname_endswith=[]):
     """
-        Check if filename contains all neededd keywords and all accepted file types
+        Check if filename contains all needed keywords and all accepted file types
     """
 
     if not isinstance(fname, str): raise ValueError("fname must be a string")
 
     try:
-        validate_text_contains_any(fname, fname_contains, True)
+        validate_text_contains_any(fname, fname_contains)
     except:
         return False
 
@@ -323,7 +323,7 @@ class GeneralValidator:
 
         except Exception as e:
             # log.warning(e)
-            import traceback
-            print(traceback.format_exc())
+            # import traceback
+            # print(traceback.format_exc())
             res = {"status": "fail", "message": str(e)}
             return res if show_reason else False

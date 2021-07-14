@@ -1,7 +1,7 @@
 import datetime
 import licenseware.mongodata as m
 from licenseware import AppUtilizationSchema, log
-
+from licenseware.utils.urls import APP_ID
 
 
 class TenantUtils:
@@ -14,8 +14,9 @@ class TenantUtils:
         analysis_collection_name: str = None,
     ):
         
-        app_prefix = str(app_id).split('-')[0].upper() 
-        # services names should be named like "XXX-name" where XXX it's a acronym
+        self.app_id = app_id or APP_ID
+        app_prefix = str(self.app_id).split('-')[0].upper() 
+        # services names should be named like "XXX-name" where XXX it's a unique acronym
         
         self.data_collection_name = data_collection_name or app_prefix + "Data"
         self.utilization_collection_name = utilization_collection_name or app_prefix + "Utilization"

@@ -59,8 +59,8 @@ class Authenticator:
             os.environ['AUTH_TOKEN_DATETIME'] = datetime.utcnow().isoformat()
         else:
             os.environ['APP_AUTHENTICATED'] = 'false'
+            log.error(response)
             
-        log.info(response)
         return response
 
     def _login(self):
