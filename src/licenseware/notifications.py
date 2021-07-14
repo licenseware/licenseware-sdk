@@ -46,3 +46,6 @@ async def notify_status(event, status):
     res = requests.post(
         url, json=payload, headers={"Authorization": os.getenv('AUTH_TOKEN')}
     )
+    
+    if res.status_code != 200:
+        log.error("Failed to send processing status to notification-service")
