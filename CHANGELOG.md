@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.14.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.14.0...v0.14.1) (2021-07-14)
+
+
+### Bug Fixes
+
+* updated notify_status to checkmongo for running processes before sending a idle status, log only authentification fail to avoid clutterlogs ([528d78c](https://www.github.com/licenseware/licenseware-sdk/commit/528d78cc42e065103ea763cde5f8fa4d15b96ef8))
+
 ## [0.14.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.13.3...v0.14.0) (2021-07-13)
 
 
