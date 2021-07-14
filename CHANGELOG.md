@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.14.4](https://www.github.com/licenseware/licenseware-sdk/compare/v0.14.3...v0.14.4) (2021-07-14)
+
+
+### Bug Fixes
+
+* fix in case args were given on notify_status ([f8a937e](https://www.github.com/licenseware/licenseware-sdk/commit/f8a937e6a792a1dba3d7e10944bd3023ead68343))
+
 ### [0.14.3](https://www.github.com/licenseware/licenseware-sdk/compare/v0.14.2...v0.14.3) (2021-07-14)
 
 
