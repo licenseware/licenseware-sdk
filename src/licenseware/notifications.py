@@ -26,9 +26,9 @@ def backward_compatibility(**kparams):
     # new: event, status
     
     if isinstance(kparams['tenant_id'], dict):
-        return kparams['tenant_id'], kparams['status'] 
+        return kparams['tenant_id'], kparams['event_type'] or kparams['status'] 
     else:
-        return kparams, kparams['status']
+        return kparams, kparams['event_type'] or kparams['status']
 
 
 
