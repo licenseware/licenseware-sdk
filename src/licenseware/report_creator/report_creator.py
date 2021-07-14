@@ -176,7 +176,7 @@ from licenseware.decorators import (
 from typing import List, Tuple, Callable
 import time
 
-from licenseware import log
+from licenseware.utils.log_config import log
 
 
 
