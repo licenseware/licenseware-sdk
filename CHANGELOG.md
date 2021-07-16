@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.14.5](https://www.github.com/licenseware/licenseware-sdk/compare/v0.14.4...v0.14.5) (2021-07-16)
+
+
+### Bug Fixes
+
+* changed order in backward compatibility ([d7cdf3b](https://www.github.com/licenseware/licenseware-sdk/commit/d7cdf3bab779ca653b53d03eec6949025ae25632))
+
 ### [0.14.4](https://www.github.com/licenseware/licenseware-sdk/compare/v0.14.3...v0.14.4) (2021-07-14)
 
 
