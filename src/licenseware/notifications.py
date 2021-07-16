@@ -26,9 +26,9 @@ def backward_compatibility(**kparams):
     # new: event, status
     
     if isinstance(kparams['tenant_id'], dict):
-        return kparams['tenant_id'], kparams['event_type'] or kparams['status'] 
+        return kparams['tenant_id'], kparams['status'] or kparams['event_type']
     else:
-        return kparams, kparams['event_type'] or kparams['status']
+        return kparams, kparams['status'] or kparams['event_type']
 
 
 
@@ -42,15 +42,15 @@ async def notify_status(tenant_id, upload_id=None, status=None, app_id=None):
         **dict(tenant_id=tenant_id, event_type=upload_id, status=status, app_id=app_id)
     )
     
-    # if status == 'idle':
-    #     # Check if there are any Running processsors before sending Idle to registry-service
-    #     wait = 5 #sec
-    #     for _ in range(int(3600/wait)): # 1 hour
-    #         res, _ = TenantUtils().get_processing_status(event["tenant_id"])
-    #         if res['status'] == 'Running':
-    #             time.sleep(wait)
-    #         elif res['status'] == 'Idle':
-    #             break
+    if status == 'idle':
+        # Check if there are any Running processsors before sending Idle to registry-service
+        wait = 5 #sec
+        for _ in range(int(3600/wait)): # 1 hour
+            res, _ = TenantUtils().get_uploader_status(event["tenant_id"], event['event_type'])
+            if res['status'] == 'Running':
+                time.sleep(wait)
+            elif res['status'] == 'Idle':
+                break
             
 
     url = NOTIFICATION_SERVICE_URL + "/processing-status"
@@ -59,7 +59,7 @@ async def notify_status(tenant_id, upload_id=None, status=None, app_id=None):
         'tenant_id': event["tenant_id"],
         'upload_id': event["event_type"],
         'status': status,
-        'app_id': app_id or APP_ID #added for backward compatibility
+        'app_id': app_id or APP_ID.replace('worker', 'service') #added for backward compatibility
     }
 
     res = requests.post(
