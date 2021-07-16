@@ -42,15 +42,15 @@ async def notify_status(tenant_id, upload_id=None, status=None, app_id=None):
         **dict(tenant_id=tenant_id, event_type=upload_id, status=status, app_id=app_id)
     )
     
-    if status == 'idle':
-        # Check if there are any Running processsors before sending Idle to registry-service
-        wait = 5 #sec
-        for _ in range(int(3600/wait)): # 1 hour
-            res, _ = TenantUtils().get_processing_status(event["tenant_id"])
-            if res['status'] == 'Running':
-                time.sleep(wait)
-            elif res['status'] == 'Idle':
-                break
+    # if status == 'idle':
+    #     # Check if there are any Running processsors before sending Idle to registry-service
+    #     wait = 5 #sec
+    #     for _ in range(int(3600/wait)): # 1 hour
+    #         res, _ = TenantUtils().get_processing_status(event["tenant_id"])
+    #         if res['status'] == 'Running':
+    #             time.sleep(wait)
+    #         elif res['status'] == 'Idle':
+    #             break
             
 
     url = NOTIFICATION_SERVICE_URL + "/processing-status"
