@@ -63,6 +63,20 @@ class TenantUtils:
 
         if results: return {'status': 'Running'}, 200
         return {'status': 'Idle'}, 200
+
+    def get_uploader_status(self, tenant_id, uploader_id):
+        [self._close_timed_out(f)
+         for f in self._get_timed_out_files(tenant_id)]
+        query = {'tenant_id': tenant_id,
+                 'status': 'Running', 'file_type': uploader_id}
+        results = m.fetch(
+            match=query, collection=self.analysis_collection_name)
+        log.info(results)
+
+        if results:
+            return {'status': 'Running'}, 200
+        return {'status': 'Idle'}, 200
+
         
 
 
