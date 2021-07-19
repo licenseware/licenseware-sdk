@@ -39,7 +39,7 @@ But since each 'running' status will have at some point an 'idle' status I think
 """
 
 import datetime
-from licenseware import log
+from licenseware.utils import log
 from licenseware.utils.redis_service import redis_connection as rd
 import os, json, requests
 from licenseware.decorators.auth_decorators import authenticated_machine
