@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.15.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.14.5...v0.15.0) (2021-07-23)
+
+
+### Features
+
+* added notifications directly in sdk ([20212a4](https://www.github.com/licenseware/licenseware-sdk/commit/20212a427f316125bc5b58cb9dc651704d1c0c5f))
+* get processing status based on uploader ([e4e9db7](https://www.github.com/licenseware/licenseware-sdk/commit/e4e9db768e2992f0c2c249e98a8e147bbf23db71))
+
+
+### Bug Fixes
+
+* make mongodata thread safe by closing the connection after query ([1981936](https://www.github.com/licenseware/licenseware-sdk/commit/1981936e9e5a8cb26e88966bdd0d57e6eb55faf9))
+* notification imports fix ([f63501e](https://www.github.com/licenseware/licenseware-sdk/commit/f63501e36bed381ea3a39e103cb84a1b36ff18f8))
+
 ### [0.14.5](https://www.github.com/licenseware/licenseware-sdk/compare/v0.14.4...v0.14.5) (2021-07-16)
 
 
