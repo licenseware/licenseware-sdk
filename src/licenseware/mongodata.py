@@ -33,6 +33,8 @@ from bson.json_util import dumps
 from bson.objectid import ObjectId
 import json
 from .utils import log, log_dict
+from pymongo.write_concern import WriteConcern
+from pymongo.read_concern import ReadConcern
 
 
 
@@ -182,11 +184,12 @@ def insert(schema, collection, data, db_name=None):
     if isinstance(data, str): return data
 
     if isinstance(data, dict):
-        inserted_id = parse_oid(collection.insert_one(data).inserted_id)
+        _oid_inserted = collection.with_options(write_concern=WriteConcern("majority")).insert_one(data).inserted_id
+        inserted_id = parse_oid(_oid_inserted)
         return [inserted_id]
 
     if isinstance(data, list):
-        inserted_ids = collection.insert_many(data).inserted_ids
+        inserted_ids = collection.with_options(write_concern=WriteConcern("majority")).insert_many(data).inserted_ids
         return [parse_oid(oid) for oid in inserted_ids]
 
     raise Exception(f"Can't interpret validated data: {data}")
@@ -224,11 +227,11 @@ def fetch(match, collection, as_list=True, db_name=None):
         return doc
 
     if match['distinct_key']: 
-        found_docs = collection.distinct(match['distinct_key'])
+        found_docs = collection.with_options(read_concern=ReadConcern("majority")).distinct(match['distinct_key'])
     elif match['query_tuple']:
-        found_docs = collection.find(*match['query_tuple'])
+        found_docs = collection.with_options(read_concern=ReadConcern("majority")).find(*match['query_tuple'])
     else:
-        found_docs = collection.find(match['query'])
+        found_docs = collection.with_options(read_concern=ReadConcern("majority")).find(match['query'])
 
     if as_list: 
         return [parse_doc(doc) for doc in found_docs]
@@ -255,7 +258,7 @@ def aggregate(pipeline, collection, as_list=True, db_name=None):
     collection = get_collection(collection, db_name)
     if not isinstance(collection, Collection): return collection 
 
-    found_docs = collection.aggregate(pipeline, allowDiskUse=True)
+    found_docs = collection.with_options(read_concern=ReadConcern("majority")).aggregate(pipeline, allowDiskUse=True)
 
     if as_list: return [parse_doc(doc) for doc in found_docs]
         
@@ -326,7 +329,7 @@ def update(schema, match, new_data, collection, append=False, db_name=None):
     if isinstance(new_data, str): return new_data
     
     _filter = {"_id": match["_id"]} if "_id" in match else match
-    updated_docs_nbr = collection.update_many(
+    updated_docs_nbr = collection.with_options(write_concern=WriteConcern("majority")).update_many(
         filter = _filter,
         update = _append_query(new_data) if append else {"$set": new_data},
         upsert = True
@@ -357,7 +360,7 @@ def delete(match, collection, db_name=None):
     col = get_collection(collection, db_name)
     if not isinstance(col, Collection): return col 
 
-    deleted_docs_nbr = col.delete_many(
+    deleted_docs_nbr = col.with_options(write_concern=WriteConcern("majority")).delete_many(
         filter=match['query'] or match['_id'],
     ).deleted_count
     
@@ -373,6 +376,6 @@ def delete_collection(collection, db_name=None):
     col = get_collection(collection, db_name)
     if not isinstance(col, Collection): return col 
 
-    res = col.drop()
+    res = col.with_options(write_concern=WriteConcern("majority")).drop()
     return 1 if res is None else 0
 
