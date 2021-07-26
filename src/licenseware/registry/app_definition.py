@@ -26,9 +26,10 @@ which represents that tenant has processed files and has saved data as a result
 
 import os
 import requests
-from licenseware.utils.urls import BASE_URL, REGISTRY_SERVICE_URL
+from licenseware.utils.urls import BASE_URL, BASE_PATH, URL_PREFIX, REGISTRY_SERVICE_URL
 from licenseware.utils.log_config import log
 from licenseware.decorators.auth_decorators import authenticated_machine
+
 
 
 class AppDefinition:
@@ -40,9 +41,10 @@ class AppDefinition:
         description,
         activated_tenants_func,
         tenants_with_data_func,
-        flag='',
+        flags=[],
         icon="default.png", 
         app_activation_url='/app/init',
+        refresh_registration_url='/register_all',
         editable_tables_url='/editable_tables',
         history_report_url='/reports/history_report',
         tenant_registration_url='/tenant_registration_url'
@@ -52,16 +54,15 @@ class AppDefinition:
         self.name = name
         self.description = description
         self.icon = icon
-        self.flag=flag
-        self.app_activation_url = BASE_URL + app_activation_url
+        self.flags = flags
         self.activated_tenants_func = activated_tenants_func
         self.tenants_with_data_func = tenants_with_data_func
-        self.refresh_registration_url = BASE_URL  + '/register_all'
-        self.editable_tables_url = BASE_URL  + editable_tables_url
-        self.history_report_url = BASE_URL + history_report_url
-        self.tenant_registration_url = BASE_URL  + tenant_registration_url
+        self.app_activation_url = URL_PREFIX + app_activation_url
+        self.refresh_registration_url = URL_PREFIX + refresh_registration_url
+        self.editable_tables_url = URL_PREFIX + editable_tables_url
+        self.history_report_url = URL_PREFIX + history_report_url
+        self.tenant_registration_url = URL_PREFIX + tenant_registration_url
         
-
 
     @authenticated_machine
     def register_app(self):
@@ -80,13 +81,13 @@ class AppDefinition:
                 "tenants_with_app_activated": self.activated_tenants_func(),
                 "tenants_with_data_available": self.tenants_with_data_func(),
                 "description": self.description,
-                "flag": self.flag,
+                "flags": self.flags,
                 "icon": self.icon,
-                "refresh_registration_url": self.refresh_registration_url,
-                "app_activation_url": self.app_activation_url,
-                "editable_tables_url": self.editable_tables_url,
-                "history_report_url": self.history_report_url,
-                "tenant_registration_url":self.tenant_registration_url
+                "refresh_registration_url": BASE_PATH + self.refresh_registration_url,
+                "app_activation_url": BASE_PATH + self.app_activation_url,
+                "editable_tables_url": BASE_PATH + self.editable_tables_url,
+                "history_report_url":  BASE_PATH + self.history_report_url,
+                "tenant_registration_url":  BASE_PATH + self.tenant_registration_url
             }]
         }
 

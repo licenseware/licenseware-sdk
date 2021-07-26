@@ -157,8 +157,6 @@ filters = [
 """
 
 
-from copy import deepcopy
-
 from flask import request
 from flask_restx import Namespace, Resource, fields
 
@@ -174,8 +172,6 @@ from licenseware.decorators import (
 )
 
 from typing import List, Tuple, Callable
-import time
-
 from licenseware.utils.log_config import log
 
 

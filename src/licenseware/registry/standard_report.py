@@ -24,7 +24,7 @@ class StandardReport:
         description, 
         url, 
         connected_apps, 
-        beta_flag='false', 
+        flags=[], 
         _filter=None
     ):
         self.app_id = app_id
@@ -32,7 +32,7 @@ class StandardReport:
         self.report_name = report_name
         self.description = description
         self.url = url #report_url
-        self.beta_flag=beta_flag
+        self.flags=flags
         self.components = {}
         if _filter: self.register_filter(_filter)
         self.connected_apps = connected_apps        
@@ -56,7 +56,7 @@ class StandardReport:
             "report_id": self.report_id,
             "report_name": self.report_name,
             "description": self.description,
-            "beta_flag": self.beta_flag,
+            "flags": self.flags,
             "report_components": [self.components[component].return_json_payload() for component in self.components],
             "filters": self._filter.filter_columns,
             "url": self.root_url + '/reports' + self.url,
@@ -77,7 +77,7 @@ class StandardReport:
                     "report_id": self.report_id,
                     "report_name": self.report_name,
                     "description": self.description,
-                    "beta_flag": self.beta_flag,
+                    "flags": self.flags,
                     "url": f'{os.getenv("APP_BASE_PATH")}{os.getenv("APP_URL_PREFIX")}/reports{self.url}',
                     "refresh_registry_url": self.refresh_registry_url,
                     "connected_apps": self.connected_apps
