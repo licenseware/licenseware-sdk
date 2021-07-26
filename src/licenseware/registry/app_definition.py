@@ -40,24 +40,26 @@ class AppDefinition:
         description,
         activated_tenants_func,
         tenants_with_data_func,
-        beta_flag='false',
+        flag='',
         icon="default.png", 
         app_activation_url='/app/init',
         editable_tables_url='/editable_tables',
         history_report_url='/reports/history_report',
+        tenant_registration_url='/tenant_registration_url'
     ):
 
         self.id = id
         self.name = name
         self.description = description
         self.icon = icon
-        self.beta_flag=beta_flag
+        self.flag=flag
         self.app_activation_url = BASE_URL + app_activation_url
         self.activated_tenants_func = activated_tenants_func
         self.tenants_with_data_func = tenants_with_data_func
         self.refresh_registration_url = BASE_URL  + '/register_all'
         self.editable_tables_url = BASE_URL  + editable_tables_url
-        self.history_report_url = BASE_URL  + history_report_url
+        self.history_report_url = BASE_URL + history_report_url
+        self.tenant_registration_url = BASE_URL  + tenant_registration_url
         
 
 
@@ -78,12 +80,13 @@ class AppDefinition:
                 "tenants_with_app_activated": self.activated_tenants_func(),
                 "tenants_with_data_available": self.tenants_with_data_func(),
                 "description": self.description,
-                "beta_flag": self.beta_flag,
+                "flag": self.flag,
                 "icon": self.icon,
                 "refresh_registration_url": self.refresh_registration_url,
                 "app_activation_url": self.app_activation_url,
                 "editable_tables_url": self.editable_tables_url,
-                "history_report_url": self.history_report_url
+                "history_report_url": self.history_report_url,
+                "tenant_registration_url":self.tenant_registration_url
             }]
         }
 

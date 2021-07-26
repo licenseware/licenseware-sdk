@@ -1,1 +1,2 @@
 from .notifications import notify_status
+from .notifications_handler import EventNotificationsHandler

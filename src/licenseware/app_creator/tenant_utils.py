@@ -87,13 +87,23 @@ class TenantUtils:
 
         log.info(f"tenant data deleted: {res}")
 
-    def get_activated_tenants(self):
+    def get_activated_tenants(self, tenant_id=None):
+        
+        if not tenant_id:
+            tenants_list = m.fetch(
+                match='tenant_id', collection=self.utilization_collection_name
+            )
+            log.info(f"Activated_tenants: {tenants_list}")
+            return tenants_list
+        
         tenants_list = m.fetch(
-            match='tenant_id', collection=self.utilization_collection_name)
-        log.info(f"Activated_tenants: {tenants_list}")
+            match={'tenant_id': tenant_id}, collection=self.utilization_collection_name
+        )
+        log.info(f"Activated tenant: {tenants_list}")
         return tenants_list
+        
 
-    def get_last_update_dates(self):
+    def get_last_update_dates(self, tenant_id=None):
         pipeline = [
             {
                 '$group': {
@@ -112,6 +122,9 @@ class TenantUtils:
                 }
             }
         ]
+        
+        if tenant_id:
+            pipeline.insert(0, {'$match': {'tenant_id': tenant_id}})
 
         last_update_dates = m.aggregate(
             pipeline, collection=self.data_collection_name)
@@ -121,9 +134,9 @@ class TenantUtils:
 
         return last_update_dates
 
-    def get_tenants_with_data(self):
+    def get_tenants_with_data(self, tenant_id=None):
 
-        enabled_tenants = self.get_last_update_dates()
+        enabled_tenants = self.get_last_update_dates(tenant_id)
 
         if enabled_tenants:
             enabled_tenants = [{

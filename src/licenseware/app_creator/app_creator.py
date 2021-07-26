@@ -163,6 +163,7 @@ class AppCreator:
         self.add_uploads_status_routes()
         self.add_uploads_quota_routes()
         self.add_uploads_history_routes()
+        self.add_tenant_registration_url()
         
         self.app_definition.register_all(
             uploaders = self.uploaders if self.uploaders is not None else [],
@@ -395,4 +396,26 @@ class AppCreator:
 
             self.ns.add_resource(UploaderHistory, "/uploads" + uploader.history_url)
 
+    def add_tenant_registration_url(self):
+        
+        tenant_utils = self.tenant_utils
+        
+        class TenantRegistration(Resource): 
+            @failsafe(fail_code=500)
+            @machine_check
+            @self.ns.doc('Get `app_activated` and `data_available` boleans for tenant_id')
+            @self.ns.doc(params={'tenant_id': 'Tenant ID for which the info is requested'})
+            def get(self):
+                
+                tenant_id = request.args.get('tenant_id')
+                
+                if tenant_id:
+                    
+                    return {
+                        "app_activated": bool(tenant_utils.get_tenants_with_data(tenant_id)),
+                        "data_available": bool(tenant_utils.get_activated_tenants(tenant_id))
+                    }
     
+                return {'status': 'fail', 'message': 'Query parameter `tenant_id` not provided'}
+        
+        self.ns.add_resource(TenantRegistration, self.app_definition.tenant_registration_url)
