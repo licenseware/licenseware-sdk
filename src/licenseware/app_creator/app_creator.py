@@ -162,7 +162,6 @@ class AppCreator:
         self.add_uploads_filestream_validation_routes()
         self.add_uploads_status_routes()
         self.add_uploads_quota_routes()
-        self.add_uploads_history_routes()
         self.add_tenant_registration_url()
         
         self.app_definition.register_all(
@@ -383,19 +382,6 @@ class AppCreator:
             self.ns.add_resource(UploaderStatus, "/uploads" + uploader.status_check_url)
             
             
-    def add_uploads_history_routes(self):
-          
-        for uploader in self.uploaders:
-                  
-            class UploaderHistory(Resource): 
-                @failsafe(fail_code=500)
-                @authorization_check
-                @self.ns.doc('Get the list of actions the tenant made in the past') 
-                def get(self):
-                    return {"detail": "not implemented"}, 500 
-
-            self.ns.add_resource(UploaderHistory, "/uploads" + uploader.history_url)
-
     def add_tenant_registration_url(self):
         
         tenant_utils = self.tenant_utils
