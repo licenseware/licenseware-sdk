@@ -1,13 +1,27 @@
-import os
+import os, re
 import shutil
-try:
-    from werkzeug.utils import secure_filename
-except:
-    pass # we are on the worker side
-
+from werkzeug.utils import secure_filename as werkzeug_secure_filename
 
 
 UPLOAD_PATH = os.getenv("UPLOAD_PATH")
+
+
+def secure_filename(fname):
+    """
+        Custom handling of secure filename 
+        Added an exception for review lite files `~` char
+    """
+    
+    review_lite_file = re.search(r"feature|option|version", fname, re.IGNORECASE)
+    
+    if review_lite_file: fname = re.sub('~', '_SECURE_TILDA_', fname)
+    
+    fname = werkzeug_secure_filename(fname)
+    
+    if review_lite_file: fname = re.sub('_SECURE_TILDA_', '~', fname)
+    
+    return fname
+
 
 
 def save_file(file, tenant_id=None, path=None):
