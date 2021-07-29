@@ -26,20 +26,27 @@ class TenantUtils:
 
     # Processing status
 
-    def _get_timed_out_files(self, tenant_id=None):
-
+    def _get_timed_out_files(self, tenant_id=None, low_memory=False):
+        
         time_out_time = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
         start_time    = datetime.datetime.utcnow() - datetime.timedelta(days=360)
         
         query = {
             'status': 'Running',
-            'updated_at': {'$gt': start_time.isoformat(), '$lt': time_out_time.isoformat()}
+            'updated_at': {
+                '$gt': start_time.isoformat(), 
+                '$lt': time_out_time.isoformat()
+            }
         }
         
         if tenant_id: 
             query['tenant_id'] = tenant_id
     
-        return m.fetch(match=query, collection=self.analysis_collection_name)
+        return m.fetch(
+            match = query, 
+            collection = self.analysis_collection_name, 
+            as_list = not(low_memory)
+        )
 
 
     def _close_timed_out(self, timed_out_file):
@@ -54,19 +61,20 @@ class TenantUtils:
         )
         
         
-    def close_timed_out_files(self, tenant_id=None): 
+    def close_timed_out_files(self, tenant_id=None, low_memory=False): 
         """
             Check `AnalysisStats` collection for files that have status: 'Running'
             Set status to `Error` if they are running for more time than specified in `_get_timed_out_files`
+            
+            low_memory = False : will use a generator to save memory
+            
         """
         
-        timed_out_files = self._get_timed_out_files(tenant_id)
+        timed_out_files = self._get_timed_out_files(tenant_id, low_memory)
         
         if isinstance(timed_out_files, str):
             log.error(timed_out_files)
             return
-        
-        if not timed_out_files: return
         
         for f in timed_out_files:
             self._close_timed_out(f)
