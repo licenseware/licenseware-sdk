@@ -1,5 +1,19 @@
 # Changelog
 
+### [0.15.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.15.0...v0.15.1) (2021-07-29)
+
+
+### Bug Fixes
+
+* added custom filename exception for odb reviewlite files ([c9be085](https://www.github.com/licenseware/licenseware-sdk/commit/c9be0850099aae3efbe54cac4ea9745edbd97a2c))
+* changed beta_flag to flags, fixed urls for internal use ([88aa88c](https://www.github.com/licenseware/licenseware-sdk/commit/88aa88c61b18e9e37c4cc5c499bc8021ff5a06c1))
+* mongodata threadsafe ([e439ca9](https://www.github.com/licenseware/licenseware-sdk/commit/e439ca92b253a9b595a09e2a45cdb72f5a4a0832))
+* removed /uploads/history route from app creator ([62f2723](https://www.github.com/licenseware/licenseware-sdk/commit/62f2723602d9be5d851f67ebf24b753838d80c51))
+* renamed beta_flag to flag in app_definition, added tenant_id param to tenant_utils/get tenants activated and with data, added tenant_registration_url to app creator ([39d8eee](https://www.github.com/licenseware/licenseware-sdk/commit/39d8eee35a84246b2de7a3ed3c1992eb75f49480))
+* renamed beta_flag to flags on uploader.py ([1cf8d4b](https://www.github.com/licenseware/licenseware-sdk/commit/1cf8d4b3a5fb76631b8f8bc53a7babcf35e48c1f))
+* tenantutils used the wrong schema for updating AnalysisStatusSchema ([2385cc6](https://www.github.com/licenseware/licenseware-sdk/commit/2385cc6af6dc4a8503095a4b6cec7d89874c1d3d))
+* url on app definition had an extra app prefix ([2eaad2f](https://www.github.com/licenseware/licenseware-sdk/commit/2eaad2f15a807951bace2e1758c261ae7201ad26))
+
 ## [0.15.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.14.5...v0.15.0) (2021-07-23)
 
 
