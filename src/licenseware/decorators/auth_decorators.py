@@ -1,14 +1,10 @@
 import os
 import requests
 from functools import wraps
-
-try:
-    from flask import request
-except:
-    pass  # we are on the worker side
-
+from flask import request
 from licenseware.utils.log_config import log
 from licenseware.auth import Authenticator
+
 
 # Auth decorators
 

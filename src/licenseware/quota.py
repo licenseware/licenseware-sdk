@@ -24,7 +24,7 @@ import sys
 import uuid
 import dateutil.parser as dateparser
 from .serializer import AppUtilizationSchema
-from .mongodata import insert, fetch, update
+from licenseware import mongodata 
 
 
 QUOTA = {
@@ -77,7 +77,7 @@ class Quota:
             raise ValueError("Please specify a value for 'unit_type' parameter")    
 
 
-        results = fetch(
+        results = mongodata.fetch(
             match={'tenant_id': tenant_id, 'unit_type': unit_type},
             collection=self.collection
         )
@@ -94,7 +94,7 @@ class Quota:
             "quota_reset_date": get_quota_reset_date()
         }
 
-        inserted_ids = insert(
+        inserted_ids = mongodata.insert(
             schema=self.schema, data=init_data, collection=self.collection
         )
 
@@ -112,7 +112,7 @@ class Quota:
             raise ValueError("Please specify a value for 'unit_type' parameter")    
 
 
-        current_utilization = fetch(
+        current_utilization = mongodata.fetch(
             match={'tenant_id': tenant_id, 'unit_type': unit_type},
             collection=self.collection
         )
@@ -121,7 +121,7 @@ class Quota:
             new_utilization = current_utilization[0]
             new_utilization['monthly_quota_consumed'] += number_of_units
             
-            updated_docs = update(
+            updated_docs = mongodata.update(
                 schema=self.schema,
                 match=current_utilization[0],
                 new_data=new_utilization,
@@ -152,12 +152,12 @@ class Quota:
         
         query = {'tenant_id': tenant_id, 'unit_type': unit_type}
 
-        results = fetch(query, self.collection)
+        results = mongodata.fetch(query, self.collection)
 
         if not results:
             new_user_response, status = self.init_quota(tenant_id, unit_type)
             if status == 200:
-                results = fetch(query, self.collection)
+                results = mongodata.fetch(query, self.collection)
                 if results: quota = results[0]
             else:
                 return new_user_response, status
@@ -171,7 +171,7 @@ class Quota:
         if quota_reset_date < current_date:
             quota['quota_reset_date'] = get_quota_reset_date()
             quota['monthly_quota_consumed'] = 0
-            update(self.schema, results[0], quota, self.collection)
+            mongodata.update(self.schema, results[0], quota, self.collection)
             # Recall check_quota method with the new reseted date and quota
             self.check_quota(tenant_id, unit_type, number_of_units)
 

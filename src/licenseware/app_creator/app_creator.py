@@ -91,11 +91,9 @@ from licenseware.registry import (
     Uploader
 )
 
-from licenseware.decorators import (
-    authorization_check, 
-    machine_check,
-    failsafe
-)
+
+from licenseware.decorators.failsafe_decorator import failsafe
+from licenseware.decorators.auth_decorators import authorization_check, machine_check
 
 from .tenant_utils import TenantUtils
 from licenseware.utils.urls import URL_PREFIX

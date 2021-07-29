@@ -28,7 +28,7 @@ import os
 from uuid import UUID
 from pymongo import MongoClient
 from pymongo.collection import Collection
-from .decorators import failsafe
+from licenseware.decorators.failsafe_decorator import failsafe
 from bson.json_util import dumps
 from bson.objectid import ObjectId
 import json

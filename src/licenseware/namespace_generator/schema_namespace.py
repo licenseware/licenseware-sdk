@@ -3,7 +3,7 @@ from inspect import signature
 from marshmallow import Schema
 from marshmallow_jsonschema import JSONSchema
 from flask_restx import Namespace, Resource
-from licenseware.decorators import authorization_check
+from licenseware.decorators.auth_decorators import authorization_check
 
 from .mongo_request import MongoRequest
 
