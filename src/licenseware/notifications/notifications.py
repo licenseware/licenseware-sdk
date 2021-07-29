@@ -14,7 +14,7 @@ import time
 import traceback
 from licenseware.utils.log_config import log
 from licenseware.decorators.auth_decorators import authenticated_machine
-from licenseware.utils.urls import NOTIFICATION_SERVICE_URL, APP_ID
+from licenseware.utils.urls import APP_ID
 from licenseware.app_creator.tenant_utils import TenantUtils
 from licenseware.notifications.notifications_handler import EventNotificationsHandler
 

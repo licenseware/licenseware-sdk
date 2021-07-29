@@ -1,6 +1,6 @@
 import datetime
 import licenseware.mongodata as m
-from licenseware.serializer.app_utilization import AppUtilizationSchema
+from licenseware.serializer.analysis_status import AnalysisStatusSchema
 from licenseware.utils.log_config import log
 from licenseware.utils.urls import APP_ID
 
@@ -19,61 +19,92 @@ class TenantUtils:
         app_prefix = str(self.app_id).split('-')[0].upper()
         # services names should be named like "XXX-name" where XXX it's a unique acronym
 
+        self.schema = AnalysisStatusSchema
         self.data_collection_name = data_collection_name or app_prefix + "Data"
         self.utilization_collection_name = utilization_collection_name or app_prefix + "Utilization"
         self.analysis_collection_name = analysis_collection_name or app_prefix + "AnalysisStats"
 
     # Processing status
 
-    def _get_timed_out_files(self, tenant_id):
+    def _get_timed_out_files(self, tenant_id=None):
 
         time_out_time = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
-        start_time = datetime.datetime.utcnow() - datetime.timedelta(days=360)
-
+        start_time    = datetime.datetime.utcnow() - datetime.timedelta(days=360)
+        
         query = {
-            'tenant_id': tenant_id,
             'status': 'Running',
             'updated_at': {'$gt': start_time.isoformat(), '$lt': time_out_time.isoformat()}
         }
-
+        
+        if tenant_id: 
+            query['tenant_id'] = tenant_id
+    
         return m.fetch(match=query, collection=self.analysis_collection_name)
+
 
     def _close_timed_out(self, timed_out_file):
 
         timed_out_file["status"] = "Error"
 
         return m.update(
-            schema=AppUtilizationSchema,
+            schema=self.schema,
             match=timed_out_file,
             new_data=timed_out_file,
             collection=self.analysis_collection_name
         )
-
+        
+        
+    def close_timed_out_files(self, tenant_id=None): 
+        """
+            Check `AnalysisStats` collection for files that have status: 'Running'
+            Set status to `Error` if they are running for more time than specified in `_get_timed_out_files`
+        """
+        
+        timed_out_files = self._get_timed_out_files(tenant_id)
+        
+        if isinstance(timed_out_files, str):
+            log.error(timed_out_files)
+            return
+        
+        if not timed_out_files: return
+        
+        for f in timed_out_files:
+            self._close_timed_out(f)
+            
+                
+    
     def get_processing_status(self, tenant_id):
+        """
+            Get processing status for a tenant_id from all uploaders
+        """
 
-        [self._close_timed_out(f)
-         for f in self._get_timed_out_files(tenant_id)]
-
+        self.close_timed_out_files(tenant_id)
+        
         query = {'tenant_id': tenant_id, 'status': 'Running'}
-        results = m.fetch(
-            match=query, collection=self.analysis_collection_name)
+        results = m.fetch(match=query, collection=self.analysis_collection_name)
         log.info(results)
 
-        if results:
-            return {'status': 'Running'}, 200
+        if results: return {'status': 'Running'}, 200
         return {'status': 'Idle'}, 200
 
+
     def get_uploader_status(self, tenant_id, uploader_id):
-        [self._close_timed_out(f)
-         for f in self._get_timed_out_files(tenant_id)]
-        query = {'tenant_id': tenant_id,
-                 'status': 'Running', 'file_type': uploader_id}
-        results = m.fetch(
-            match=query, collection=self.analysis_collection_name)
+        """
+            Get processing status for a tenant_id and the specified uploader
+        """
+        
+        self.close_timed_out_files(tenant_id)
+
+        query = {
+            'tenant_id': tenant_id,
+            'status': 'Running', 
+            'file_type': uploader_id
+        }
+        
+        results = m.fetch(match=query, collection=self.analysis_collection_name)
         log.info(results)
 
-        if results:
-            return {'status': 'Running'}, 200
+        if results: return {'status': 'Running'}, 200
         return {'status': 'Idle'}, 200
 
     # Activated tenants and tenants with data
@@ -86,6 +117,7 @@ class TenantUtils:
         )
 
         log.info(f"tenant data deleted: {res}")
+
 
     def get_activated_tenants(self, tenant_id=None):
         
