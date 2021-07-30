@@ -22,6 +22,8 @@ class RedisEventDispacher:
         e.listen()
 
     `event_handler` function should receive only one argument
+    
+    
 
     """
 
@@ -32,6 +34,7 @@ class RedisEventDispacher:
     def listen(self):
         
         cron_clock = 0
+        
         while True:
             redis_service = RedisService()
             redis_service.read_stream_events()
@@ -44,7 +47,7 @@ class RedisEventDispacher:
             
             # Cron tasks 
             cron_clock += 1
-            if cron_clock == minutes(60):
+            if cron_clock == minutes(120): #each 2 hours
                 with ProcessPoolExecutor() as executor:
                     for cron_job in cron_jobs_list:
                         executor.submit(cron_job)  #execute cron jobs    

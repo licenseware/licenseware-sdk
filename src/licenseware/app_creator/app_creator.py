@@ -130,7 +130,7 @@ class AppCreator:
         api.add_namespace( self.api, path=URL_PREFIX )
 
         for report in self.reports_api:
-            api.add_namespace( report, path=URL_PREFIX + "/reports")
+            api.add_namespace( report, path=URL_PREFIX + "/reports" )
             
         return api
 
@@ -195,7 +195,6 @@ class AppCreator:
     def init_tenant_utils(self):
         
         self.tenant_utils = TenantUtils(
-            app_id=self.app_kwargs['id'],
             data_collection_name = self.kwargs.get('data_collection_name'),
             utilization_collection_name = self.kwargs.get('utilization_collection_name'),
             analysis_collection_name = self.kwargs.get('analysis_collection_name')

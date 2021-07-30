@@ -5,14 +5,14 @@ Once defined add it to `cron_jobs_list` list
 
 """
 
+from .file_timeouts import FileTimeout
+
+
 
 
 def set_status_failed_for_timed_out_files():
-    from licenseware.app_creator.tenant_utils import TenantUtils
     # using low_memory just in case we have tons of data
-    TenantUtils().close_timed_out_files(low_memory=True)
-
-
+    FileTimeout(low_memory=True).close_timed_out_files()
 
 
 
