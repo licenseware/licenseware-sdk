@@ -1,5 +1,13 @@
 # Changelog
 
+### [0.16.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.16.0...v0.16.1) (2021-07-30)
+
+
+### Bug Fixes
+
+* added back app_id param to tenant id for backward compatibility ([50f7d98](https://www.github.com/licenseware/licenseware-sdk/commit/50f7d9834ed59c2c7ceecb8ae5595e1749e66bff))
+* refactored tenant utils to solve circular import error ([ab105cc](https://www.github.com/licenseware/licenseware-sdk/commit/ab105cc60efe4036dd963ef7efdf2b7557071e9b))
+
 ## [0.16.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.15.0...v0.16.0) (2021-07-29)
 
 
