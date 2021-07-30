@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.16.2](https://www.github.com/licenseware/licenseware-sdk/compare/v0.16.1...v0.16.2) (2021-07-30)
+
+
+### Bug Fixes
+
+* updated failed files cron job ([c6e59e1](https://www.github.com/licenseware/licenseware-sdk/commit/c6e59e1df9503578c2cc162e54516f4775bc63b6))
+
 ### [0.16.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.16.0...v0.16.1) (2021-07-30)
 
 
