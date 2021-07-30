@@ -15,10 +15,13 @@ class TenantUtils:
 
     def __init__(
         self,
+        app_id: str = None,
         data_collection_name: str = None,
         utilization_collection_name: str = None,
         analysis_collection_name: str = None,
     ):
+        if app_id:
+            log.warning("Parameter `app_id` is not required anymore. Will be removed in future versions")
 
         self.schema = AnalysisStatusSchema
         self.data_collection_name = data_collection_name or mongo_data_collection_name
