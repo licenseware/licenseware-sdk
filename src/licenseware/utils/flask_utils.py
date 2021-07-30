@@ -1,9 +1,8 @@
 import os, re
 import shutil
 from werkzeug.utils import secure_filename as werkzeug_secure_filename
+from .constants import UPLOAD_PATH
 
-
-UPLOAD_PATH = os.getenv("UPLOAD_PATH")
 
 
 def secure_filename(fname):

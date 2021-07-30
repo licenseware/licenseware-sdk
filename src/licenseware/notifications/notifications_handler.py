@@ -38,12 +38,10 @@ But since each 'running' status will have at some point an 'idle' status I think
 
 """
 
-import datetime
+import json
 from licenseware.utils import log
 from licenseware.utils.redis_service import redis_connection as rd
-import os, json, requests
-from licenseware.decorators.auth_decorators import authenticated_machine
-from licenseware.utils.urls import REGISTRY_SERVICE_URL
+from licenseware.utils.update_registry import update_registry
 
 
 
@@ -65,16 +63,16 @@ class EventNotificationsHandler:
         
         if old_new_status == ['running', 'idle']:
             self.save()
-            return self.update_registry()
+            return update_registry(self.new_event)
         
         if old_new_status == ['idle', 'running']:
             self.save()
-            return self.update_registry()
+            return update_registry(self.new_event)
         
         if set(old_new_status) == {'running'} and self.old_event['first_time']:
             self.save()
-            return self.update_registry()
-    
+            return update_registry(self.new_event)
+
         return {'message': 'no need to update registry'}, 200
           
         
@@ -101,24 +99,5 @@ class EventNotificationsHandler:
             # 'last_update': datetime.datetime.now().isoformat(), #maybe later for a timeout?
             'first_time': False
         }, default=str)
-
-
-    @authenticated_machine
-    def update_registry(self):
-        log.info(f"Sending update to registry, data: {self.new_event}")
-        payload = {'data': [self.new_event]}
-
-        response = requests.post(
-            url= REGISTRY_SERVICE_URL + '/uploaders/status', 
-            json=payload, 
-            headers={"Authorization": os.getenv('AUTH_TOKEN')}
-        )
-
-        if response.status_code == 200:
-            log.info("Notification registry service success!")
-            return {"status": "success", "message": payload}, 200
-        else:
-            log.warning("Notification registry service failed!")
-            return {"status": "fail", "message": payload}, 500
 
 
