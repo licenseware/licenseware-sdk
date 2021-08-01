@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.17.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.17.0...v0.17.1) (2021-08-01)
+
+
+### Bug Fixes
+
+* selecting db with connection ([1cdd9c2](https://www.github.com/licenseware/licenseware-sdk/commit/1cdd9c2c25d09523ecf09bc0a38b005758d44e8e))
+
 ## [0.17.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.16.2...v0.17.0) (2021-08-01)
 
 
