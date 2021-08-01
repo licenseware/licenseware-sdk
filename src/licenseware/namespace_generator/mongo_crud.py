@@ -66,7 +66,6 @@ class MongoCrud:
                 coll.create_index(col_list, unique=True)
         except AttributeError:
             logging.info("No compound indexes declared")
-        return coll.list_indexes()
 
     def fetch_data(self, request_obj):
         self.request_obj = request_obj
