@@ -1,5 +1,13 @@
 # Changelog
 
+### [0.17.3](https://www.github.com/licenseware/licenseware-sdk/compare/v0.17.2...v0.17.3) (2021-08-01)
+
+
+### Bug Fixes
+
+* add support for multiple stats schemas ([c422231](https://www.github.com/licenseware/licenseware-sdk/commit/c422231c5e4265f6cafc39111c444a7492d50e13))
+* collection was called twice ([6241eb7](https://www.github.com/licenseware/licenseware-sdk/commit/6241eb7afbc4d917cac69b6c30347e97a386b1e7))
+
 ### [0.17.2](https://www.github.com/licenseware/licenseware-sdk/compare/v0.17.1...v0.17.2) (2021-08-01)
 
 
