@@ -354,10 +354,6 @@ def update(schema, match, new_data, collection, append=False, db_name=None):
         if not match:
             match = match['_id'] = match['distinct_key']
 
-        collection = get_collection(collection, db_name)
-        if not isinstance(collection, Collection):
-            return collection
-
         new_data = validate_data(schema, new_data)
         if isinstance(new_data, str):
             return new_data
