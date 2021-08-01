@@ -136,6 +136,13 @@ def return_db(db_name):
     return default_db
 
 
+def return_collection_name(collection):
+    if collection:
+        return collection
+    default_collection = os.getenv("MONGO_COLLECTION_NAME") or "Data"
+    return collection or default_collection
+
+
 class Connect(object):
     @staticmethod
     def get_connection():
@@ -182,8 +189,9 @@ def insert(schema, collection, data, db_name=None):
         If something fails will return a string with the error message.
     """
     db_name = return_db(db_name)
+    collection_name = return_collection_name(collection)
     with Connect.get_connection() as mongo_connection:
-        collection = mongo_connection[db_name][collection]
+        collection = mongo_connection[db_name][collection_name]
         if not isinstance(collection, Collection):
             return collection
 
@@ -223,10 +231,11 @@ def fetch(match, collection, as_list=True, db_name=None):
     """
 
     match = parse_match(match)
-    
+
     db_name = return_db(db_name)
+    collection_name = return_collection_name(collection)
     with Connect.get_connection() as mongo_connection:
-        collection = mongo_connection[db_name][collection]
+        collection = mongo_connection[db_name][collection_name]
         if not isinstance(collection, Collection):
             return collection
 
@@ -270,8 +279,9 @@ def aggregate(pipeline, collection, as_list=True, db_name=None):
 
     """
     db_name = return_db(db_name)
+    collection_name = return_collection_name(collection)
     with Connect.get_connection() as mongo_connection:
-        collection = mongo_connection[db_name][collection]
+        collection = mongo_connection[db_name][collection_name]
         if not isinstance(collection, Collection):
             return collection
 
@@ -336,8 +346,9 @@ def update(schema, match, new_data, collection, append=False, db_name=None):
 
     """
     db_name = return_db(db_name)
+    collection_name = return_collection_name(collection)
     with Connect.get_connection() as mongo_connection:
-        collection = mongo_connection[db_name][collection]
+        collection = mongo_connection[db_name][collection_name]
         match = parse_match(match)
         match = match['query'] or match['_id']
         if not match:
@@ -377,8 +388,9 @@ def delete(match, collection, db_name=None):
 
     """
     db_name = return_db(db_name)
+    collection_name = return_collection_name(collection)
     with Connect.get_connection() as mongo_connection:
-        collection = mongo_connection[db_name][collection]
+        collection = mongo_connection[db_name][collection_name]
         match = parse_match(match)
 
         if not isinstance(collection, Collection):
@@ -397,8 +409,9 @@ def delete_collection(collection, db_name=None):
         Delete a collection from the database.
     """
     db_name = return_db(db_name)
+    collection_name = return_collection_name(collection)
     with Connect.get_connection() as mongo_connection:
-        collection = mongo_connection[db_name][collection]
+        collection = mongo_connection[db_name][collection_name]
         if not isinstance(collection, Collection):
             return collection
 
