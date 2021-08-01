@@ -128,6 +128,14 @@ def parse_match(match):
 mongo_connection = None
 
 
+def return_db(db_name):
+    if db_name:
+        return db_name
+    default_db = os.getenv("MONGO_DB_NAME") or os.getenv(
+        "MONGO_DATABASE_NAME") or "db"
+    return default_db
+
+
 class Connect(object):
     @staticmethod
     def get_connection():
@@ -173,7 +181,7 @@ def insert(schema, collection, data, db_name=None):
         returns a list of ids inserted in the database in the order they were added
         If something fails will return a string with the error message.
     """
-
+    db_name = return_db(db_name)
     with Connect.get_connection() as mongo_connection:
         collection = mongo_connection[db_name][collection]
         if not isinstance(collection, Collection):
@@ -215,7 +223,8 @@ def fetch(match, collection, as_list=True, db_name=None):
     """
 
     match = parse_match(match)
-
+    
+    db_name = return_db(db_name)
     with Connect.get_connection() as mongo_connection:
         collection = mongo_connection[db_name][collection]
         if not isinstance(collection, Collection):
@@ -260,7 +269,7 @@ def aggregate(pipeline, collection, as_list=True, db_name=None):
         If something fails will return a string with the error message.
 
     """
-
+    db_name = return_db(db_name)
     with Connect.get_connection() as mongo_connection:
         collection = mongo_connection[db_name][collection]
         if not isinstance(collection, Collection):
@@ -326,7 +335,7 @@ def update(schema, match, new_data, collection, append=False, db_name=None):
         If something fails will return a string with the error message.
 
     """
-
+    db_name = return_db(db_name)
     with Connect.get_connection() as mongo_connection:
         collection = mongo_connection[db_name][collection]
         match = parse_match(match)
@@ -367,6 +376,7 @@ def delete(match, collection, db_name=None):
         If something fails will return a string with the error message.
 
     """
+    db_name = return_db(db_name)
     with Connect.get_connection() as mongo_connection:
         collection = mongo_connection[db_name][collection]
         match = parse_match(match)
@@ -386,11 +396,12 @@ def delete_collection(collection, db_name=None):
     """
         Delete a collection from the database.
     """
-
+    db_name = return_db(db_name)
     with Connect.get_connection() as mongo_connection:
         collection = mongo_connection[db_name][collection]
         if not isinstance(collection, Collection):
             return collection
 
-        res = collection.with_options(write_concern=WriteConcern("majority")).drop()
+        res = collection.with_options(
+            write_concern=WriteConcern("majority")).drop()
         return 1 if res is None else 0
