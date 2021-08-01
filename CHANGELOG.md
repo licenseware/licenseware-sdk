@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.17.2](https://www.github.com/licenseware/licenseware-sdk/compare/v0.17.1...v0.17.2) (2021-08-01)
+
+
+### Bug Fixes
+
+* get collection name ([bbb4bb0](https://www.github.com/licenseware/licenseware-sdk/commit/bbb4bb0e3544b1af0a2cf2226aa8e7366199dd2f))
+
 ### [0.17.1](https://www.github.com/licenseware/licenseware-sdk/compare/v0.17.0...v0.17.1) (2021-08-01)
 
 
