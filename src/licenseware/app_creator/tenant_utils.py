@@ -10,7 +10,6 @@ from licenseware.utils.base_collection_names import (
 )
 
 
-
 class TenantUtils:
 
     def __init__(
@@ -21,7 +20,8 @@ class TenantUtils:
         analysis_collection_name: str = None,
     ):
         if app_id:
-            log.warning("Parameter `app_id` is not required anymore. Will be removed in future versions")
+            log.warning(
+                "Parameter `app_id` is not required anymore. Will be removed in future versions")
 
         self.schema = AnalysisStatusSchema
         self.data_collection_name = data_collection_name or mongo_data_collection_name
@@ -36,41 +36,58 @@ class TenantUtils:
         """
 
         FileTimeout(
-            tenant_id=tenant_id, 
+            tenant_id=tenant_id,
             schema=self.analysis_collection_name
         ).close_timed_out_files()
-        
-        
-        query = {'tenant_id': tenant_id, 'status': 'Running'}
-        results = m.fetch(match=query, collection=self.analysis_collection_name)
+
+        query = {
+            'tenant_id': tenant_id, 
+            '$or': [
+                {
+                    'files.status': 'Running'
+                },
+                {
+                    'status': 'Running'
+                }
+        ]}
+        results = m.fetch(
+            match=query, collection=self.analysis_collection_name)
         log.info(results)
 
-        if results: return {'status': 'Running'}, 200
+        if results:
+            return {'status': 'Running'}, 200
         return {'status': 'Idle'}, 200
-
 
     def get_uploader_status(self, tenant_id, uploader_id):
         """
             Get processing status for a tenant_id and the specified uploader
         """
-        
+
         FileTimeout(
-            tenant_id=tenant_id, 
+            tenant_id=tenant_id,
             schema=self.schema,
             analysis_collection_name=self.analysis_collection_name
         ).close_timed_out_files()
-        
-        
+
         query = {
             'tenant_id': tenant_id,
-            'status': 'Running', 
-            'file_type': uploader_id
+            'file_type': uploader_id,
+            '$or': [
+                {
+                    'files.status': 'Running'
+                },
+                {
+                    'status': 'Running'
+                }
+            ]
         }
-        
-        results = m.fetch(match=query, collection=self.analysis_collection_name)
+
+        results = m.fetch(
+            match=query, collection=self.analysis_collection_name)
         log.info(results)
 
-        if results: return {'status': 'Running'}, 200
+        if results:
+            return {'status': 'Running'}, 200
         return {'status': 'Idle'}, 200
 
     # Activated tenants and tenants with data
@@ -84,22 +101,20 @@ class TenantUtils:
 
         log.info(f"tenant data deleted: {res}")
 
-
     def get_activated_tenants(self, tenant_id=None):
-        
+
         if not tenant_id:
             tenants_list = m.fetch(
                 match='tenant_id', collection=self.utilization_collection_name
             )
             log.info(f"Activated_tenants: {tenants_list}")
             return tenants_list
-        
+
         tenants_list = m.fetch(
             match={'tenant_id': tenant_id}, collection=self.utilization_collection_name
         )
         log.info(f"Activated tenant: {tenants_list}")
         return tenants_list
-        
 
     def get_last_update_dates(self, tenant_id=None):
         pipeline = [
@@ -120,7 +135,7 @@ class TenantUtils:
                 }
             }
         ]
-        
+
         if tenant_id:
             pipeline.insert(0, {'$match': {'tenant_id': tenant_id}})
 
