@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.17.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.16.2...v0.17.0) (2021-08-01)
+
+
+### Features
+
+* added support for dramatiq ([935c68d](https://www.github.com/licenseware/licenseware-sdk/commit/935c68d01648c8facaf860672556dba0f308ce6b))
+
 ### [0.16.2](https://www.github.com/licenseware/licenseware-sdk/compare/v0.16.1...v0.16.2) (2021-07-30)
 
 
