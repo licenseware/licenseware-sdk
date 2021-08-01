@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.17.5](https://www.github.com/licenseware/licenseware-sdk/compare/v0.17.4...v0.17.5) (2021-08-01)
+
+
+### Bug Fixes
+
+* add handling for nested files ([aa37f1d](https://www.github.com/licenseware/licenseware-sdk/commit/aa37f1d6c3247e819c7a2e8349e62bf1f438772a))
+
 ### [0.17.4](https://www.github.com/licenseware/licenseware-sdk/compare/v0.17.3...v0.17.4) (2021-08-01)
 
 
