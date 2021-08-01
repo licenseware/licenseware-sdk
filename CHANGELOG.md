@@ -1,5 +1,13 @@
 # Changelog
 
+### [0.17.4](https://www.github.com/licenseware/licenseware-sdk/compare/v0.17.3...v0.17.4) (2021-08-01)
+
+
+### Bug Fixes
+
+* replace estimateddocument with count_documents ([bced30e](https://www.github.com/licenseware/licenseware-sdk/commit/bced30eb9770210ab8f0b542be59ef4dd208da67))
+* status reporting fixes ([5ebe1bd](https://www.github.com/licenseware/licenseware-sdk/commit/5ebe1bd29ab6cbd7800e59f0c5e8bb9b6aa8217c))
+
 ### [0.17.3](https://www.github.com/licenseware/licenseware-sdk/compare/v0.17.2...v0.17.3) (2021-08-01)
 
 
