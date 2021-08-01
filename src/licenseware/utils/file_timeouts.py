@@ -30,7 +30,14 @@ class FileTimeout:
         start_time    = datetime.datetime.utcnow() - datetime.timedelta(days=360)
         
         query = {
-            'status': 'Running',
+            '$or': [
+                {
+                    'files.status': 'Running'
+                },
+                {
+                    'status': 'Running'
+                }
+            ],
             'updated_at': {
                 '$gt': start_time.isoformat(), 
                 '$lt': time_out_time.isoformat()

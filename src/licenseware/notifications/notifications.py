@@ -42,16 +42,10 @@ def sync_notify_status(tenant_id, upload_id=None, status=None, app_id=None):
     )
 
     if status == 'idle':
-        # Check if there are any Running processsors before sending Idle to registry-service
-        wait = 5  # sec
-        for _ in range(int(3600/wait)):  # 1 hour
-            res, _ = TenantUtils().get_uploader_status(
+        res, _ = TenantUtils().get_uploader_status(
                 event["tenant_id"], event['event_type'])
-            if res['status'] == 'Running':
-                time.sleep(wait)
-            elif res['status'] == 'Idle':
-                break
-
+        if res['status'] == 'Running':
+            return None
     notif_event = {
         'tenant_id': event["tenant_id"],
         'upload_id': event["event_type"],

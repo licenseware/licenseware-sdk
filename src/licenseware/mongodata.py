@@ -414,3 +414,20 @@ def delete_collection(collection, db_name=None):
         res = collection.with_options(
             write_concern=WriteConcern("majority")).drop()
         return 1 if res is None else 0
+
+
+@failsafe
+def estimated_count(match, collection, db_name=None):
+    """
+        Delete a collection from the database.
+    """
+    db_name = return_db(db_name)
+    collection_name = return_collection_name(collection)
+    with Connect.get_connection() as mongo_connection:
+        collection = mongo_connection[db_name][collection_name]
+        if not isinstance(collection, Collection):
+            return collection
+
+        res = collection.with_options(
+            write_concern=WriteConcern("majority")).estimated_document_count(filter=match)
+        return 1 if res is None else 0

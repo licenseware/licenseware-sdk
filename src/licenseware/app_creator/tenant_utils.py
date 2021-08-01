@@ -50,11 +50,11 @@ class TenantUtils:
                     'status': 'Running'
                 }
         ]}
-        results = m.fetch(
+        results = m.estimated_count(
             match=query, collection=self.analysis_collection_name)
         log.info(results)
 
-        if results:
+        if results > 0:
             return {'status': 'Running'}, 200
         return {'status': 'Idle'}, 200
 
@@ -82,11 +82,11 @@ class TenantUtils:
             ]
         }
 
-        results = m.fetch(
+        results = m.estimated_count(
             match=query, collection=self.analysis_collection_name)
         log.info(results)
 
-        if results:
+        if results > 0:
             return {'status': 'Running'}, 200
         return {'status': 'Idle'}, 200
 
