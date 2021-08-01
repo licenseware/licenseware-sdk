@@ -57,6 +57,8 @@ class FileTimeout:
     def close_timed_out(self, timed_out_file: dict):
 
         timed_out_file["status"] = "Error"
+        for file in timed_out_file.get('files', []):
+            file['status'] = 'Error'
 
         return m.update(
             schema=self.schema,
