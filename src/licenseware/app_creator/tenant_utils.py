@@ -50,7 +50,7 @@ class TenantUtils:
                     'status': 'Running'
                 }
         ]}
-        results = m.estimated_count(
+        results = m.document_count(
             match=query, collection=self.analysis_collection_name)
         log.info(results)
 
@@ -82,7 +82,7 @@ class TenantUtils:
             ]
         }
 
-        results = m.estimated_count(
+        results = m.document_count(
             match=query, collection=self.analysis_collection_name)
         log.info(results)
 

@@ -417,7 +417,7 @@ def delete_collection(collection, db_name=None):
 
 
 @failsafe
-def estimated_count(match, collection, db_name=None):
+def document_count(match, collection, db_name=None):
     """
         Delete a collection from the database.
     """
@@ -428,6 +428,6 @@ def estimated_count(match, collection, db_name=None):
         if not isinstance(collection, Collection):
             return collection
 
-        res = collection.with_options(
-            write_concern=WriteConcern("majority")).estimated_document_count(filter=match)
-        return 1 if res is None else 0
+        return collection.with_options(
+            write_concern=WriteConcern("majority")).count_documents(filter=match)  
+        
