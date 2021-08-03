@@ -2,8 +2,6 @@ import os
 from dramatiq.brokers.redis import RedisBroker
 
 
-
-
 broker = RedisBroker(
     host=os.getenv('REDIS_HOST'),
     port=os.getenv('REDIS_PORT'),

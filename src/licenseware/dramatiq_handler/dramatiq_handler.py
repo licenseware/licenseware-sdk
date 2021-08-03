@@ -1,36 +1,21 @@
 import dramatiq
-from functools import wraps
+from flask import Flask
+from typing import Callable
 from .redis_broker import broker
 from .app_middleware import AppContextMiddleware
+import builtins
+
+#TODO if event_handlers is a list we could add them all to builtins
 
 
-#Function which will handle events
-dramatiq_sender = None
+def initialize_context(app: Flask, event_handler: Callable):
 
-
-
-def dramatiq_initiator(app):
-    """
-        Initialize dramatiq redis broker with Flask app instance
-    """
-    
     dramatiq.set_broker(broker)
     broker.add_middleware(AppContextMiddleware(app))
     
-    return app
+    dramatiq_actor = dramatiq.actor(fn=lambda *args, **kwargs: event_handler, broker=broker, max_retries=3)
     
-
-def dramatiq_listener(func):
-    """
-        Default dramatiq decorator which triggers worker function
-    """
-
-    @wraps(func)
-    def decorated(*args, **kwargs):   
-        global dramatiq_sender 
-        dramatiq_actor  = dramatiq.actor(fn=lambda *args, **kwargs: func, broker=broker, max_retries=3)
-        dramatiq_sender = dramatiq_actor #populating global scope
-        return dramatiq_sender
-        
-    return decorated
-
+    builtins.DramatiqEvent = dramatiq_actor
+    
+    return dramatiq_actor
+    
