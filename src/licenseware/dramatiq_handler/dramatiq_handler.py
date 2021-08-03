@@ -16,14 +16,14 @@ def dramatiq_initiator(app):
     return app
     
 
-def dramatiq_listener(f):
+def dramatiq_listener(func):
     """
         Default dramatiq decorator which triggers worker function
     """
 
-    @wraps(f)
+    @wraps(func)
     def decorated(*args, **kwargs):   
-        return dramatiq.actor(fn=f, broker=broker, max_retries=3)
+        return dramatiq.actor(fn=lambda *args, **kwargs: func, broker=broker, max_retries=3)
         
     return decorated
 
