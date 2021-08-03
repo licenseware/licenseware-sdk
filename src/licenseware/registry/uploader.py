@@ -56,7 +56,6 @@ from licenseware.utils.log_config import log
 from typing import List, Callable
 from licenseware.decorators.auth_decorators import authenticated_machine
 from ..utils.validators import validate_event
-from licenseware.dramatiq_handler import dramatiq_sender
 
 
 
@@ -369,7 +368,7 @@ class Uploader(Quota):
         }
         
         validate_event(event)
-        dramatiq_sender.send(event)
+        DramatiqEvent.send(event)
         
         # RedisService.send_stream_event({
         #     "tenant_id": request_obj.headers.get("TenantId"),
