@@ -4,6 +4,10 @@ from .redis_broker import broker
 from .app_middleware import AppContextMiddleware
 
 
+#Function which will handle events
+dramatiq_sender = None
+
+
 
 def dramatiq_initiator(app):
     """
@@ -23,7 +27,10 @@ def dramatiq_listener(func):
 
     @wraps(func)
     def decorated(*args, **kwargs):   
-        return dramatiq.actor(fn=lambda *args, **kwargs: func, broker=broker, max_retries=3)
+        global dramatiq_sender 
+        dramatiq_actor  = dramatiq.actor(fn=lambda *args, **kwargs: func, broker=broker, max_retries=3)
+        dramatiq_sender = dramatiq_actor #populating global scope
+        return dramatiq_sender
         
     return decorated
 
