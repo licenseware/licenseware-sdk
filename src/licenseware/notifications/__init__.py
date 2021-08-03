@@ -1,2 +1,2 @@
-from .notifications import notify_status
+from .notifications import notify_status, sync_notify_status
 from .notifications_handler import EventNotificationsHandler

@@ -55,6 +55,10 @@ from ..quota import Quota
 from licenseware.utils.log_config import log
 from typing import List, Callable
 from licenseware.decorators.auth_decorators import authenticated_machine
+from ..utils.validators import validate_event
+from licenseware.dramatiq_handler.redis_broker import broker
+
+
 
 
 def reason_response(reason, valid_fname, valid_contents, filename_nok_msg='Filename is not valid.'):
@@ -358,11 +362,22 @@ class Uploader(Quota):
             }, 400
 
 
-        RedisService.send_stream_event({
+
+        event = {
             "tenant_id": request_obj.headers.get("TenantId"),
             "files": ",".join(saved_files),
             "event_type": event_type
-        })
+        }
+        
+        validate_event(event)
+        broker.actors[event_type].send(event)
+        
+        # DramatiqEvent.send(event)
+        # RedisService.send_stream_event({
+        #     "tenant_id": request_obj.headers.get("TenantId"),
+        #     "files": ",".join(saved_files),
+        #     "event_type": event_type
+        # })
 
         return {"status": "success", "message": "files uploaded successfuly", 
             "units": len(saved_files), 
