@@ -62,4 +62,4 @@ def process_redis_event(event):
 """
 
 
-from .dramatiq_handler import dramatiq_initiator, dramatiq_listener
+from .dramatiq_handler import dramatiq_initiator, dramatiq_listener, dramatiq_sender
