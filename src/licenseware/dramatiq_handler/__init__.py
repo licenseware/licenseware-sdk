@@ -24,4 +24,6 @@ Where `process_redis_event` is the event handler which will be decorated with `d
 
 """
 
+#TODO doesn't work as intended 
+
 from .dramatiq_handler import initialize_context

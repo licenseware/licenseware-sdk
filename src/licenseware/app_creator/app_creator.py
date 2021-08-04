@@ -97,7 +97,7 @@ from licenseware.decorators.auth_decorators import authorization_check, machine_
 
 from .tenant_utils import TenantUtils
 from licenseware.utils.urls import URL_PREFIX
-
+from licenseware.auth import Authenticator
 
 
 
@@ -126,6 +126,8 @@ class AppCreator:
         
         
     def init_app(self, api):
+        
+        Authenticator.connect()
         
         api.add_namespace( self.api, path=URL_PREFIX )
 
