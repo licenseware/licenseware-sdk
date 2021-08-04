@@ -67,8 +67,8 @@ class FileTimeout:
                     '$lt': time_out_time.isoformat()
                 }
             }
-            return m.update(self.schema, match=_filter, new_data={
-                     'status': 'Timeout'}, collection=self.analysis_collection_name)
+            return stats_collection.update_many(filter=_filter, upsert=False, update={
+                     'status': 'Timeout'})
 
         # return m.fetch(
         #     match = query,
