@@ -67,8 +67,13 @@ class FileTimeout:
                     '$lt': time_out_time.isoformat()
                 }
             }
-            return stats_collection.update_many(filter=_filter, upsert=False, update={
-                     'status': 'Timeout'})
+
+            update_data = {
+                '$set': {
+                    'status': 'Timeout'
+                }
+            }
+            return stats_collection.update_many(filter=_filter, upsert=False, update=update_data)
 
         # return m.fetch(
         #     match = query,
