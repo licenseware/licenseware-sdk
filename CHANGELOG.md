@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.18.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.17.4...v0.18.0) (2021-08-04)
+
+
+### Features
+
+* added dramatiq event sender to test ([d79ff41](https://www.github.com/licenseware/licenseware-sdk/commit/d79ff4149aacf03316d41fb216daed07d3680b5e))
+* added dramatiq_sender to upload_serivce to test ([7d0121a](https://www.github.com/licenseware/licenseware-sdk/commit/7d0121a643265e687766e67a67bd3818400615b0))
+* trying to integrate dramatiq on uploads service ([81a723c](https://www.github.com/licenseware/licenseware-sdk/commit/81a723c22291b49dbc7602e57d555e92eae0f4ab))
+
+
+### Bug Fixes
+
+* add handling for nested files ([aa37f1d](https://www.github.com/licenseware/licenseware-sdk/commit/aa37f1d6c3247e819c7a2e8349e62bf1f438772a))
+* added args/kwargs to decorated listener ([308fa52](https://www.github.com/licenseware/licenseware-sdk/commit/308fa527a3efe3478edf923c8af9502db89333db))
+* added auth on appcreator init_app ([2a6b484](https://www.github.com/licenseware/licenseware-sdk/commit/2a6b484c1bbc5ac149006cc8c1821fe7a8d30430))
+* added broker to uploads service ([316a439](https://www.github.com/licenseware/licenseware-sdk/commit/316a439d5c49a34b3d1f69f96ac00adca9fcb8c8))
+* added DramatiqEvent to uploader ([d6b3a09](https://www.github.com/licenseware/licenseware-sdk/commit/d6b3a096fa3792440dc2cd10e2361d281c1f0344))
+* added sync_notify_status to notifications init ([bfa7059](https://www.github.com/licenseware/licenseware-sdk/commit/bfa705912ec3e1ccc11cb923d0079f3082424b0d))
+* now adding DramatiqEvent to builtins ([a9aa80b](https://www.github.com/licenseware/licenseware-sdk/commit/a9aa80b7b835b15424d9e38fc910ee4a20cc6901))
+
 ### [0.17.4](https://www.github.com/licenseware/licenseware-sdk/compare/v0.17.3...v0.17.4) (2021-08-01)
 
 
