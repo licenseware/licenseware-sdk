@@ -3,7 +3,7 @@ import os
 import redis
 
 redis_pass = os.getenv("REDIS_PASSWORD", None)
-redis_db_id = os.getenv("REDIS_DB_ID", None)
+redis_db_id = os.getenv("REDIS_DB", None)
 
 if redis_pass and redis_db_id:
     redis_connection = redis.Redis(
