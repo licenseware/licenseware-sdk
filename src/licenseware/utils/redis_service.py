@@ -1,24 +1,24 @@
 import logging
 import os
 import redis
+import time
 
-redis_pass = os.getenv("REDIS_PASSWORD", None)
-redis_db_id = os.getenv("REDIS_DB", None)
 
-if redis_pass and redis_db_id:
-    redis_connection = redis.Redis(
-        host=os.getenv("REDIS_HOST"),
-        port=os.getenv("REDIS_PORT"),
-        decode_responses=True,
-        password=redis_pass,
-        db=redis_db_id
-    )
-else:
+if 'local' in os.getenv('ENVIRONMENT'):
     redis_connection = redis.Redis(
         host=os.getenv("REDIS_HOST"),
         port=os.getenv("REDIS_PORT"),
         decode_responses=True
     )
+else:
+    redis_connection = redis.Redis(
+        host=os.getenv("REDIS_HOST"),
+        port=os.getenv("REDIS_PORT"),
+        decode_responses=True,
+        password=os.getenv("REDIS_PASSWORD"),
+        db=os.getenv("REDIS_DB", 0)
+    )
+
 
 redis_stream = os.getenv("REDIS_PROCESSING_STREAM")
 last_id_key = f'{redis_stream}_last_id'
