@@ -215,7 +215,7 @@ def insert(schema, collection, data, db_name=None):
 
             raise Exception(f"Can't interpret validated data: {data}")
         except DuplicateKeyError:
-            raise Exception(f"Key already exists {inserted_id}")
+            raise Exception(f"Key already exists")
 
 
 @failsafe
