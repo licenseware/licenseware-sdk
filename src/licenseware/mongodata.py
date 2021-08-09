@@ -35,6 +35,7 @@ import json
 from .utils import log, log_dict
 from pymongo.write_concern import WriteConcern
 from pymongo.read_concern import ReadConcern
+from pymongo.errors import DuplicateKeyError
 
 
 @failsafe
@@ -199,18 +200,22 @@ def insert(schema, collection, data, db_name=None):
         if isinstance(data, str):
             return data
 
-        if isinstance(data, dict):
-            _oid_inserted = collection.with_options(
-                write_concern=WriteConcern("majority")).insert_one(data).inserted_id
-            inserted_id = parse_oid(_oid_inserted)
-            return [inserted_id]
+        try:
 
-        if isinstance(data, list):
-            inserted_ids = collection.with_options(
-                write_concern=WriteConcern("majority")).insert_many(data).inserted_ids
-            return [parse_oid(oid) for oid in inserted_ids]
+            if isinstance(data, dict):
+                _oid_inserted = collection.with_options(
+                    write_concern=WriteConcern("majority")).insert_one(data).inserted_id
+                inserted_id = parse_oid(_oid_inserted)
+                return [inserted_id]
 
-        raise Exception(f"Can't interpret validated data: {data}")
+            if isinstance(data, list):
+                inserted_ids = collection.with_options(
+                    write_concern=WriteConcern("majority")).insert_many(data).inserted_ids
+                return [parse_oid(oid) for oid in inserted_ids]
+
+            raise Exception(f"Can't interpret validated data: {data}")
+        except DuplicateKeyError:
+            raise Exception(f"Key already exists {inserted_id}")
 
 
 @failsafe
