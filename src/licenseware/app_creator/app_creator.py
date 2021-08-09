@@ -163,11 +163,13 @@ class AppCreator:
         self.add_uploads_status_routes()
         self.add_uploads_quota_routes()
         self.add_tenant_registration_url()
+
+        if not self.kwargs.get('disable_registration', False):
         
-        self.app_definition.register_all(
-            uploaders = self.uploaders if self.uploaders is not None else [],
-            reports   = self.reports if self.reports is not None else [],
-        )
+            self.app_definition.register_all(
+                uploaders = self.uploaders if self.uploaders is not None else [],
+                reports   = self.reports if self.reports is not None else [],
+            )
         
         return self.ns
         
