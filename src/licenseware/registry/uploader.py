@@ -280,7 +280,7 @@ class Uploader(Quota):
             Upload files from request.
         """
         
-        msg, status = self._upload_response(request_obj, event_type=self.unit_type)
+        msg, status = self._upload_response(request_obj, event_type=self.uploader_id)
         
         tenant_id = request_obj.headers.get("TenantId")
 
