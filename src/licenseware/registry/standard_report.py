@@ -39,6 +39,9 @@ class StandardReport:
         self.root_url = os.getenv("APP_BASE_PATH") + os.getenv("APP_URL_PREFIX")
         self.refresh_registry_url = self.root_url + '/register_all'
 
+        if 'local' in os.getenv("ENVIRONMENT", ""):
+            self.app_id = os.getenv("APP_ID", app_id)
+
 
     def register_component_from_data(self, component_data, data_method):
         component = StandardReportComponent(component_data, data_method)

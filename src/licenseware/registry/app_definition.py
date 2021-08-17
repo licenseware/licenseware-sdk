@@ -62,6 +62,9 @@ class AppDefinition:
         self.editable_tables_url = editable_tables_url
         self.history_report_url = history_report_url
         self.tenant_registration_url = tenant_registration_url
+
+        if 'local' in os.getenv("ENVIRONMENT", ""):
+            self.id = os.getenv("APP_ID", id)
         
 
     @authenticated_machine

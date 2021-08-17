@@ -157,6 +157,7 @@ filters = [
 """
 
 
+import os
 from flask import request
 from flask_restx import Namespace, Resource, fields
 
@@ -209,6 +210,9 @@ class ReportCreator:
         self.register_components()
         self.register_filters()
         self.standard_report.register_report()
+
+        if 'local' in os.getenv("ENVIRONMENT", ""):
+            self.app_id = os.getenv("APP_ID", app_id)
         
         
     @property

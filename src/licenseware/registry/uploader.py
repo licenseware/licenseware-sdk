@@ -177,6 +177,9 @@ class Uploader(Quota):
         self.registration_url = f'{os.getenv("REGISTRY_SERVICE_URL")}/uploaders'
         self.auth_token = os.getenv('AUTH_TOKEN')
 
+        if 'local' in os.getenv("ENVIRONMENT", ""):
+            self.app_id = os.getenv("APP_ID", app_id)
+
     @authenticated_machine
     def register_uploader(self):
 
