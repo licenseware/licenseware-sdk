@@ -41,7 +41,10 @@ class StandardReport:
 
         if 'local' in os.getenv("ENVIRONMENT", ""):
             self.app_id = os.getenv("APP_ID", app_id)
-
+            self.report_id = f'{os.getenv("PERSONAL_PREFIX", "local")}-{report_id}'
+            for c_app in self.connected_apps:
+                if app_id == c_app:
+                    c_app = self.app_id
 
     def register_component_from_data(self, component_data, data_method):
         component = StandardReportComponent(component_data, data_method)
