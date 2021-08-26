@@ -65,6 +65,7 @@ class AppDefinition:
 
         if 'local' in os.getenv("ENVIRONMENT", ""):
             self.id = os.getenv("APP_ID", id)
+            self.name = f'name-{os.getenv("PERSONAL_PREFIX", "local")}'
         
 
     @authenticated_machine

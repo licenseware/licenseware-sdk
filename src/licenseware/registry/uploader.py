@@ -179,7 +179,8 @@ class Uploader(Quota):
 
         if 'local' in os.getenv("ENVIRONMENT", ""):
             self.app_id = os.getenv("APP_ID", app_id)
-            self.uploader_id = f'{os.getenv("PERSONAL_PREFIX", "local")}-{uploader_id}'
+            self.uploader_id = f'{uploader_id}-{os.getenv("PERSONAL_PREFIX", "local")}'
+            self.upload_name = f'{upload_name}-{os.getenv("PERSONAL_PREFIX", "local")}'
 
     @authenticated_machine
     def register_uploader(self):
