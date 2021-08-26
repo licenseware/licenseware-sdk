@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.19.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.18.0...v0.19.0) (2021-08-26)
+
+
+### Features
+
+* add watch to dramatiq ([de378cc](https://www.github.com/licenseware/licenseware-sdk/commit/de378cc4c00baf448164a6e0ec793f673644512c))
+* added optional registration for apps ([e709672](https://www.github.com/licenseware/licenseware-sdk/commit/e709672532e383713f35ad8038a9e4fc596c183a))
+* handle local id for report and uploader ([14edadc](https://www.github.com/licenseware/licenseware-sdk/commit/14edadc9d32e4152b2b83f64ed99cc2a35741f77))
+* support for custom app_id in local development ([ccf403f](https://www.github.com/licenseware/licenseware-sdk/commit/ccf403ff3f3c91ff8d0233183bed0dad7ff844fc))
+
+
+### Bug Fixes
+
+* better handling for local running apps ([2cfdb5d](https://www.github.com/licenseware/licenseware-sdk/commit/2cfdb5de48c9cfa74a35395abf7e65edfddd93e6))
+* change redis db env variable name ([e6ece1d](https://www.github.com/licenseware/licenseware-sdk/commit/e6ece1d4aed95f129ff4b47001db30f0572e40fe))
+* disable raise duplicate key ([e6ce888](https://www.github.com/licenseware/licenseware-sdk/commit/e6ce888374974d900a3d4ef62701b859d742287d))
+* force use password on redis prod ([6f2d8f0](https://www.github.com/licenseware/licenseware-sdk/commit/6f2d8f01b8769c7788d69886406e828ce2b303ba))
+* handle app_id in environment instead of lware_identity ([7522290](https://www.github.com/licenseware/licenseware-sdk/commit/75222905a64a832875019ee9b8ee02a0678640ef))
+* invalid value in logging ([ce19365](https://www.github.com/licenseware/licenseware-sdk/commit/ce193656ef2a24d1b853cfff4204a732efb66525))
+* redis db id variable name ([dd5afba](https://www.github.com/licenseware/licenseware-sdk/commit/dd5afba60751d62c91d9a33782f783cda0534c89))
+* send event based on uploader_id instead of unit_type ([9ca65e9](https://www.github.com/licenseware/licenseware-sdk/commit/9ca65e96366dbe4ff2a5e911c047488e1b8afa9d))
+* suppress duplicate key errors logging ([7084335](https://www.github.com/licenseware/licenseware-sdk/commit/7084335512d2be7d243f1557f25e58125bbc9026))
+* use constants instead of urls ([71b4a54](https://www.github.com/licenseware/licenseware-sdk/commit/71b4a54f837fab1173158dd18efb0311dd8a4055))
+
 ## [0.18.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.17.4...v0.18.0) (2021-08-04)
 
 
