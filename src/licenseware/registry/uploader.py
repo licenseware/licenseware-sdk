@@ -375,7 +375,7 @@ class Uploader(Quota):
         }
         
         validate_event(event)
-        broker.actors[event_type].send(event)
+        broker.actors[self.app_id].send(event)
         
         # DramatiqEvent.send(event)
         # RedisService.send_stream_event({
