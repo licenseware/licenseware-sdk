@@ -247,8 +247,8 @@ class Uploader(Quota):
                 }
             ]}
         if 'local' in os.getenv("ENVIRONMENT", ""):
-            payload['data']['app_id'] = f"{self.app_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
-            payload['data']['upload_id'] = f"{self.uploader_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+            payload['data'][0]['app_id'] = f"{self.app_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+            payload['data'][0]['upload_id'] = f"{self.uploader_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
             
         notification_sent = requests.post(
             url=self.registration_url + '/status',
