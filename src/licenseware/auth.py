@@ -24,9 +24,19 @@ This is just for internal licenseware use:
 
 import os
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages import urllib3
 from datetime import datetime, timedelta
 from functools import wraps
 from licenseware.utils.log_config import log
+
+retry_strategy = urllib3.Retry(
+    total=3
+)
+adapter = HTTPAdapter(max_retries=retry_strategy)
+http = requests.Session()
+http.mount("https://", adapter)
+http.mount("http://", adapter)
 
 
 class Authenticator:
@@ -43,6 +53,7 @@ class Authenticator:
             route = os.getenv('AUTH_SERVICE_USERS_URL_PATH')
 
         self.auth_url = self.auth_url + route
+
 
     @classmethod
     def connect(cls):
@@ -71,7 +82,7 @@ class Authenticator:
             "password": self.password
         }
 
-        response = requests.post(url=f"{self.auth_url}/login", json=payload)
+        response = http.post(url=f"{self.auth_url}/login", json=payload)
 
         if response.status_code == 200:
             return response.json(), 200
@@ -91,7 +102,7 @@ class Authenticator:
             "password": self.password
         }
 
-        response = requests.post(url=f'{self.auth_url}/create', json=payload)
+        response = http.post(url=f'{self.auth_url}/create', json=payload)
 
         if response.status_code == 201:
             return response.json(), 201
