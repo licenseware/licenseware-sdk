@@ -177,10 +177,6 @@ class Uploader(Quota):
         self.registration_url = f'{os.getenv("REGISTRY_SERVICE_URL")}/uploaders'
         self.auth_token = os.getenv('AUTH_TOKEN')
 
-        if 'local' in os.getenv("ENVIRONMENT", ""):
-            self.app_id = os.getenv("APP_ID", app_id)
-            self.uploader_id = f'{uploader_id}-{os.getenv("PERSONAL_PREFIX", "local")}'
-            self.upload_name = f'{upload_name}-{os.getenv("PERSONAL_PREFIX", "local")}'
 
     @authenticated_machine
     def register_uploader(self):
@@ -210,6 +206,12 @@ class Uploader(Quota):
                 "icon": self.icon,
             }]
         }
+
+        if 'local' in os.getenv("ENVIRONMENT", ""):
+            payload['data']['app_id'] = f"{self.app_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+            payload['data']['upload_id'] = f"{self.uploader_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+            payload['data']['upload_name'] = f"{self.upload_name}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+
 
         log.info(payload)
         
@@ -244,6 +246,10 @@ class Uploader(Quota):
                     'app_id': self.app_id
                 }
             ]}
+        if 'local' in os.getenv("ENVIRONMENT", ""):
+            payload['data']['app_id'] = f"{self.app_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+            payload['data']['upload_id'] = f"{self.uploader_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+            
         notification_sent = requests.post(
             url=self.registration_url + '/status',
             headers=headers,

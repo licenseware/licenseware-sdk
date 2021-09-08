@@ -39,14 +39,6 @@ class StandardReport:
         self.root_url = os.getenv("APP_BASE_PATH") + os.getenv("APP_URL_PREFIX")
         self.refresh_registry_url = self.root_url + '/register_all'
 
-        if 'local' in os.getenv("ENVIRONMENT", ""):
-            self.app_id = os.getenv("APP_ID", app_id)
-            self.report_id = f'{report_id}-{os.getenv("PERSONAL_PREFIX", "local")}'
-            self.report_name = f'{report_name}-{os.getenv("PERSONAL_PREFIX", "local")}'
-
-            for c_app in self.connected_apps:
-                if app_id == c_app:
-                    c_app = os.getenv("APP_ID", app_id)
 
     def register_component_from_data(self, component_data, data_method):
         component = StandardReportComponent(component_data, data_method)
@@ -70,6 +62,15 @@ class StandardReport:
             "url": self.root_url + '/reports' + self.url,
             "connected_apps": self.connected_apps
         }
+
+        if 'local' in os.getenv("ENVIRONMENT", ""):
+            payload['app_id'] = f"{self.app_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+            payload['report_id'] = f"{self.report_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+            payload['report_name'] = f"{self.report_name}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+            for c_app in self.connected_apps:
+                if self.app_id == c_app:
+                    c_app = f"{self.app_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+
         return payload
 
     def return_component_url(self, component_id):

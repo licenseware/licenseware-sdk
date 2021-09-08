@@ -53,6 +53,10 @@ def sync_notify_status(tenant_id, upload_id=None, status=None, app_id=None):
         # added for backward compatibility
         'app_id': app_id or APP_ID.replace('worker', 'service')
     }
+    
+    if 'local' in os.getenv("ENVIRONMENT", ""):
+            notif_event['app_id'] = f"{app_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+            notif_event['upload_id'] = f"{event['event_type']}-{os.getenv('PERSONAL_PREFIX', 'local')}"
 
     try:
         return EventNotificationsHandler(notif_event).status_check()
