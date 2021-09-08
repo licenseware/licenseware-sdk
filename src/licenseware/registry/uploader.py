@@ -208,9 +208,9 @@ class Uploader(Quota):
         }
 
         if 'local' in os.getenv("ENVIRONMENT", ""):
-            payload['data']['app_id'] = f"{self.app_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
-            payload['data']['upload_id'] = f"{self.uploader_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
-            payload['data']['upload_name'] = f"{self.upload_name}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+            payload['data'][0]['app_id'] = f"{self.app_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+            payload['data'][0]['upload_id'] = f"{self.uploader_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+            payload['data'][0]['upload_name'] = f"{self.upload_name}-{os.getenv('PERSONAL_PREFIX', 'local')}"
 
 
         log.info(payload)

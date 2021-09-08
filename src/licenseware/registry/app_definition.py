@@ -92,8 +92,8 @@ class AppDefinition:
         }
 
         if 'local' in os.getenv("ENVIRONMENT", ""):
-            payload['data']['app_id'] = f"{self.id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
-            payload['data']['name'] = f"{self.name}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+            payload['data'][0]['app_id'] = f"{self.id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+            payload['data'][0]['name'] = f"{self.name}-{os.getenv('PERSONAL_PREFIX', 'local')}"
 
         url = REGISTRY_SERVICE_URL + '/apps'
         headers = {"Authorization": os.getenv('AUTH_TOKEN')}

@@ -62,12 +62,11 @@ class StandardReport:
             "url": self.root_url + '/reports' + self.url,
             "connected_apps": self.connected_apps
         }
-
         if 'local' in os.getenv("ENVIRONMENT", ""):
             payload['app_id'] = f"{self.app_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
             payload['report_id'] = f"{self.report_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
             payload['report_name'] = f"{self.report_name}-{os.getenv('PERSONAL_PREFIX', 'local')}"
-            for c_app in self.connected_apps:
+            for c_app in payload['connected_apps']:
                 if self.app_id == c_app:
                     c_app = f"{self.app_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
 
@@ -92,6 +91,15 @@ class StandardReport:
                     "connected_apps": self.connected_apps
                 }]
             }
+
+            if 'local' in os.getenv("ENVIRONMENT", ""):
+                payload[0]['app_id'] = f"{self.app_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+                payload[0]['report_id'] = f"{self.report_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+                payload[0]['report_name'] = f"{self.report_name}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+                for c_app in payload[0]['connected_apps']:
+                    if self.app_id == c_app:
+                        c_app = f"{self.app_id}-{os.getenv('PERSONAL_PREFIX', 'local')}"
+
             log.info(payload)
             url = f'{os.getenv("REGISTRY_SERVICE_URL")}/reports'
             headers = {"Authorization": os.getenv('AUTH_TOKEN'), 'Accept': 'application/json'}
