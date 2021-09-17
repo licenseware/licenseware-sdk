@@ -62,7 +62,8 @@ class EditableTable:
     
         self.component_id = component_id or self.component_id_from_schema()
         self.title = title or self.title_from_schema()
-        self.url = BASE_URL + (url or self.url_from_schema())
+        self.path = (url or self.url_from_schema())
+        self.url = BASE_URL + self.path
         self.table_type = table_type
         self.order = order
         self.style_attributes = style_attributes
