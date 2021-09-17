@@ -3,7 +3,7 @@ import datetime
 import logging
 import licenseware.mongodata as m
 from flask_restx import abort
-
+from licenseware import log
 
 # TODO
 # ONE TO ONE
@@ -71,6 +71,9 @@ class MongoCrud:
         self.request_obj = request_obj
 
         results = m.fetch(match=self.query, collection=self.collection)
+        
+        log.debug(f"Fetching data with query {self.query} got {results}")
+        
 
         if isinstance(results, str):
             abort(500, reason=results)
@@ -90,6 +93,10 @@ class MongoCrud:
             collection=self.collection,
             append=False
         )
+        
+        
+        log.debug(f"Updating data with query {self.query} got {updated_docs}")
+        
 
         if updated_docs == 0:
             abort(404, reason='Query had no match')
@@ -112,7 +119,10 @@ class MongoCrud:
             collection=self.collection,
             data=data
         )
-
+        
+        log.debug(f"Inserting data with query {self.query} got {inserted_docs}")
+        
+        
         if len(inserted_docs) == 0:
             abort(404, reason='Could not insert data')
 
@@ -125,6 +135,8 @@ class MongoCrud:
         self.request_obj = request_obj
 
         deleted_docs = m.delete(match=self.query, collection=self.collection)
+
+        log.debug(f"Deleting data with query {self.query} got {deleted_docs}")
 
         if deleted_docs == 0:
             abort(404, reason='Query had no match')
