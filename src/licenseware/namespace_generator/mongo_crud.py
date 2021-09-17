@@ -3,7 +3,7 @@ import datetime
 import logging
 import licenseware.mongodata as m
 from flask_restx import abort
-from licenseware import log
+import logging as log
 
 # TODO
 # ONE TO ONE
