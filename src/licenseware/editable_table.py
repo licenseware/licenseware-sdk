@@ -108,6 +108,7 @@ class EditableTable:
             "columns": self.columns_spec_list()
         }
 
+    
     def columns_spec_list(self):
 
         columns_list = []
@@ -121,13 +122,13 @@ class EditableTable:
                 "required": self.col_required(field_data),
                 "visible": self.col_visible(field_name, field_data),
                 "entities_url": self.col_entities_url(field_data),
-                # "validation": "Not defined", ?
+                "entities_path": self.col_entities_path(field_data),
             })
 
         return columns_list
 
 
-    def col_entities_url(self, field_data):
+    def col_entities_url(self, field_data, _get_only_path=False):
         """
             _id - device(doc) id which contains foreign_keys to get the distinct_keys
             distinct_key - mongo's unique_key
@@ -141,13 +142,21 @@ class EditableTable:
             params = urlencode({
                 'distinct_key': metadata['distinct_key'], 
                 'foreign_key' : metadata['foreign_key'],
-                '_id': 'put_device_id_here',
+                '_id': '{entity_id}'
             })
-            return f"{self.url}?{params}"
+            
+            return f"{self.path}?{params}" if _get_only_path else f"{self.url}?{params}"
 
-        return None
-
-
+        # Create query params with just _id
+        params = urlencode({'_id': '{entity_id}'})
+        
+        return f"{self.path}?{params}" if _get_only_path else f"{self.url}?{params}"
+    
+    
+    def col_entities_path(self, field_data):
+        return self.col_entities_url(field_data, _get_only_path=True)
+        
+        
     def col_required(self, field_data):
         return field_data['required']
 
