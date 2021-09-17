@@ -1,5 +1,42 @@
 # Changelog
 
+## [1.0.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.18.0...v1.0.0) (2021-09-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* change uploader to send based on app_id instead of uploader_id
+
+### Features
+
+* add new uploader to quota ([80a3019](https://www.github.com/licenseware/licenseware-sdk/commit/80a3019574bc261516a0945f674d870a2cfe5a6e))
+* add retry to login ([5df046f](https://www.github.com/licenseware/licenseware-sdk/commit/5df046fb54e9c33d8162a4abb8251a40a47713bf))
+* add watch to dramatiq ([de378cc](https://www.github.com/licenseware/licenseware-sdk/commit/de378cc4c00baf448164a6e0ec793f673644512c))
+* added optional registration for apps ([e709672](https://www.github.com/licenseware/licenseware-sdk/commit/e709672532e383713f35ad8038a9e4fc596c183a))
+* change uploader to send based on app_id instead of uploader_id ([61c0bb7](https://www.github.com/licenseware/licenseware-sdk/commit/61c0bb7545c4209495d0f647e0d4e624d5cc113a))
+* handle local id for report and uploader ([14edadc](https://www.github.com/licenseware/licenseware-sdk/commit/14edadc9d32e4152b2b83f64ed99cc2a35741f77))
+* support for custom app_id in local development ([ccf403f](https://www.github.com/licenseware/licenseware-sdk/commit/ccf403ff3f3c91ff8d0233183bed0dad7ff844fc))
+
+
+### Bug Fixes
+
+* better handling for local running apps ([2cfdb5d](https://www.github.com/licenseware/licenseware-sdk/commit/2cfdb5de48c9cfa74a35395abf7e65edfddd93e6))
+* better handling of local apps ([9240571](https://www.github.com/licenseware/licenseware-sdk/commit/9240571dd9f4963cfd83b3b9040befb37b628f30))
+* bug in notifications ([a91a6dd](https://www.github.com/licenseware/licenseware-sdk/commit/a91a6dd0bc2178b37dd115f219c582decbf9d9da))
+* bug in registration ([7ae039f](https://www.github.com/licenseware/licenseware-sdk/commit/7ae039f8d2c2d3bfbd606bdf00887d1c63c0b6b4))
+* change redis db env variable name ([e6ece1d](https://www.github.com/licenseware/licenseware-sdk/commit/e6ece1d4aed95f129ff4b47001db30f0572e40fe))
+* disable raise duplicate key ([e6ce888](https://www.github.com/licenseware/licenseware-sdk/commit/e6ce888374974d900a3d4ef62701b859d742287d))
+* force use password on redis prod ([6f2d8f0](https://www.github.com/licenseware/licenseware-sdk/commit/6f2d8f01b8769c7788d69886406e828ce2b303ba))
+* forgot to add path to editable tables ([17f4742](https://www.github.com/licenseware/licenseware-sdk/commit/17f47426acf004e65e52cb5fa8d45839772e5829))
+* handle app_id in environment instead of lware_identity ([7522290](https://www.github.com/licenseware/licenseware-sdk/commit/75222905a64a832875019ee9b8ee02a0678640ef))
+* invalid value in logging ([ce19365](https://www.github.com/licenseware/licenseware-sdk/commit/ce193656ef2a24d1b853cfff4204a732efb66525))
+* log import fix ([5d68f9e](https://www.github.com/licenseware/licenseware-sdk/commit/5d68f9e58baaaa6b0650dd62823bc3283e26d991))
+* redis db id variable name ([dd5afba](https://www.github.com/licenseware/licenseware-sdk/commit/dd5afba60751d62c91d9a33782f783cda0534c89))
+* send event based on uploader_id instead of unit_type ([9ca65e9](https://www.github.com/licenseware/licenseware-sdk/commit/9ca65e96366dbe4ff2a5e911c047488e1b8afa9d))
+* suppress duplicate key errors logging ([7084335](https://www.github.com/licenseware/licenseware-sdk/commit/7084335512d2be7d243f1557f25e58125bbc9026))
+* updated editable tables to create url for all ([f721ebd](https://www.github.com/licenseware/licenseware-sdk/commit/f721ebd9308d0a5dc6479afcd1820bbeab753f3e))
+* use constants instead of urls ([71b4a54](https://www.github.com/licenseware/licenseware-sdk/commit/71b4a54f837fab1173158dd18efb0311dd8a4055))
+
 ## [0.18.0](https://www.github.com/licenseware/licenseware-sdk/compare/v0.17.4...v0.18.0) (2021-08-04)
 
 
